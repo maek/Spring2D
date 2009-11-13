@@ -51,6 +51,16 @@ namespace Spring2D
         return *this;
       }
 
+      // Update scale
+      Vector& operator*= (const Real& R)
+      {
+        x *= R;
+        y *= R;
+
+        return *this;
+      }
+
+
   };
 
 
@@ -59,14 +69,14 @@ namespace Spring2D
   // Equal
   inline bool operator== (const Vector& V1, const Vector& V2)
   {
-    return (V1.x == V2.x && V1.y == V2.y); 
+    return (V1.x == V2.x && V1.y == V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Not Equal
   inline bool operator!= (const Vector& V1, const Vector& V2)
   {
-    return (V1.x != V2.x || V1.y != V2.y); 
+    return (V1.x != V2.x || V1.y != V2.y);
   }
 
   // ---------------------------------------------------------------------------
@@ -78,12 +88,22 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
+  // Inversion (unary minus)
+  inline Vector operator- (const Vector& V)
+  {
+    return Vector(
+        V.x * -1,
+        V.y * -1);
+  }
+
+
+  // ---------------------------------------------------------------------------
   // Addition
   inline Vector operator+ (const Vector& V1, const Vector& V2)
   {
     return Vector(
         V1.x + V2.x,
-        V1.y + V2.y); 
+        V1.y + V2.y);
   }
 
   // ---------------------------------------------------------------------------
@@ -92,7 +112,29 @@ namespace Spring2D
   {
     return Vector(
         V1.x - V2.x,
-        V1.y - V2.y); 
+        V1.y - V2.y);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Scaling
+  inline Vector operator* (const Vector& V, const Real& R)
+  {
+    return Vector(
+        V.x * R,
+        V.y * R);
+  }
+  inline Vector operator* (const Real& R, const Vector& V)
+  {
+    return Vector(
+        V.x * R,
+        V.y * R);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Dot (scalar) product
+  Real dot (const Vector& V1, const Vector& V2)
+  {
+    return static_cast<Real> (V1.x * V2.x + V1.y * V2.y);
   }
 
 
