@@ -22,6 +22,7 @@ namespace Spring2D
       // Constructor
       explicit Vector (const Real X = 0.0, const Real Y = 0.0) : x(X), y(Y) { }
 
+
       // Assignment
       Vector& operator= (const Vector& V)
       {
@@ -31,7 +32,27 @@ namespace Spring2D
         return *this;
       }
 
+
+      // Update addition
+      Vector& operator+= (const Vector& V)
+      {
+        x += V.x;
+        y += V.y;
+
+        return *this;
+      }
+
+      // Update subtraction
+      Vector& operator-= (const Vector& V)
+      {
+        x -= V.x;
+        y -= V.y;
+
+        return *this;
+      }
+
   };
+
 
 
   // ---------------------------------------------------------------------------
@@ -53,6 +74,25 @@ namespace Spring2D
   inline std::ostream& operator<< (std::ostream& os, const Vector& V)
   {
     return (os << "[" << V.x << ", " << V.y << "]");
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Addition
+  inline Vector operator+ (const Vector& V1, const Vector& V2)
+  {
+    return Vector(
+        V1.x + V2.x,
+        V1.y + V2.y); 
+  }
+
+  // ---------------------------------------------------------------------------
+  // Subtraction
+  inline Vector operator- (const Vector& V1, const Vector& V2)
+  {
+    return Vector(
+        V1.x - V2.x,
+        V1.y - V2.y); 
   }
 
 
