@@ -6,7 +6,6 @@
 
 namespace Spring2D
 {
-
   // ---------------------------------------------------------------------------
   // Class for the 2D vectors
   class Vector
@@ -15,6 +14,16 @@ namespace Spring2D
 
       Real x;
       Real y;
+
+
+    public:
+
+      // Canonical vectors
+      static const Vector ZERO;
+      static const Vector VERSOR_X;
+      static const Vector VERSOR_Y;
+      static const Vector NEG_VERSOR_X;
+      static const Vector NEG_VERSOR_Y;
 
 
     public:
@@ -92,8 +101,8 @@ namespace Spring2D
   inline Vector operator- (const Vector& V)
   {
     return Vector(
-        V.x * -1,
-        V.y * -1);
+        -V.x,
+        -V.y);
   }
 
 
