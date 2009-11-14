@@ -1,7 +1,7 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
-#include "s2Common.h"
+#include "s2Settings.h"
 
 
 namespace Spring2D

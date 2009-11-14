@@ -21,8 +21,8 @@ $(LIB): $(CXXOBJECTS)
 
 
 $(OBJDIR)/s2Vector.o: $(SRCDIR)/s2Vector.cc\
- 											$(INCDIR)/s2Vector.h\
-										 	$(INCDIR)/s2Common.h
+											$(INCDIR)/s2Vector.h\
+											$(INCDIR)/s2Settings.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 
