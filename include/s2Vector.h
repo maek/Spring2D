@@ -1,3 +1,8 @@
+// bool isZero () const
+// Vector normalizedCopy () const
+// Vector perpendicular (const Vector& V)
+
+
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
@@ -69,12 +74,6 @@ namespace Spring2D
         return *this;
       }
 
-      // Dot (scalar) product
-      Real dot (const Vector& V) const
-      {
-        return (x * V.x + y * V.y);
-      }
-
 
       // Magnitude (length)
       Real magnitude () const
@@ -86,6 +85,21 @@ namespace Spring2D
       Real squaredMagnitude () const
       {
         return (x * x + y * y);
+      }
+
+
+      // Normalize
+      Vector& normalize ()
+      {
+        Real m = s2Sqrt(x * x + y * y);
+
+        if (m > 0)
+        {
+          x /= m;
+          y /= m;
+        }
+
+        return *this;
       }
 
 
@@ -156,6 +170,14 @@ namespace Spring2D
     return Vector(
         V.x * R,
         V.y * R);
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Dot (scalar) product
+  inline Real dotProduct (const Vector& V1, const Vector& V2)
+  {
+    return (V1.x * V2.x + V1.y * V2.y);
   }
 
 
