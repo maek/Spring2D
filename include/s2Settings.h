@@ -5,12 +5,15 @@
 #include <iostream>
 #include <cmath>
 
+// Double precision flag
+#define S2_DOUBLE_PRECISION 0
+
 
 // Create the Spring2D namespace & define a shorter synonym for it
 namespace Spring2D
 {
   // Define the real number values & related functions to be used
-#ifdef S2_DOUBLE_PRECISION
+#if S2_DOUBLE_PRECISION
   typedef double Real;
   #define s2Sqrt(x) sqrt(x);
 #else

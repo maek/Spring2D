@@ -69,6 +69,25 @@ namespace Spring2D
         return *this;
       }
 
+      // Dot (scalar) product
+      Real dot (const Vector& V) const
+      {
+        return (x * V.x + y * V.y);
+      }
+
+
+      // Magnitude (length)
+      Real magnitude () const
+      {
+        return s2Sqrt(x * x + y * y);
+      }
+
+      // Squared Magnitude
+      Real squaredMagnitude () const
+      {
+        return (x * x + y * y);
+      }
+
 
   };
 
@@ -137,13 +156,6 @@ namespace Spring2D
     return Vector(
         V.x * R,
         V.y * R);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Dot (scalar) product
-  Real dot (const Vector& V1, const Vector& V2)
-  {
-    return static_cast<Real> (V1.x * V2.x + V1.y * V2.y);
   }
 
 
