@@ -18,7 +18,7 @@ namespace Spring2D
       bool start ();
 
       bool runStep ();
-      
+
       bool turnOff ();
 
 

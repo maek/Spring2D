@@ -42,7 +42,7 @@ namespace Spring2D
 
 
     running_ = false;
-    
+
     return true;
   }
 }
