@@ -25,10 +25,10 @@ namespace Spring2D
 
       // Canonical vectors
       static const Vector ZERO;
-      static const Vector VERSOR_X;
-      static const Vector VERSOR_Y;
-      static const Vector NEG_VERSOR_X;
-      static const Vector NEG_VERSOR_Y;
+      static const Vector X_VERSOR;
+      static const Vector Y_VERSOR;
+      static const Vector X_NEG_VERSOR;
+      static const Vector Y_NEG_VERSOR;
 
 
     public:

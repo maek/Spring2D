@@ -2,6 +2,7 @@
 #define __ENGINE_H__
 
 #include "s2Settings.h"
+#include "s2Environment.h"
 
 
 namespace Spring2D
@@ -12,22 +13,12 @@ namespace Spring2D
   {
     public:
 
-
-    public:
-
-      bool start ();
-
-      bool runStep ();
-
-      bool turnOff ();
+      Environment* createEnvironment ();
 
 
     private:
 
-      bool running_;
-
-
-    private:
+      Environment *environment_;
 
   };
 

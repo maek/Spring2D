@@ -5,7 +5,7 @@ OBJDIR = obj
 LIBDIR = lib
 INCDIR = include
 
-OBJECTS = s2Engine.o s2Body.o s2Vector.o
+OBJECTS = s2Engine.o s2Environment.o s2Body.o s2Vector.o
 
 CXX = g++
 CXXFLAGS = -Wall -fPIC
@@ -21,7 +21,14 @@ $(LIB): $(CXXOBJECTS)
 
 $(OBJDIR)/s2Engine.o: $(SRCDIR)/s2Engine.cc\
 											$(INCDIR)/s2Engine.h\
+											$(INCDIR)/s2Environment.h\
 											$(INCDIR)/s2Settings.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2Environment.o: $(SRCDIR)/s2Environment.cc\
+													 $(INCDIR)/s2Environment.h\
+													 $(INCDIR)/s2Body.h\
+													 $(INCDIR)/s2Settings.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJDIR)/s2Body.o: $(SRCDIR)/s2Body.cc\

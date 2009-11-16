@@ -3,6 +3,7 @@
 
 // Include all the external headers
 #include <iostream>
+#include <list>
 #include <cmath>
 
 // Double precision flag
@@ -20,6 +21,8 @@ namespace Spring2D
   typedef float Real;
   #define s2Sqrt(x) sqrtf(x);
 #endif
+
+
 }
 
 namespace s2 = Spring2D;

@@ -13,6 +13,9 @@ namespace Spring2D
   {
     public:
 
+      // TODO: constructor with position
+
+
       // Set the body position
       void setPosition (const Vector& POSITION)
       {
@@ -35,6 +38,7 @@ namespace Spring2D
     private:
 
       Vector position_;
+
   };
 
 
