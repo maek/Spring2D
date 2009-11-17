@@ -45,4 +45,4 @@ $(OBJDIR)/s2Vector.o: $(SRCDIR)/s2Vector.cc\
 
 .PHONY: clean
 clean:
-	$(RM) $(CXXOBJECTS) $(LIBDIR)/lib$(LIB).so
+	@$(RM) -v $(CXXOBJECTS) $(LIBDIR)/lib$(LIB).so
