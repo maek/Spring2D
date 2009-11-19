@@ -14,7 +14,9 @@ namespace Spring2D
     public:
 
       Vector position;
+
       Vector velocity;
+
       Vector acceleration;
 
 
@@ -22,7 +24,7 @@ namespace Spring2D
 
       // Constructor
       Body (const Vector& POSITION = Vector::ZERO,
-          const Vector& VELOCITY = Vector::ZERO)
+            const Vector& VELOCITY = Vector::ZERO)
         : position(POSITION), velocity(VELOCITY), acceleration(Vector::ZERO)
       { }
 

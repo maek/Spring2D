@@ -13,14 +13,16 @@ namespace Spring2D
   {
     public:
 
+      // Virtual Destructor
       virtual ~Integrator() { }
 
 
-      virtual void compute (Environment*) = 0;
+      virtual void compute (Environment*) const = 0;
 
 
     protected:
 
+      // Constructor
       Integrator (const Real& TIME_STEP) : timeStep_(TIME_STEP) { }
 
 

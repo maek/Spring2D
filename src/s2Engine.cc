@@ -5,7 +5,7 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // Get the environment
-  Environment* Engine::getEnvironment ()
+  Environment* Engine::getEnvironment () const
   {
     return environment_;
   }
@@ -14,7 +14,7 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Run a complete physics step
-  void Engine::runStep()
+  void Engine::runStep() const
   {
     integrator_->compute(environment_);
   }

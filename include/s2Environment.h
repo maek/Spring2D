@@ -3,6 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Body.h"
+#include "s2Vector.h"
 
 
 namespace Spring2D
@@ -17,11 +18,12 @@ namespace Spring2D
 
 
       Body* createBody (const Vector& POSITION = Vector::ZERO,
-          const Vector& VELOCITY = Vector::ZERO);
+                        const Vector& VELOCITY = Vector::ZERO);
 
       void destroyBody (Body*);
 
 
+      // Return the body list
       BodyList* getBodyList()
       {
         return &bodyList_;

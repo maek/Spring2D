@@ -2,8 +2,9 @@
 #define __ENGINE_H__
 
 #include "s2Settings.h"
-#include "s2Integrator.h"
 #include "s2EulerIntegrator.h"
+#include "s2Integrator.h"
+#include "s2Environment.h"
 
 
 namespace Spring2D
@@ -14,12 +15,14 @@ namespace Spring2D
   {
     public:
 
+      // Constructor
       Engine (const Real& TIME_STEP)
       {
         environment_  = new Environment();
         integrator_   = new EulerIntegrator(TIME_STEP);
       }
 
+      // Destructor
       ~Engine ()
       {
         delete integrator_;
@@ -27,14 +30,15 @@ namespace Spring2D
       }
 
 
-      Environment* getEnvironment ();
+      Environment* getEnvironment () const;
 
-      void runStep ();
+      void runStep () const;
 
 
     private:
 
       Environment *environment_;
+
       Integrator  *integrator_;
 
   };
