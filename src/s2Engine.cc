@@ -4,12 +4,18 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Create a new environment
-  Environment* Engine::createEnvironment ()
+  // Get the environment
+  Environment* Engine::getEnvironment ()
   {
-    environment_ = new Environment();
     return environment_;
   }
 
 
+
+  // ---------------------------------------------------------------------------
+  // Run a complete physics step
+  void Engine::runStep()
+  {
+    integrator_->compute(environment_);
+  }
 }

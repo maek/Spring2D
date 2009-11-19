@@ -3,6 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Integrator.h"
+#include "s2Environment.h"
 
 
 namespace Spring2D
@@ -13,7 +14,11 @@ namespace Spring2D
   {
     public:
 
+      EulerIntegrator (const Real& TIME_STEP) : Integrator(TIME_STEP) { }
+
+
       void compute (Environment*);
+
   };
 
 

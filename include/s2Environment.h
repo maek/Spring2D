@@ -22,6 +22,12 @@ namespace Spring2D
       void destroyBody (Body*);
 
 
+      BodyList* getBodyList()
+      {
+        return &bodyList_;
+      }
+
+
     private:
 
       BodyList bodyList_;

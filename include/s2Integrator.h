@@ -13,7 +13,21 @@ namespace Spring2D
   {
     public:
 
+      virtual ~Integrator() { }
+
+
       virtual void compute (Environment*) = 0;
+
+
+    protected:
+
+      Integrator (const Real& TIME_STEP) : timeStep_(TIME_STEP) { }
+
+
+    protected:
+
+      Real timeStep_;
+
   };
 
 
