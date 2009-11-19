@@ -6,6 +6,8 @@
 #include "s2Body.h"
 #include "s2Engine.h"
 #include "s2Environment.h"
+#include "s2EulerIntegrator.h"
+#include "s2Integrator.h"
 #include "s2Vector.h"
 
 
