@@ -16,7 +16,8 @@ namespace Spring2D
       typedef std::list<Body*> BodyList;
 
 
-      Body* createBody (const Vector& POS = Vector::ZERO);
+      Body* createBody (const Vector& POSITION = Vector::ZERO,
+          const Vector& VELOCITY = Vector::ZERO);
 
       void destroyBody (Body*);
 
