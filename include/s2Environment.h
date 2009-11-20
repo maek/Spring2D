@@ -24,9 +24,9 @@ namespace Spring2D
 
 
       // Return the body list
-      BodyList* getBodyList()
+      const BodyList& getBodyList() const
       {
-        return &bodyList_;
+        return bodyList_;
       }
 
 

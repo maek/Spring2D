@@ -7,10 +7,10 @@ namespace Spring2D
   // Compute the new position of each body & update velocity and acceleration
   void EulerIntegrator::compute (Environment *environment) const
   {
-    Environment::BodyList *bodyList = environment->getBodyList();
-    Environment::BodyList::iterator body;
+    const Environment::BodyList bodyList = environment->getBodyList();
+    Environment::BodyList::const_iterator body;
 
-    for (body = bodyList->begin(); body != bodyList->end(); ++body)
+    for (body = bodyList.begin(); body != bodyList.end(); ++body)
     {
       // Update the position
       (*body)->position += (*body)->velocity * timeStep_;
