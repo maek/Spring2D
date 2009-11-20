@@ -2,6 +2,8 @@
 #define __BODY_H__
 
 #include "s2Settings.h"
+#include "s2CircleShape.h"
+#include "s2Shape.h"
 #include "s2Vector.h"
 
 
@@ -20,13 +22,31 @@ namespace Spring2D
       Vector acceleration;
 
 
+      Shape *shape;
+
+
     public:
 
       // Constructor
       Body (const Vector& POSITION = Vector::ZERO,
-            const Vector& VELOCITY = Vector::ZERO)
-        : position(POSITION), velocity(VELOCITY), acceleration(Vector::ZERO)
+            const Vector& VELOCITY = Vector::ZERO,
+            Shape* bodyShape = 0)
+        : position(POSITION), velocity(VELOCITY), acceleration(Vector::ZERO),
+          shape(bodyShape)
       { }
+
+      // Destructor
+      ~Body ()
+      {
+        delete shape;
+      }
+
+
+      // Set the shape as CIRCLE
+      void setCircleShape (const Real& RADIUS)
+      {
+        shape = new CircleShape(RADIUS);
+      }
 
   };
 
