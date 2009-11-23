@@ -23,6 +23,10 @@ namespace Spring2D
 #endif
 
 
+  // Physics constants
+  const Real G = 9.80665;
+
+
 }
 
 namespace s2 = Spring2D;

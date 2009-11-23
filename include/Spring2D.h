@@ -7,6 +7,8 @@
 #include "s2Engine.h"
 #include "s2Environment.h"
 #include "s2EulerIntegrator.h"
+#include "s2Force.h"
+#include "s2GravitationalForce.h"
 #include "s2Integrator.h"
 #include "s2Vector.h"
 

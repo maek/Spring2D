@@ -75,7 +75,7 @@ namespace Spring2D
       }
 
       // Get the body mass
-      Real getMass ()
+      Real getMass () const
       {
         return mass_;
       }
@@ -88,7 +88,7 @@ namespace Spring2D
       }
 
       // Is the body static ?
-      bool isDynamic ()
+      bool isDynamic () const
       {
         return !static_;
       }
@@ -101,9 +101,22 @@ namespace Spring2D
       }
 
       // Is the body dynamic ?
-      bool isStatic ()
+      bool isStatic () const
       {
         return static_;
+      }
+
+
+      // Add a force to the net force
+      void applyForce (const Vector& FORCE)
+      {
+        netForce_ += FORCE;
+      }
+
+      // Clear the net force
+      void clearNetForce ()
+      {
+        netForce_ = Vector::ZERO;
       }
 
 
@@ -124,6 +137,8 @@ namespace Spring2D
       Real mass_;
 
       bool static_;
+
+      Vector netForce_;
   };
 
 
