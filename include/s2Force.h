@@ -2,8 +2,6 @@
 #define __FORCE_H__
 
 #include "s2Settings.h"
-#include "s2Body.h"
-#include "s2Vector.h"
 
 
 namespace Spring2D
@@ -14,19 +12,7 @@ namespace Spring2D
   {
     public:
 
-      void apply () = 0;
-
-
-      // Return the involved body
-      const Body& getBody () const
-      {
-        return *body_;
-      }
-
-
-    protected:
-
-      Body* body_;
+      virtual void apply () = 0;
 
   };
 

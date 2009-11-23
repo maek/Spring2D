@@ -15,7 +15,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      GravitationalForce (const Body* BODY,
+      GravitationalForce (Body* BODY,
                           const Vector& GRAVITY_ACCELERATION = Vector(0, G))
         : body_(BODY), gravityAcceleration_(GRAVITY_ACCELERATION)
       { }
@@ -30,12 +30,13 @@ namespace Spring2D
         }
 
         // TODO: it is faster to change directly the acceleration
-        body_->addForce(gravityAcceleration_ * body_->getMass());
+        body_->applyForce(gravityAcceleration_ * body_->getMass());
       }
 
 
     private:
 
+      Body* body_;
       Vector gravityAcceleration_;
 
   };

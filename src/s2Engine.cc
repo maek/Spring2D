@@ -4,18 +4,13 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Get the environment
-  Environment* Engine::getEnvironment () const
-  {
-    return environment_;
-  }
-
-
-
-  // ---------------------------------------------------------------------------
   // Run a complete physics step
   void Engine::runStep() const
   {
+    // Compute the net forces
+    forceRegister_->computeForces();
+
+    // Compute the new positions, velocities and accelerations
     integrator_->compute(environment_);
   }
 }

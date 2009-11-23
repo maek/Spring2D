@@ -12,11 +12,18 @@ namespace Spring2D
 
     for (body = bodyList.begin(); body != bodyList.end(); ++body)
     {
+      // Update the acceleration
+      (*body)->acceleration_ = (*body)->netForce_ * (1.0 / (*body)->mass_);
+
       // Update the position
       (*body)->position_ += (*body)->velocity_ * timeStep_;
 
       // Update the velocity
       (*body)->velocity_ += (*body)->acceleration_ * timeStep_;
+
+
+      // Clear the net force
+      (*body)->clearNetForce();
     }
 
   }

@@ -5,6 +5,7 @@
 #include "s2EulerIntegrator.h"
 #include "s2Integrator.h"
 #include "s2Environment.h"
+#include "s2ForceRegister.h"
 
 
 namespace Spring2D
@@ -18,19 +19,30 @@ namespace Spring2D
       // Constructor
       Engine (const Real& TIME_STEP)
       {
-        environment_  = new Environment();
-        integrator_   = new EulerIntegrator(TIME_STEP);
+        environment_    = new Environment();
+        integrator_     = new EulerIntegrator(TIME_STEP);
+        forceRegister_  = new ForceRegister();
       }
 
       // Destructor
       ~Engine ()
       {
+        delete forceRegister_;
         delete integrator_;
         delete environment_;
       }
 
 
-      Environment* getEnvironment () const;
+      Environment* getEnvironment () const
+      {
+        return environment_;
+      }
+
+      ForceRegister* getForceRegister () const
+      {
+        return forceRegister_;
+      }
+
 
       void runStep () const;
 
@@ -41,6 +53,7 @@ namespace Spring2D
 
       Integrator  *integrator_;
 
+      ForceRegister *forceRegister_;
   };
 
 

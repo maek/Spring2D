@@ -4,6 +4,7 @@
 // Include all the external headers
 #include <iostream>
 #include <list>
+#include <algorithm>
 #include <cmath>
 
 // Double precision flag
