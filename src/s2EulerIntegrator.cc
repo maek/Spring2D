@@ -13,10 +13,10 @@ namespace Spring2D
     for (body = bodyList.begin(); body != bodyList.end(); ++body)
     {
       // Update the position
-      (*body)->position += (*body)->velocity * timeStep_;
+      (*body)->position_ += (*body)->velocity_ * timeStep_;
 
       // Update the velocity
-      (*body)->velocity += (*body)->acceleration * timeStep_;
+      (*body)->velocity_ += (*body)->acceleration_ * timeStep_;
     }
 
   }
