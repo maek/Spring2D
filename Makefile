@@ -5,7 +5,11 @@ OBJDIR = obj
 LIBDIR = lib
 INCDIR = include
 
-OBJECTS = s2Engine.o s2EulerIntegrator.o s2Environment.o s2Vector.o
+OBJECTS = s2Engine.o\
+				 	s2EulerIntegrator.o\
+				 	s2VerletIntegrator.o\
+				 	s2Environment.o\
+				 	s2Vector.o
 
 CXX = g++
 CXXFLAGS = -Wall -fPIC
@@ -30,6 +34,15 @@ $(OBJDIR)/s2Engine.o:							$(SRCDIR)/s2Engine.cc\
 
 $(OBJDIR)/s2EulerIntegrator.o:		$(SRCDIR)/s2EulerIntegrator.cc\
 																	$(INCDIR)/s2EulerIntegrator.h\
+																	$(INCDIR)/s2Settings.h\
+																	$(INCDIR)/s2Integrator.h\
+																	$(INCDIR)/s2Environment.h\
+																	$(INCDIR)/s2Body.h\
+																	$(INCDIR)/s2Vector.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2VerletIntegrator.o:		$(SRCDIR)/s2VerletIntegrator.cc\
+																	$(INCDIR)/s2VerletIntegrator.h\
 																	$(INCDIR)/s2Settings.h\
 																	$(INCDIR)/s2Integrator.h\
 																	$(INCDIR)/s2Environment.h\

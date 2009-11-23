@@ -12,6 +12,7 @@
 #include "s2GravitationalForce.h"
 #include "s2Integrator.h"
 #include "s2Vector.h"
+#include "s2VerletIntegrator.h"
 
 
 #endif // __SPRING2D_H__

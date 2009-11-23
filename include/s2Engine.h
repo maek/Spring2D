@@ -3,6 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2EulerIntegrator.h"
+#include "s2VerletIntegrator.h"
 #include "s2Integrator.h"
 #include "s2Environment.h"
 #include "s2ForceRegister.h"
@@ -17,10 +18,10 @@ namespace Spring2D
     public:
 
       // Constructor
-      Engine (const Real& TIME_STEP)
+      Engine (const Real& TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
       {
         environment_    = new Environment();
-        integrator_     = new EulerIntegrator(TIME_STEP);
+        integrator_     = new VerletIntegrator(TIME_STEP);
         forceRegister_  = new ForceRegister();
       }
 
@@ -33,21 +34,34 @@ namespace Spring2D
       }
 
 
+      // Get a pointer to the environment
       Environment* getEnvironment () const
       {
         return environment_;
       }
 
+      // Get a pointer to the force register
       ForceRegister* getForceRegister () const
       {
         return forceRegister_;
       }
 
 
-      void runStep () const;
+      // Return the current physical time
+      Real getCurrentTime ()
+      {
+        return stepCounter_ * timeStep_;
+      }
+
+
+      void runStep ();
 
 
     private:
+
+      Real timeStep_;
+
+      int stepCounter_;
 
       Environment *environment_;
 

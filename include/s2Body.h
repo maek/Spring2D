@@ -124,6 +124,7 @@ namespace Spring2D
 
       // TODO: find another way
       friend class EulerIntegrator;
+      friend class VerletIntegrator;
 
 
     private:
