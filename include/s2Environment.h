@@ -17,22 +17,25 @@ namespace Spring2D
       typedef std::list<Body*> BodyList;
 
 
+    public:
+
+      // Constructor
+      Environment (const Real& TIME_STEP) : timeStep_(TIME_STEP) {}
+
+
       Body* createBody (const Vector& POSITION = Vector::ZERO,
                         const Vector& VELOCITY = Vector::ZERO);
 
       void destroyBody (Body*);
 
 
-      // Return the body list
-      const BodyList& getBodyList() const
-      {
-        return bodyList_;
-      }
+      void integrateAllBody ();
 
 
     private:
 
       BodyList bodyList_;
+      Real timeStep_;
 
   };
 

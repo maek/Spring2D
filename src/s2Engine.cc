@@ -10,8 +10,8 @@ namespace Spring2D
     // Compute the net forces
     forceRegister_->computeForces();
 
-    // Compute the new positions, velocities and accelerations
-    integrator_->compute(environment_);
+    // Update positions, velocities and accelerations
+    environment_->integrateAllBody();
 
 
     // Increment the step counter

@@ -6,8 +6,7 @@ LIBDIR = lib
 INCDIR = include
 
 OBJECTS = s2Engine.o\
-				 	s2EulerIntegrator.o\
-				 	s2VerletIntegrator.o\
+					s2Body.o\
 				 	s2Environment.o\
 				 	s2Vector.o
 
@@ -27,26 +26,12 @@ $(LIB): $(CXXOBJECTS)
 $(OBJDIR)/s2Engine.o:							$(SRCDIR)/s2Engine.cc\
 																	$(INCDIR)/s2Engine.h\
 																	$(INCDIR)/s2Settings.h\
-																	$(INCDIR)/s2EulerIntegrator.h\
-																	$(INCDIR)/s2Integrator.h\
 																	$(INCDIR)/s2Environment.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJDIR)/s2EulerIntegrator.o:		$(SRCDIR)/s2EulerIntegrator.cc\
-																	$(INCDIR)/s2EulerIntegrator.h\
-																	$(INCDIR)/s2Settings.h\
-																	$(INCDIR)/s2Integrator.h\
-																	$(INCDIR)/s2Environment.h\
+$(OBJDIR)/s2Body.o:								$(SRCDIR)/s2Body.cc\
 																	$(INCDIR)/s2Body.h\
-																	$(INCDIR)/s2Vector.h
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OBJDIR)/s2VerletIntegrator.o:		$(SRCDIR)/s2VerletIntegrator.cc\
-																	$(INCDIR)/s2VerletIntegrator.h\
 																	$(INCDIR)/s2Settings.h\
-																	$(INCDIR)/s2Integrator.h\
-																	$(INCDIR)/s2Environment.h\
-																	$(INCDIR)/s2Body.h\
 																	$(INCDIR)/s2Vector.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 

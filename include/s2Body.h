@@ -113,33 +113,25 @@ namespace Spring2D
         netForce_ += FORCE;
       }
 
-      // Clear the net force
-      void clearNetForce ()
-      {
-        netForce_ = Vector::ZERO;
-      }
+
+      void integrate (const Real&);
 
 
     private:
 
-      // TODO: find another way
-      friend class EulerIntegrator;
-      friend class VerletIntegrator;
+      Vector  position_;
 
+      Vector  velocity_;
 
-    private:
+      Vector  acceleration_;
 
-      Vector position_;
+      Real    mass_;
 
-      Vector velocity_;
-
-      Vector acceleration_;
-
-      Real mass_;
 
       bool static_;
 
       Vector netForce_;
+
   };
 
 

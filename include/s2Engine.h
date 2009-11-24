@@ -2,9 +2,6 @@
 #define __ENGINE_H__
 
 #include "s2Settings.h"
-#include "s2EulerIntegrator.h"
-#include "s2VerletIntegrator.h"
-#include "s2Integrator.h"
 #include "s2Environment.h"
 #include "s2ForceRegister.h"
 
@@ -20,8 +17,7 @@ namespace Spring2D
       // Constructor
       Engine (const Real& TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
       {
-        environment_    = new Environment();
-        integrator_     = new VerletIntegrator(TIME_STEP);
+        environment_    = new Environment(TIME_STEP);
         forceRegister_  = new ForceRegister();
       }
 
@@ -29,7 +25,6 @@ namespace Spring2D
       ~Engine ()
       {
         delete forceRegister_;
-        delete integrator_;
         delete environment_;
       }
 
@@ -64,8 +59,6 @@ namespace Spring2D
       int stepCounter_;
 
       Environment *environment_;
-
-      Integrator  *integrator_;
 
       ForceRegister *forceRegister_;
   };
