@@ -8,6 +8,9 @@ namespace Spring2D
   // (VELOCIY VERLET)
   void Body::integrate (const Real& TIME_STEP)
   {
+    if (static_)
+      return;
+
     // (1) Update the position
     position_ += (velocity_ * TIME_STEP) +
       (0.5 * acceleration_ * TIME_STEP * TIME_STEP);
