@@ -9,7 +9,7 @@
 #include "s2Force.h"
 #include "s2ForceRegister.h"
 #include "s2GravitationalForce.h"
-#include "s2Vector.h"
+#include "s2Vector2.h"
 
 
 #endif // __SPRING2D_H__

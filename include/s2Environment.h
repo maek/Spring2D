@@ -3,7 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Body.h"
-#include "s2Vector.h"
+#include "s2Vector2.h"
 
 
 namespace Spring2D
@@ -23,8 +23,8 @@ namespace Spring2D
       Environment (const Real& TIME_STEP) : timeStep_(TIME_STEP) {}
 
 
-      Body* createBody (const Vector& POSITION = Vector::ZERO,
-                        const Vector& VELOCITY = Vector::ZERO);
+      Body* createBody (const Vector2& POSITION = Vector2::ZERO,
+                        const Vector2& VELOCITY = Vector2::ZERO);
 
       void destroyBody (Body*);
 

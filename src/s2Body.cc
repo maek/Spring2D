@@ -22,7 +22,7 @@ namespace Spring2D
 
 
     // Clear the net force
-    netForce_ = Vector::ZERO;
+    netForce_ = Vector2::ZERO;
 
   }
 

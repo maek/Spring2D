@@ -1,10 +1,10 @@
 // bool isZero () const
-// Vector normalizedCopy () const
-// Vector perpendicular (const Vector& V)
+// Vector2 normalizedCopy () const
+// Vector2 perpendicular (const Vector2& V)
 
 
-#ifndef __VECTOR_H__
-#define __VECTOR_H__
+#ifndef __VECTOR2_H__
+#define __VECTOR2_H__
 
 #include "s2Settings.h"
 
@@ -13,7 +13,7 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // Class for the 2D vectors
-  class Vector
+  class Vector2
   {
     public:
 
@@ -24,21 +24,21 @@ namespace Spring2D
     public:
 
       // Canonical vectors
-      static const Vector ZERO;
-      static const Vector X_VERSOR;
-      static const Vector Y_VERSOR;
-      static const Vector X_NEG_VERSOR;
-      static const Vector Y_NEG_VERSOR;
+      static const Vector2 ZERO;
+      static const Vector2 X_VERSOR;
+      static const Vector2 Y_VERSOR;
+      static const Vector2 X_NEG_VERSOR;
+      static const Vector2 Y_NEG_VERSOR;
 
 
     public:
 
       // Constructor
-      explicit Vector (const Real X = 0.0, const Real Y = 0.0) : x(X), y(Y) { }
+      explicit Vector2 (const Real& X = 0, const Real& Y = 0) : x(X), y(Y) { }
 
 
       // Assignment
-      Vector& operator= (const Vector& V)
+      Vector2& operator= (const Vector2& V)
       {
         x = V.x;
         y = V.y;
@@ -48,7 +48,7 @@ namespace Spring2D
 
 
       // Update addition
-      Vector& operator+= (const Vector& V)
+      Vector2& operator+= (const Vector2& V)
       {
         x += V.x;
         y += V.y;
@@ -57,7 +57,7 @@ namespace Spring2D
       }
 
       // Update subtraction
-      Vector& operator-= (const Vector& V)
+      Vector2& operator-= (const Vector2& V)
       {
         x -= V.x;
         y -= V.y;
@@ -66,7 +66,7 @@ namespace Spring2D
       }
 
       // Update scale
-      Vector& operator*= (const Real& R)
+      Vector2& operator*= (const Real& R)
       {
         x *= R;
         y *= R;
@@ -89,7 +89,7 @@ namespace Spring2D
 
 
       // Normalize
-      Vector& normalize ()
+      Vector2& normalize ()
       {
         Real m = s2Sqrt(x * x + y * y);
 
@@ -109,21 +109,21 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Equal
-  inline bool operator== (const Vector& V1, const Vector& V2)
+  inline bool operator== (const Vector2& V1, const Vector2& V2)
   {
     return (V1.x == V2.x && V1.y == V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Not Equal
-  inline bool operator!= (const Vector& V1, const Vector& V2)
+  inline bool operator!= (const Vector2& V1, const Vector2& V2)
   {
     return (V1.x != V2.x || V1.y != V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Print
-  inline std::ostream& operator<< (std::ostream& os, const Vector& V)
+  inline std::ostream& operator<< (std::ostream& os, const Vector2& V)
   {
     return (os << "[" << V.x << ", " << V.y << "]");
   }
@@ -131,9 +131,9 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Inversion (unary minus)
-  inline Vector operator- (const Vector& V)
+  inline Vector2 operator- (const Vector2& V)
   {
-    return Vector(
+    return Vector2(
         -V.x,
         -V.y);
   }
@@ -141,33 +141,33 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Addition
-  inline Vector operator+ (const Vector& V1, const Vector& V2)
+  inline Vector2 operator+ (const Vector2& V1, const Vector2& V2)
   {
-    return Vector(
+    return Vector2(
         V1.x + V2.x,
         V1.y + V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Subtraction
-  inline Vector operator- (const Vector& V1, const Vector& V2)
+  inline Vector2 operator- (const Vector2& V1, const Vector2& V2)
   {
-    return Vector(
+    return Vector2(
         V1.x - V2.x,
         V1.y - V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Scaling
-  inline Vector operator* (const Vector& V, const Real& R)
+  inline Vector2 operator* (const Vector2& V, const Real& R)
   {
-    return Vector(
+    return Vector2(
         V.x * R,
         V.y * R);
   }
-  inline Vector operator* (const Real& R, const Vector& V)
+  inline Vector2 operator* (const Real& R, const Vector2& V)
   {
-    return Vector(
+    return Vector2(
         V.x * R,
         V.y * R);
   }
@@ -175,7 +175,7 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Dot (scalar) product
-  inline Real dotProduct (const Vector& V1, const Vector& V2)
+  inline Real dotProduct (const Vector2& V1, const Vector2& V2)
   {
     return (V1.x * V2.x + V1.y * V2.y);
   }
@@ -184,4 +184,4 @@ namespace Spring2D
 }
 
 
-#endif // __VECTOR_H__
+#endif // __VECTOR2_H__

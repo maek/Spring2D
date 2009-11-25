@@ -3,7 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Body.h"
-#include "s2Vector.h"
+#include "s2Vector2.h"
 
 
 namespace Spring2D
@@ -16,7 +16,7 @@ namespace Spring2D
 
       // Constructor
       GravitationalForce (Body* BODY,
-                          const Vector& GRAVITY_ACCELERATION = Vector(0, G))
+                          const Vector2& GRAVITY_ACCELERATION = Vector2(0, G))
         : body_(BODY), gravityAcceleration_(GRAVITY_ACCELERATION)
       { }
 
@@ -37,7 +37,7 @@ namespace Spring2D
     private:
 
       Body* body_;
-      Vector gravityAcceleration_;
+      Vector2 gravityAcceleration_;
 
   };
 

@@ -2,7 +2,7 @@
 #define __BODY_H__
 
 #include "s2Settings.h"
-#include "s2Vector.h"
+#include "s2Vector2.h"
 
 
 namespace Spring2D
@@ -14,16 +14,16 @@ namespace Spring2D
     public:
 
       // Constructor
-      Body (const Vector& POSITION = Vector::ZERO,
-            const Vector& VELOCITY = Vector::ZERO, const Real& MASS = 1.0,
+      Body (const Vector2& POSITION = Vector2::ZERO,
+            const Vector2& VELOCITY = Vector2::ZERO, const Real& MASS = 1.0,
             const bool STATIC = false)
-        : position_(POSITION), velocity_(VELOCITY), acceleration_(Vector::ZERO),
+        : position_(POSITION), velocity_(VELOCITY), acceleration_(Vector2::ZERO),
           mass_(MASS), static_(STATIC)
       { }
 
 
       // Set the body position
-      void setPosition (const Vector& POSITION)
+      void setPosition (const Vector2& POSITION)
       {
         position_ = POSITION;
       }
@@ -34,13 +34,13 @@ namespace Spring2D
       }
 
       // Get the body position
-      Vector getPosition () const
+      Vector2 getPosition () const
       {
         return position_;
       }
 
       // Set the body velocity
-      void setVelocity (const Vector& VELOCITY)
+      void setVelocity (const Vector2& VELOCITY)
       {
         velocity_ = VELOCITY;
       }
@@ -51,13 +51,13 @@ namespace Spring2D
       }
 
       // Get the body velocity
-      Vector getVelocity () const
+      Vector2 getVelocity () const
       {
         return velocity_;
       }
 
       // Get the body acceleration
-      Vector getAcceleration () const
+      Vector2 getAcceleration () const
       {
         return acceleration_;
       }
@@ -108,7 +108,7 @@ namespace Spring2D
 
 
       // Add a force to the net force
-      void applyForce (const Vector& FORCE)
+      void applyForce (const Vector2& FORCE)
       {
         netForce_ += FORCE;
       }
@@ -119,18 +119,18 @@ namespace Spring2D
 
     private:
 
-      Vector  position_;
+      Vector2  position_;
 
-      Vector  velocity_;
+      Vector2  velocity_;
 
-      Vector  acceleration_;
+      Vector2  acceleration_;
 
       Real    mass_;
 
 
       bool static_;
 
-      Vector netForce_;
+      Vector2 netForce_;
 
   };
 
