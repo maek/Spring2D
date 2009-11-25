@@ -32,6 +32,7 @@ $(OBJDIR)/s2Engine.o:							$(SRCDIR)/s2Engine.cc\
 $(OBJDIR)/s2Body.o:								$(SRCDIR)/s2Body.cc\
 																	$(INCDIR)/s2Body.h\
 																	$(INCDIR)/s2Settings.h\
+																	$(INCDIR)/s2Complex.h\
 																	$(INCDIR)/s2Vector2.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
