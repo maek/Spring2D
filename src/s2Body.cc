@@ -4,7 +4,7 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Compute the new position & update velocity and acceleration
+  // Compute the new position & update velocity
   // (EULER)
   void Body::integrate (const Real& TIME_STEP)
   {
@@ -14,11 +14,8 @@ namespace Spring2D
     // (1) Update the position
     position_ += (velocity_ * TIME_STEP);
 
-    // (2) Update the acceleration
-    acceleration_ = netForce_ * (1.0 / mass_);
-
-    // (3) Update the velocity
-    velocity_ += acceleration_ * TIME_STEP;
+    // (2) Update the velocity
+    velocity_ += netForce_ * (1.0 / mass_) * TIME_STEP;
 
 
     // Clear the net force

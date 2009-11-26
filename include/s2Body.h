@@ -2,6 +2,7 @@
 #define __BODY_H__
 
 #include "s2Settings.h"
+#include "s2Complex.h"
 #include "s2Vector2.h"
 
 
@@ -15,9 +16,13 @@ namespace Spring2D
 
       // Constructor
       Body (const Vector2& POSITION = Vector2::ZERO,
-            const Vector2& VELOCITY = Vector2::ZERO, const Real& MASS = 1.0,
+            const Vector2& VELOCITY = Vector2::ZERO,
+            const Complex& ORIENTATION = Complex(0, 0),
+            const Vector2& ROTATION = Vector2::ZERO,
+            const Real MASS = 1.0,
             const bool STATIC = false)
-        : position_(POSITION), velocity_(VELOCITY), acceleration_(Vector2::ZERO),
+        : position_(POSITION), velocity_(VELOCITY),
+          orientation_(ORIENTATION), rotation_(ROTATION),
           mass_(MASS), static_(STATIC)
       { }
 
@@ -56,10 +61,39 @@ namespace Spring2D
         return velocity_;
       }
 
-      // Get the body acceleration
-      Vector2 getAcceleration () const
+
+      // Set the body orientation
+      void setOrientation (const Complex& ORIENTATION)
       {
-        return acceleration_;
+        orientation_ = ORIENTATION;
+      }
+      void setOrientation (const Real ANGLE)
+      {
+        orientation_.r = s2cos(ANGLE);
+        orientation_.i = s2sin(ANGLE);
+      }
+
+      // Get the body orientation (in radians)
+      Real getOrientation () const
+      {
+        return s2atan2(orientation_.i, orientation_.r);
+      }
+
+      // Set the body rotation
+      void setRotation (const Vector2& ROTATION)
+      {
+        rotation_ = ROTATION;
+      }
+      void setRotation (const Real X, const Real Y)
+      {
+        rotation_.x = X;
+        rotation_.y = Y;
+      }
+
+      // Get the body rotation
+      Vector2 getRotation () const
+      {
+        return rotation_;
       }
 
 
@@ -119,18 +153,21 @@ namespace Spring2D
 
     private:
 
-      Vector2  position_;
+      Vector2   position_;
 
-      Vector2  velocity_;
+      Vector2   velocity_;
 
-      Vector2  acceleration_;
+      Complex   orientation_;
 
-      Real    mass_;
+      Vector2   rotation_;
+
+
+      Real      mass_;
 
 
       bool static_;
 
-      Vector2 netForce_;
+      Vector2   netForce_;
 
   };
 

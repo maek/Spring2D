@@ -23,7 +23,7 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // Update positions, velocities and acceleration for each dynamic body
+  // Update positions & velocities for each dynamic body
   void Environment::integrateAllBody ()
   {
     for (BodyList::iterator body = bodyList_.begin();
