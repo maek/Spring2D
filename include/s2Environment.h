@@ -20,7 +20,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      Environment (const Real& TIME_STEP) : timeStep_(TIME_STEP) {}
+      Environment (const Real TIME_STEP) : timeStep_(TIME_STEP) {}
 
 
       Body* createBody (const Vector2& POSITION = Vector2::ZERO,

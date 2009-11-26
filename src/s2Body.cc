@@ -6,7 +6,7 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Compute the new position & update velocity
   // (EULER)
-  void Body::integrate (const Real& TIME_STEP)
+  void Body::integrate (const Real TIME_STEP)
   {
     if (static_)
       return;

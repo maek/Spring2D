@@ -34,7 +34,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      explicit Vector2 (const Real& X = 0, const Real& Y = 0) : x(X), y(Y) { }
+      explicit Vector2 (const Real X = 0, const Real Y = 0) : x(X), y(Y) { }
 
 
       // Assignment
@@ -66,7 +66,7 @@ namespace Spring2D
       }
 
       // Update scale
-      Vector2& operator*= (const Real& R)
+      Vector2& operator*= (const Real R)
       {
         x *= R;
         y *= R;
@@ -78,7 +78,7 @@ namespace Spring2D
       // Magnitude (length)
       Real magnitude () const
       {
-        return s2Sqrt(x * x + y * y);
+        return s2hypot(x, y);
       }
 
       // Squared Magnitude
@@ -91,7 +91,7 @@ namespace Spring2D
       // Normalize
       Vector2& normalize ()
       {
-        Real m = s2Sqrt(x * x + y * y);
+        Real m = s2hypot(x, y);
 
         if (m > 0)
         {
@@ -159,13 +159,13 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Scaling
-  inline Vector2 operator* (const Vector2& V, const Real& R)
+  inline Vector2 operator* (const Vector2& V, const Real R)
   {
     return Vector2(
         V.x * R,
         V.y * R);
   }
-  inline Vector2 operator* (const Real& R, const Vector2& V)
+  inline Vector2 operator* (const Real R, const Vector2& V)
   {
     return Vector2(
         V.x * R,

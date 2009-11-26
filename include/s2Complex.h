@@ -19,7 +19,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      explicit Complex (const Real& R = 0, const Real& I = 0) : r(R), i(I) { }
+      explicit Complex (const Real R = 0, const Real I = 0) : r(R), i(I) { }
 
 
       // Assignment
@@ -50,14 +50,14 @@ namespace Spring2D
       // TODO: does it need ?
       Real magnitude () const
       {
-        return s2Sqrt(r * r + i * i);
+        return s2hypot(r, i);
       }
 
 
       // Normalize
       Complex& normalize ()
       {
-        Real m = s2Sqrt(r * r + i * i);
+        Real m = s2hypot(r, i);
 
         if (m > 0)
         {

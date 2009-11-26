@@ -32,7 +32,7 @@ namespace Spring2D
       {
         position_ = POSITION;
       }
-      void setPosition (Real X, Real Y)
+      void setPosition (const Real X, const Real Y)
       {
         position_.x = X;
         position_.y = Y;
@@ -49,7 +49,7 @@ namespace Spring2D
       {
         velocity_ = VELOCITY;
       }
-      void setVelocity (Real X, Real Y)
+      void setVelocity (const Real X, const Real Y)
       {
         velocity_.x = X;
         velocity_.y = Y;
@@ -98,7 +98,7 @@ namespace Spring2D
 
 
       // Set the body mass
-      void setMass (const Real& MASS)
+      void setMass (const Real MASS)
       {
         if (MASS <= 0)
         {
@@ -148,7 +148,7 @@ namespace Spring2D
       }
 
 
-      void integrate (const Real&);
+      void integrate (const Real);
 
 
     private:

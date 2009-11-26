@@ -15,7 +15,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      Engine (const Real& TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
+      Engine (const Real TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
       {
         environment_    = new Environment(TIME_STEP);
         forceRegister_  = new ForceRegister();
