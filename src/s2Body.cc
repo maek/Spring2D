@@ -11,15 +11,25 @@ namespace Spring2D
     if (static_)
       return;
 
-    // (1) Update the position
+    // (1a) Update the velocity
+    velocity_ += netForce_  * (1.0 / mass_) * TIME_STEP;
+
+    // (1b) Update the rotation
+    rotation_ += netTorque_ * (1.0 / momentOfInertia_) * TIME_STEP;
+
+    // (2a) Update the position
     position_ += (velocity_ * TIME_STEP);
 
-    // (2) Update the velocity
-    velocity_ += netForce_ * (1.0 / mass_) * TIME_STEP;
+    // (2b) Update the orientation
+    orientation_ *= (rotation_ * TIME_STEP);
 
 
-    // Clear the net force
-    netForce_ = Vector2::ZERO;
+    // Normalize the orientation
+    orientation_.normalize();
+
+    // Clear the nets
+    netForce_   = Vector2::ZERO;
+    netTorque_  = 0;
 
   }
 

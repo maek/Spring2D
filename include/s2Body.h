@@ -15,16 +15,21 @@ namespace Spring2D
     public:
 
       // Constructor
-      Body (const Vector2& POSITION = Vector2::ZERO,
-            const Vector2& VELOCITY = Vector2::ZERO,
-            const Complex& ORIENTATION = Complex(0, 0),
-            const Vector2& ROTATION = Vector2::ZERO,
-            const Real MASS = 1.0,
-            const bool STATIC = false)
+      // TODO: get the moment of intertia from the shape
+      //  CIRCLE  = (m * r^2) / 2
+      //  RECT    = (m * (b^2 + h^2)) / 12
+      Body (
+          const Vector2& POSITION = Vector2::ZERO,
+          const Vector2& VELOCITY = Vector2::ZERO,
+          const Complex& ORIENTATION = Complex(1, 0),
+          const Real ROTATION = 0,
+          const Real MASS = 1,
+          const Real MOMENT_OF_INERTIA = 1,
+          const bool STATIC = false)
         : position_(POSITION), velocity_(VELOCITY),
-          orientation_(ORIENTATION), rotation_(ROTATION),
-          mass_(MASS), static_(STATIC)
-      { }
+        orientation_(ORIENTATION), rotation_(ROTATION),
+        mass_(MASS), momentOfInertia_(MOMENT_OF_INERTIA), static_(STATIC)
+    { }
 
 
       // Set the body position
@@ -80,18 +85,13 @@ namespace Spring2D
       }
 
       // Set the body rotation
-      void setRotation (const Vector2& ROTATION)
+      void setRotation (const Real ROTATION)
       {
         rotation_ = ROTATION;
       }
-      void setRotation (const Real X, const Real Y)
-      {
-        rotation_.x = X;
-        rotation_.y = Y;
-      }
 
       // Get the body rotation
-      Vector2 getRotation () const
+      Real getRotation () const
       {
         return rotation_;
       }
@@ -159,15 +159,20 @@ namespace Spring2D
 
       Complex   orientation_;
 
-      Vector2   rotation_;
+      Real      rotation_;
 
 
       Real      mass_;
 
+      Real      momentOfInertia_;
 
-      bool static_;
 
       Vector2   netForce_;
+
+      Real      netTorque_;
+
+
+      bool      static_;
 
   };
 

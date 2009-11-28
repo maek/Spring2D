@@ -44,6 +44,19 @@ namespace Spring2D
 
         return *this;
       }
+      Complex& operator*= (const Real R)
+      {
+        // (a + bi) * (c + di) = (a * c - b * d) + (a * d + b * c)i
+        Real c = s2cos(R);
+        Real d = s2sin(R);
+        Real tr = r;
+        Real ti = i;
+
+        r = tr * c - ti * d;
+        i = tr * d + ti * c;
+
+        return *this;
+      }
 
 
       // Magnitude (length)
