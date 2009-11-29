@@ -9,7 +9,10 @@
 #include "s2Environment.h"
 #include "s2Force.h"
 #include "s2ForceRegister.h"
-#include "s2GravitationalForce.h"
+#include "s2ForceGravity.h"
+#include "s2Torque.h"
+#include "s2TorqueRegister.h"
+#include "s2TorqueMotor.h"
 #include "s2Vector2.h"
 
 

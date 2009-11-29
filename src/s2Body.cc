@@ -27,7 +27,7 @@ namespace Spring2D
     // Normalize the orientation
     orientation_.normalize();
 
-    // Clear the nets
+    // Clear the accumulators
     netForce_   = Vector2::ZERO;
     netTorque_  = 0;
 

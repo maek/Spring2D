@@ -4,6 +4,7 @@
 #include "s2Settings.h"
 #include "s2Environment.h"
 #include "s2ForceRegister.h"
+#include "s2TorqueRegister.h"
 
 
 namespace Spring2D
@@ -19,11 +20,13 @@ namespace Spring2D
       {
         environment_    = new Environment(TIME_STEP);
         forceRegister_  = new ForceRegister();
+        torqueRegister_  = new TorqueRegister();
       }
 
       // Destructor
       ~Engine ()
       {
+        delete torqueRegister_;
         delete forceRegister_;
         delete environment_;
       }
@@ -39,6 +42,11 @@ namespace Spring2D
       ForceRegister* getForceRegister () const
       {
         return forceRegister_;
+      }
+      // Get a pointer to the torque register
+      TorqueRegister* getTorqueRegister () const
+      {
+        return torqueRegister_;
       }
 
 
@@ -61,6 +69,8 @@ namespace Spring2D
       Environment *environment_;
 
       ForceRegister *forceRegister_;
+
+      TorqueRegister *torqueRegister_;
   };
 
 

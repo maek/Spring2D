@@ -147,6 +147,12 @@ namespace Spring2D
         netForce_ += FORCE;
       }
 
+      // Add a torque to the net torque
+      void applyTorque (const Real TORQUE)
+      {
+        netTorque_ += TORQUE;
+      }
+
 
       void integrate (const Real);
 

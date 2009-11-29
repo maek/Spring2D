@@ -1,5 +1,5 @@
-#ifndef __GRAVITATIONAL_FORCE_H__
-#define __GRAVITATIONAL_FORCE_H__
+#ifndef __FORCE_GRAVITY_H__
+#define __FORCE_GRAVITY_H__
 
 #include "s2Settings.h"
 #include "s2Body.h"
@@ -10,12 +10,12 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // The gravitational force
-  class GravitationalForce : public Force
+  class ForceGravity : public Force
   {
     public:
 
       // Constructor
-      GravitationalForce (Body* BODY,
+      ForceGravity (Body* BODY,
                           const Vector2& GRAVITY_ACCELERATION = Vector2(0, G))
         : body_(BODY), gravityAcceleration_(GRAVITY_ACCELERATION)
       { }
@@ -45,4 +45,4 @@ namespace Spring2D
 }
 
 
-#endif // __GRAVITATIONAL_FORCE_H__
+#endif // __FORCE_GRAVITY_H__
