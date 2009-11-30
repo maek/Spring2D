@@ -180,6 +180,12 @@ namespace Spring2D
     return (V1.x * V2.x + V1.y * V2.y);
   }
 
+  // ---------------------------------------------------------------------------
+  // Cross (vector) product
+  inline Real crossProduct (const Vector2& V1, const Vector2& V2)
+  {
+    return (V1.x * V2.y - V1.y * V2.x);
+  }
 
 }
 

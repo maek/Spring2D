@@ -122,9 +122,9 @@ namespace Spring2D
       }
 
       // Is the body static ?
-      bool isDynamic () const
+      bool isStatic () const
       {
-        return !static_;
+        return static_;
       }
 
 
@@ -135,19 +135,36 @@ namespace Spring2D
       }
 
       // Is the body dynamic ?
-      bool isStatic () const
+      bool isDynamic () const
       {
-        return static_;
+        return !static_;
       }
 
 
-      // Add a force to the net force
+      // Apply a force
       void applyForce (const Vector2& FORCE)
       {
         netForce_ += FORCE;
       }
 
-      // Add a torque to the net torque
+      // Apply a force (WORLD) to a point (BODY)
+      void applyForceAtPoint (const Vector2& FORCE, const Vector2& POINT)
+      {
+        // TODO: check for external point (NULL force)
+
+        // Apply the force to the netForce
+        netForce_ += FORCE;
+
+        // Rotate the point
+        Vector2 worldPoint(
+            POINT.x * orientation_.r - POINT.y * orientation_.i,
+            POINT.x * orientation_.i + POINT.y * orientation_.r);
+        // Apply the torque as point CROSS force
+        netTorque_ += crossProduct(worldPoint, FORCE);
+      }
+
+
+      // Add a torque
       void applyTorque (const Real TORQUE)
       {
         netTorque_ += TORQUE;
