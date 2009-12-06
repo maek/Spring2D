@@ -2,6 +2,7 @@
 #define __BODY_H__
 
 #include "s2Settings.h"
+#include "s2CollisionPrimitive.h"
 #include "s2Complex.h"
 #include "s2Vector2.h"
 
@@ -115,6 +116,20 @@ namespace Spring2D
       }
 
 
+      // Set the collision primitive
+      void setCollisionPrimitive (CollisionPrimitive* collisionPrimitive)
+      {
+        collisionPrimitive_ = collisionPrimitive;
+        collisionPrimitive_->body_ = this;
+      }
+
+      // Get the collision primitive
+      CollisionPrimitive* getCollisionPrimitive () const
+      {
+        return collisionPrimitive_;
+      }
+
+
       // Make the body static
       void makeStatic ()
       {
@@ -176,26 +191,29 @@ namespace Spring2D
 
     private:
 
-      Vector2   position_;
+      Vector2               position_;
 
-      Vector2   velocity_;
+      Vector2               velocity_;
 
-      Complex   orientation_;
+      Complex               orientation_;
 
-      Real      rotation_;
-
-
-      Real      mass_;
-
-      Real      momentOfInertia_;
+      Real                  rotation_;
 
 
-      Vector2   netForce_;
+      Real                  mass_;
 
-      Real      netTorque_;
+      Real                  momentOfInertia_;
 
 
-      bool      static_;
+      Vector2               netForce_;
+
+      Real                  netTorque_;
+
+
+      CollisionPrimitive   *collisionPrimitive_;
+
+
+      bool                  static_;
 
   };
 

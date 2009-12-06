@@ -35,6 +35,21 @@ namespace Spring2D
   // Physics constants
   const Real G = 9.80665;
 
+  // Class declarations (to decrease dependencies)
+  class Body;
+  class Circle;
+  class CollisionPrimitive;
+  class Complex;
+  class Engine;
+  class Environment;
+  class Force;
+  class ForceGravity;
+  class ForceRegister;
+  class Rect;
+  class Torque;
+  class TorqueMotor;
+  class TorqueRegister;
+  class Vector2;
 
 }
 
