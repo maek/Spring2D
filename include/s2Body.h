@@ -84,6 +84,13 @@ namespace Spring2D
         return s2atan2(orientation_.i, orientation_.r);
       }
 
+      // Get the body orientation (in radians)
+      Matrix2x2 getOrientationMatrix () const
+      {
+        return Matrix2x2(orientation_);
+      }
+
+
       // Set the body rotation
       void setRotation (const Real ROTATION)
       {
@@ -170,9 +177,7 @@ namespace Spring2D
         netForce_ += FORCE;
 
         // Rotate the point
-        Vector2 worldPoint(
-            POINT.x * orientation_.r - POINT.y * orientation_.i,
-            POINT.x * orientation_.i + POINT.y * orientation_.r);
+        Vector2 worldPoint = Matrix2x2(orientation_) * POINT;
         // Apply the torque as point CROSS force
         netTorque_ += crossProduct(worldPoint, FORCE);
       }

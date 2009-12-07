@@ -21,7 +21,7 @@ namespace Spring2D
     position_ += (velocity_ * TIME_STEP);
 
     // (2b) Update the orientation
-    orientation_ *= (rotation_ * TIME_STEP);
+    orientation_.rotate(rotation_ * TIME_STEP);
 
 
     // Normalize the orientation

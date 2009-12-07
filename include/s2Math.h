@@ -224,8 +224,10 @@ namespace Spring2D
 
         return *this;
       }
-      // TODO: move it out of here
-      Complex& operator*= (const Real R)
+
+
+      // Rotate
+      Complex& rotate (const Real R)
       {
         // (a + bi) * (c + di) = (a * c - b * d) + (a * d + b * c)i
         Real c = s2cos(R);
@@ -334,6 +336,15 @@ namespace Spring2D
         entry[3] = E3;
       }
 
+      // Constructor (complex)
+      explicit Matrix2x2 (const Complex& COMPLEX)
+      {
+        entry[0] =  COMPLEX.r;
+        entry[1] = -COMPLEX.i;
+        entry[2] =  COMPLEX.i;
+        entry[3] =  COMPLEX.r;
+      }
+
 
       // Assignment
       Matrix2x2& operator= (const Matrix2x2& M)
@@ -350,12 +361,11 @@ namespace Spring2D
       // Update multiplication
       Matrix2x2& operator*= (const Matrix2x2& M)
       {
-        Real tentry[4];
-
-        tentry[0] = entry[0] * M.entry[0] + entry[1] * M.entry[2];
-        tentry[1] = entry[0] * M.entry[1] + entry[1] * M.entry[3];
-        tentry[2] = entry[2] * M.entry[0] + entry[3] * M.entry[2];
-        tentry[3] = entry[2] * M.entry[1] + entry[3] * M.entry[3];
+        Real tentry[4] = {
+          entry[0] * M.entry[0] + entry[1] * M.entry[2],
+          entry[0] * M.entry[1] + entry[1] * M.entry[3],
+          entry[2] * M.entry[0] + entry[3] * M.entry[2],
+          entry[2] * M.entry[1] + entry[3] * M.entry[3]};
 
         entry[0] = tentry[0];
         entry[1] = tentry[1];
@@ -424,6 +434,19 @@ namespace Spring2D
         M1.entry[0] * M2.entry[1] + M1.entry[1] * M2.entry[3],
         M1.entry[2] * M2.entry[0] + M1.entry[3] * M2.entry[2],
         M1.entry[2] * M2.entry[1] + M1.entry[3] * M2.entry[3]);
+  }
+
+
+
+
+
+  // ---------------------------------------------------------------------------
+  // Multiplication [Matrix2x2 & Vector2]
+  inline Vector2 operator* (const Matrix2x2& M, const Vector2& V)
+  {
+    return Vector2(
+        M.entry[0] * V.x + M.entry[1] * V.y,
+        M.entry[2] * V.x + M.entry[3] * V.y);
   }
 
 
