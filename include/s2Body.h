@@ -2,9 +2,8 @@
 #define __BODY_H__
 
 #include "s2Settings.h"
+#include "s2Math.h"
 #include "s2CollisionPrimitive.h"
-#include "s2Complex.h"
-#include "s2Vector2.h"
 
 
 namespace Spring2D

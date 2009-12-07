@@ -1,4 +1,4 @@
-#include "../include/s2Vector2.h"
+#include "../include/s2Math.h"
 
 
 namespace Spring2D
