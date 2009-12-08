@@ -16,6 +16,7 @@
 #include "s2Torque.h"
 #include "s2TorqueMotor.h"
 #include "s2TorqueRegister.h"
+#include "s2UGrid.h"
 
 
 #endif // __SPRING2D_H__

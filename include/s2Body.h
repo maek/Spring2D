@@ -15,7 +15,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      // TODO: get the moment of intertia from the shape
+      // TODO: get the moment of intertia from the shape (otherwise 0)
       //  CIRCLE  = (m * r^2) / 2
       //  RECT    = (m * (b^2 + h^2)) / 12
       Body (
@@ -214,7 +214,7 @@ namespace Spring2D
       Real                  netTorque_;
 
 
-      CollisionPrimitive   *collisionPrimitive_;
+      CollisionPrimitive*   collisionPrimitive_;
 
 
       bool                  static_;

@@ -15,22 +15,27 @@ namespace Spring2D
       friend class Body;
 
 
-      // Get the body pointer
+    public:
+
+      // Destructor
+      virtual ~CollisionPrimitive () { }
+
       Body* getBody () const
       {
         return body_;
       }
 
-      // Destructor
-      virtual ~CollisionPrimitive () { }
-
-    protected:
-
+      Real getRadius () const
+      {
+        return radius_;
+      }
 
 
     protected:
 
       Body*     body_;
+
+      Real      radius_;
 
   };
 

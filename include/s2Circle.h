@@ -16,13 +16,15 @@ namespace Spring2D
     public:
 
       // Constructor
-      Circle (const Real RADIUS = 1)
-        : CollisionPrimitive(), radius_(RADIUS)
+      Circle (const Real RADIUS)
+        : CollisionPrimitive()
       {
-        if (radius_ <= 0)
+        if (RADIUS <= 0)
         {
-          radius_ = 1;
+          // TODO: Exception ???
         }
+
+        radius_ = RADIUS;
       }
 
 
@@ -36,17 +38,6 @@ namespace Spring2D
 
         radius_ = RADIUS;
       }
-
-      // Get the primitive radius
-      Real getRadius () const
-      {
-        return radius_;
-      }
-
-
-    private:
-
-      Real      radius_;
 
   };
 

@@ -16,6 +16,9 @@ namespace Spring2D
     environment_->integrateAllBody();
 
 
+    // Find collision (broad phase)
+    environment_->findCollisionBroad();
+
     // Increment the step counter
     stepCounter_++;
   }

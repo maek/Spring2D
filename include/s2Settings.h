@@ -45,10 +45,12 @@ namespace Spring2D
   class Force;
   class ForceGravity;
   class ForceRegister;
+  class Matrix2x2;
   class Rect;
   class Torque;
   class TorqueMotor;
   class TorqueRegister;
+  class UGrid;
   class Vector2;
 
 }

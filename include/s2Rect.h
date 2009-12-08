@@ -19,6 +19,7 @@ namespace Spring2D
       Rect (const Vector2& HALF_SIZE = Vector2::XY)
         : CollisionPrimitive(), halfSize_(HALF_SIZE)
       {
+        // TODO: Exception ???
         if (halfSize_.x <= 0)
         {
           halfSize_.x = 1;
@@ -27,6 +28,8 @@ namespace Spring2D
         {
           halfSize_.y = 1;
         }
+
+        radius_ = halfSize_.magnitude();
       }
 
 
