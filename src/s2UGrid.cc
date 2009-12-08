@@ -21,6 +21,8 @@ namespace Spring2D
   // TODO: origin ???
   void UGrid::testBody (Shape* shape)
   {
+    // Update the AABB
+    shape->updateAABB();
 #if 0
     std::cout << primitive->getBody()->getPosition() << "\n";
     const Vector2 CENTER = primitive->getBody()->getPosition();

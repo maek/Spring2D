@@ -23,6 +23,7 @@ namespace Spring2D
   #define s2sin(x)        sin(x);
   #define s2cos(x)        cos(x);
   #define s2atan2(x, y)   atan2(x, y);
+  #define s2fabs(x)       fabs(x);
 #else
   typedef float Real;
   #define s2sqrt(x)       sqrtf(x);
@@ -30,6 +31,7 @@ namespace Spring2D
   #define s2sin(x)        sinf(x);
   #define s2cos(x)        cosf(x);
   #define s2atan2(x, y)   atan2f(x, y);
+  #define s2fabs(x)       fabsf(x);
 #endif
 
 
@@ -37,6 +39,7 @@ namespace Spring2D
   const Real G = 9.80665;
 
   // Class declarations (to decrease dependencies)
+  class AABB;
   class Body;
   class CircleShape;
   class Complex;

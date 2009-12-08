@@ -19,7 +19,6 @@ namespace Spring2D
       CircleShape (const Real RADIUS)
         : radius_(RADIUS)
       {
-        // TODO: Exception ???
         assert(RADIUS > 0);
       }
 
@@ -27,7 +26,6 @@ namespace Spring2D
       // Set the radius
       void setRadius (const Real RADIUS)
       {
-        // TODO: Exception ???
         assert(RADIUS > 0);
         radius_ = RADIUS;
       }
@@ -37,6 +35,16 @@ namespace Spring2D
       {
         return radius_;
       }
+
+
+      // Build the associated AABB
+      void buildAABB ()
+      {
+        aabb_.halfSize_ = Vector2(radius_, radius_);
+      }
+
+      // Update the associated AABB
+      void updateAABB () { }
 
 
     private:

@@ -6,9 +6,9 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Create a new body in the environment
   Body* Environment::createBody (
-      const Vector2& POSITION, const Vector2& VELOCITY)
+      const Vector2& POSITION, const Vector2& VELOCITY, const Real ORIENTATION)
   {
-    Body *body = new Body(POSITION, VELOCITY);
+    Body *body = new Body(POSITION, VELOCITY, Complex(ORIENTATION));
     bodyList_.push_back(body);
     return body;
   }

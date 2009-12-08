@@ -30,7 +30,6 @@ namespace Spring2D
     // Clear the accumulators
     netForce_   = Vector2::ZERO;
     netTorque_  = 0;
-
   }
 
 

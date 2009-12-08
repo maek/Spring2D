@@ -127,6 +127,7 @@ namespace Spring2D
       {
         shape_ = shape;
         shape_->body_ = this;
+        shape_->buildAABB();
       }
 
       // Get the shape

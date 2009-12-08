@@ -20,9 +20,9 @@ namespace Spring2D
 
       // Canonical vectors
       static const Vector2 ZERO;
+      static const Vector2 X;
+      static const Vector2 Y;
       static const Vector2 XY;
-      static const Vector2 X_VERSOR;
-      static const Vector2 Y_VERSOR;
 
 
     public:
@@ -199,7 +199,13 @@ namespace Spring2D
     public:
 
       // Constructor
-      explicit Complex (const Real R = 0, const Real I = 0) : r(R), i(I) { }
+      explicit Complex (const Real R, const Real I) : r(R), i(I) { }
+
+      explicit Complex (const Real ANGLE = 0)
+      {
+        r = s2cos(ANGLE);
+        i = s2sin(ANGLE);
+      }
 
 
       // Assignment

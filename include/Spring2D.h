@@ -3,6 +3,7 @@
 
 // Include all header files of the library (for the applications)
 #include "s2Settings.h"
+#include "s2AABB.h"
 #include "s2Body.h"
 #include "s2CircleShape.h"
 #include "s2Engine.h"

@@ -36,7 +36,8 @@ namespace Spring2D
 
       Body* createBody (
           const Vector2& POSITION = Vector2::ZERO,
-          const Vector2& VELOCITY = Vector2::ZERO);
+          const Vector2& VELOCITY = Vector2::ZERO,
+          const Real ORIENTATION = 0);
 
       void destroyBody (Body*);
 

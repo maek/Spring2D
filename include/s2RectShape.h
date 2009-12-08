@@ -19,7 +19,6 @@ namespace Spring2D
       RectShape (const Vector2& HALF_SIZE)
         : halfSize_(HALF_SIZE)
       {
-        // TODO: Exception ???
         assert(HALF_SIZE.x > 0 && HALF_SIZE.y > 0);
       }
 
@@ -27,7 +26,6 @@ namespace Spring2D
       // Set the half size
       void setHalfSize (const Vector2& HALF_SIZE)
       {
-        // TODO: Exception ???
         assert(HALF_SIZE.x > 0 && HALF_SIZE.y > 0);
         halfSize_ = HALF_SIZE;
       }
@@ -36,6 +34,61 @@ namespace Spring2D
       Vector2 getHalfSize () const
       {
         return halfSize_;
+      }
+
+
+      // Build the associated AABB
+      // TODO: check for correctness
+      void buildAABB ()
+      {
+        Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
+        Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
+        Vector2 point = -halfSize_;
+        aabb_.halfSize_.x = s2fabs(dotProduct(point, directionX));
+        aabb_.halfSize_.y = s2fabs(dotProduct(point, directionY));
+
+        point.x = -point.x;
+        Real tx = s2fabs(dotProduct(point, directionX));
+        Real ty = s2fabs(dotProduct(point, directionY));
+        if (tx > aabb_.halfSize_.x)
+        {
+          aabb_.halfSize_.x = tx;
+        }
+        if (ty > aabb_.halfSize_.y)
+        {
+          aabb_.halfSize_.y = ty;
+        }
+
+        point.y = -point.y;
+        tx = s2fabs(dotProduct(point, directionX));
+        ty = s2fabs(dotProduct(point, directionY));
+        if (tx > aabb_.halfSize_.x)
+        {
+          aabb_.halfSize_.x = tx;
+        }
+        if (ty > aabb_.halfSize_.y)
+        {
+          aabb_.halfSize_.y = ty;
+        }
+
+        point.x = -point.x;
+        tx = s2fabs(dotProduct(point, directionX));
+        ty = s2fabs(dotProduct(point, directionY));
+        if (tx > aabb_.halfSize_.x)
+        {
+          aabb_.halfSize_.x = tx;
+        }
+        if (ty > aabb_.halfSize_.y)
+        {
+          aabb_.halfSize_.y = ty;
+        }
+       }
+
+      // Update the associated AABB
+      void updateAABB ()
+      {
+        // TODO: check if is necessary to re-build the AABB (only if rotating)
+        buildAABB();
       }
 
 
