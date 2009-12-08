@@ -3,9 +3,10 @@
 
 // Include all the external headers
 #include <iostream>
+#include <cmath>
 #include <list>
 #include <algorithm>
-#include <cmath>
+#include <cassert>
 
 // Double precision flag
 #define S2_DOUBLE_PRECISION 0
@@ -37,8 +38,7 @@ namespace Spring2D
 
   // Class declarations (to decrease dependencies)
   class Body;
-  class Circle;
-  class CollisionPrimitive;
+  class CircleShape;
   class Complex;
   class Engine;
   class Environment;
@@ -46,7 +46,8 @@ namespace Spring2D
   class ForceGravity;
   class ForceRegister;
   class Matrix2x2;
-  class Rect;
+  class RectShape;
+  class Shape;
   class Torque;
   class TorqueMotor;
   class TorqueRegister;

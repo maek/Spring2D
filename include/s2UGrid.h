@@ -4,7 +4,7 @@
 #include "s2Settings.h"
 #include "s2Math.h"
 #include "s2Body.h"
-#include "s2CollisionPrimitive.h"
+#include "s2Shape.h"
 
 
 namespace Spring2D
@@ -15,7 +15,7 @@ namespace Spring2D
   {
     public:
 
-      typedef std::list<CollisionPrimitive*> CellList;
+      typedef std::list<Shape*> CellList;
 
 
     public:
@@ -44,7 +44,7 @@ namespace Spring2D
 
       void clear ();
 
-      void testBody (CollisionPrimitive*);
+      void testBody (Shape*);
 
 
     private:

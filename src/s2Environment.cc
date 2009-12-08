@@ -46,7 +46,7 @@ namespace Spring2D
         ++body)
     {
       // Add the body to the grid & automatic find collision
-      grid_->testBody((*body)->getCollisionPrimitive());
+      grid_->testBody((*body)->getShape());
     }
   }
 

@@ -18,8 +18,10 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Test for coarse collisions
-  void UGrid::testBody (CollisionPrimitive* primitive)
+  // TODO: origin ???
+  void UGrid::testBody (Shape* shape)
   {
+#if 0
     std::cout << primitive->getBody()->getPosition() << "\n";
     const Vector2 CENTER = primitive->getBody()->getPosition();
     const Real    RADIUS = primitive->getRadius();
@@ -36,6 +38,7 @@ namespace Spring2D
     std::cout << "[" <<
       static_cast<unsigned>(cposition.x) << ", " <<
       static_cast<unsigned>(cposition.y) << "] (center)" << "\n";
+#endif
 
 
     // TODO: found all other cells (ALL)
@@ -43,6 +46,7 @@ namespace Spring2D
 
 
 
+#if 0
     // Test for the RIGHT
     tposition   = (CENTER + Vector2(RADIUS, 0)) * (1.0 / cellSize_);
     tposition.x = static_cast<unsigned>(tposition.x);
@@ -161,6 +165,7 @@ namespace Spring2D
         static_cast<unsigned>(tposition.x) << ", " <<
         static_cast<unsigned>(tposition.y) << "] (bottom-right)" << "\n";
     }
+#endif
 
 
 

@@ -1,5 +1,5 @@
-#ifndef __COLLISION_PRIMITIVE_H__
-#define __COLLISION_PRIMITIVE_H__
+#ifndef __SHAPE_H__
+#define __SHAPE_H__
 
 #include "s2Settings.h"
 #include "s2Body.h"
@@ -7,27 +7,24 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // The collision geometry
-  class CollisionPrimitive
+  // The shape of the body
+  class Shape
   {
     public:
 
+      // TODO: does it need ???
       friend class Body;
 
 
     public:
 
       // Destructor
-      virtual ~CollisionPrimitive () { }
+      virtual ~Shape () { }
 
+      // Return a pointer to the body
       Body* getBody () const
       {
         return body_;
-      }
-
-      Real getRadius () const
-      {
-        return radius_;
       }
 
 
@@ -35,12 +32,10 @@ namespace Spring2D
 
       Body*     body_;
 
-      Real      radius_;
-
   };
 
 
 }
 
 
-#endif // __COLLISION_PRIMITIVE_H__
+#endif // __SHAPE_H__
