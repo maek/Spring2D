@@ -9,7 +9,8 @@ OBJECTS = s2Engine.o\
 				 	s2Math.o\
 					s2Body.o\
 					s2Environment.o\
-					s2UGrid.o
+					s2UGrid.o\
+					s2AABB.o
 
 CXX = g++
 CXXFLAGS = -Wall -fPIC
@@ -54,7 +55,19 @@ $(OBJDIR)/s2UGrid.o:			 				$(SRCDIR)/s2UGrid.cc\
 																	$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+$(OBJDIR)/s2AABB.o:								$(SRCDIR)/s2AABB.cc\
+																	$(INCDIR)/s2AABB.h\
+																	$(INCDIR)/s2Settings.h\
+																	$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+
 
 .PHONY: clean
 clean:
 	@$(RM) -v $(OBJDIR)/*.o $(LIBDIR)/*.so
+
+
+.PHONY: todo
+todo:
+	@grep -n --color 'TODO' $(INCDIR)/* $(SRCDIR)/*

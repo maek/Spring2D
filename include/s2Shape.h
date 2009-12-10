@@ -29,13 +29,13 @@ namespace Spring2D
       }
 
       // Return the halfSize of the AABB
-      Vector2 getAABB () const
+      AABB* getAABB ()
       {
-        return aabb_.halfSize_;
+        return &aabb_;
       }
 
 
-      virtual void buildAABB () = 0;
+      virtual void buildAABB (Vector2*) = 0;
 
       virtual void updateAABB () = 0;
 

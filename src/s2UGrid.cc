@@ -7,7 +7,8 @@ namespace Spring2D
   // Clear the grid
   void UGrid::clear ()
   {
-    for (int i = 0; i < xyExtent_; ++i)
+    // TODO: OPTIMIZATION -> dense bit array for the cells with bodies inside
+    for (unsigned i = 0; i < xyExtent_; ++i)
     {
       cellList_[i].clear();
     }
@@ -18,160 +19,48 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Test for coarse collisions
-  // TODO: origin ???
   void UGrid::testBody (Shape* shape)
   {
+    int index;
+
     // Update the AABB
     shape->updateAABB();
-#if 0
-    std::cout << primitive->getBody()->getPosition() << "\n";
-    const Vector2 CENTER = primitive->getBody()->getPosition();
-    const Real    RADIUS = primitive->getRadius();
-    Vector2 cposition;
-    Vector2 tposition;
 
+    // Found the min & max of the AABB
+    Vector2 position = *shape->getAABB()->center_;
+    Vector2 halfSize =  shape->getAABB()->halfSize_;
+    Vector2 min = (position - halfSize - origin_) * (1.0 / cellSize_);
+    Vector2 max = (position + halfSize - origin_) * (1.0 / cellSize_);
 
-    // Add the body to the grid [CENTER]
-    cposition   = CENTER * (1.0 / cellSize_);
-    cposition.x = static_cast<unsigned>(cposition.x);
-    cposition.y = static_cast<unsigned>(cposition.y);
-    cellList_[static_cast<unsigned>(cposition.x + cposition.y * xExtent_)].
-      push_back(primitive);
-    std::cout << "[" <<
-      static_cast<unsigned>(cposition.x) << ", " <<
-      static_cast<unsigned>(cposition.y) << "] (center)" << "\n";
-#endif
-
-
-    // TODO: found all other cells (ALL)
-    // TODO: fix the diag cells (radius)
-
-
-
-#if 0
-    // Test for the RIGHT
-    tposition   = (CENTER + Vector2(RADIUS, 0)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition != tposition)
+    // Insert the body into the grid & check for collisions
+    for (int x = static_cast<int>(min.x); x <= static_cast<int>(max.x); ++x)
     {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (right)" << "\n";
+      for (int y = static_cast<int>(min.y); y <= static_cast<int>(max.y); ++y)
+      {
+        // Check for valid grid positions
+        index = static_cast<int>(x + y * xExtent_);
+        if (index >= 0)
+        {
+          // Check for collisions in the grid
+          for (CellList::reverse_iterator shapeI = cellList_[index].rbegin();
+              shapeI != cellList_[index].rend(); ++shapeI)
+          {
+            // Check the AABB for the collision
+            if (checkAABB(shape->getAABB(), (*shapeI)->getAABB()) == true)
+            {
+              // TODO: TESTING
+              // TODO: check for already existing contact &
+              //       send only one per couple
+              std::cout << "collision [AABB]\n";
+            }
+          }
+
+          // Insert the body
+          cellList_[index].push_back(shape);
+        }
+      }
     }
 
-
-    // Test for the TOP-RIGHT
-    tposition = (CENTER + Vector2(RADIUS, RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition.x != tposition.x && cposition.y != tposition.y)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (top-right)" << "\n";
-    }
-
-
-    // Test for the TOP
-    tposition = (CENTER + Vector2(0, RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition != tposition)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (top)" << "\n";
-    }
-
-
-    // Test for the TOP-LEFT
-    tposition = (CENTER + Vector2(-RADIUS, RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition.x != tposition.x && cposition.y != tposition.y)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (top-left)" << "\n";
-    }
-
-
-    // Test for the LEFT
-    tposition = (CENTER + Vector2(-RADIUS, 0)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition != tposition)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (left)" << "\n";
-    }
-
-
-    // Test for the BOTTOM-LEFT
-    tposition = (CENTER + Vector2(-RADIUS, -RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition.x != tposition.x && cposition.y != tposition.y)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (bottom-left)" << "\n";
-    }
-
-
-    // Test for the BOTTOM
-    tposition = (CENTER + Vector2(0, -RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition != tposition)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (bottom)" << "\n";
-    }
-
-
-    // Test for the BOTTOM-RIGHT
-    tposition = (CENTER + Vector2(RADIUS, -RADIUS)) * (1.0 / cellSize_);
-    tposition.x = static_cast<unsigned>(tposition.x);
-    tposition.y = static_cast<unsigned>(tposition.y);
-    if (cposition.x != tposition.x && cposition.y != tposition.y)
-    {
-      // Add the body to the grid
-      cellList_[static_cast<unsigned>(tposition.x + tposition.y * xExtent_)].
-        push_back(primitive);
-      std::cout << "[" <<
-        static_cast<unsigned>(tposition.x) << ", " <<
-        static_cast<unsigned>(tposition.y) << "] (bottom-right)" << "\n";
-    }
-#endif
-
-
-
-    // TODO: reverse iterator
   }
 
 

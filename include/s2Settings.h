@@ -18,20 +18,20 @@ namespace Spring2D
   // Define the real number values & related functions to be used
 #if S2_DOUBLE_PRECISION
   typedef double Real;
-  #define s2sqrt(x)       sqrt(x);
-  #define s2hypot(x, y)   hypot(x, y);
-  #define s2sin(x)        sin(x);
-  #define s2cos(x)        cos(x);
-  #define s2atan2(x, y)   atan2(x, y);
-  #define s2fabs(x)       fabs(x);
+  #define s2sqrt(x)       sqrt(x)
+  #define s2hypot(x, y)   hypot(x, y)
+  #define s2sin(x)        sin(x)
+  #define s2cos(x)        cos(x)
+  #define s2atan2(x, y)   atan2(x, y)
+  #define s2fabs(x)       fabs(x)
 #else
   typedef float Real;
-  #define s2sqrt(x)       sqrtf(x);
-  #define s2hypot(x, y)   hypotf(x, y);
-  #define s2sin(x)        sinf(x);
-  #define s2cos(x)        cosf(x);
-  #define s2atan2(x, y)   atan2f(x, y);
-  #define s2fabs(x)       fabsf(x);
+  #define s2sqrt(x)       sqrtf(x)
+  #define s2hypot(x, y)   hypotf(x, y)
+  #define s2sin(x)        sinf(x)
+  #define s2cos(x)        cosf(x)
+  #define s2atan2(x, y)   atan2f(x, y)
+  #define s2fabs(x)       fabsf(x)
 #endif
 
 

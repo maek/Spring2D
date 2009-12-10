@@ -13,9 +13,14 @@ namespace Spring2D
   {
     public:
 
+      Vector2  *center_;
       Vector2   halfSize_;
 
   };
+
+
+
+  bool checkAABB (AABB*, AABB*);
 
 
 }

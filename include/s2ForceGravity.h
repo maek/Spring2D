@@ -29,7 +29,7 @@ namespace Spring2D
           return;
         }
 
-        // TODO: it is faster to change directly the acceleration
+        // TODO: OPTIMIZATION -> change directly the acceleration
         body_->applyForce(gravityAcceleration_ * body_->getMass());
       }
 

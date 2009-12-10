@@ -38,8 +38,9 @@ namespace Spring2D
 
 
       // Build the associated AABB
-      void buildAABB ()
+      void buildAABB (Vector2* CENTER)
       {
+        aabb_.center_   = CENTER;
         aabb_.halfSize_ = Vector2(radius_, radius_);
       }
 

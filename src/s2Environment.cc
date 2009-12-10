@@ -27,11 +27,11 @@ namespace Spring2D
   // Update positions & velocities for each dynamic body
   void Environment::integrateAllBody ()
   {
-    for (BodyList::iterator body = bodyList_.begin(); body != bodyList_.end();
-        ++body)
+    for (BodyList::iterator bodyI = bodyList_.begin(); bodyI != bodyList_.end();
+        ++bodyI)
     {
       // Integrate
-      (*body)->integrate(timeStep_);
+      (*bodyI)->integrate(timeStep_);
     }
   }
 
@@ -42,11 +42,11 @@ namespace Spring2D
   {
     grid_->clear();
 
-    for (BodyList::iterator body = bodyList_.begin(); body != bodyList_.end();
-        ++body)
+    for (BodyList::iterator bodyI = bodyList_.begin(); bodyI != bodyList_.end();
+        ++bodyI)
     {
       // Add the body to the grid & automatic find collision
-      grid_->testBody((*body)->getShape());
+      grid_->testBody((*bodyI)->getShape());
     }
   }
 

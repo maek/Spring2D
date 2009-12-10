@@ -39,8 +39,18 @@ namespace Spring2D
 
       // Build the associated AABB
       // TODO: check for correctness
-      void buildAABB ()
+      void buildAABB (Vector2* CENTER)
       {
+        aabb_.center_ = CENTER;
+        updateAABB();
+      }
+
+      // Update the associated AABB
+      void updateAABB ()
+      {
+        // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
+        //                       (only if rotating)
+        // TODO: make not inline
         Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
         Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
         Vector2 point = -halfSize_;
@@ -82,13 +92,6 @@ namespace Spring2D
         {
           aabb_.halfSize_.y = ty;
         }
-       }
-
-      // Update the associated AABB
-      void updateAABB ()
-      {
-        // TODO: check if is necessary to re-build the AABB (only if rotating)
-        buildAABB();
       }
 
 

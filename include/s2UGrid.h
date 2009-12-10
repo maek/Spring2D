@@ -5,6 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2Shape.h"
+#include "s2AABB.h"
 
 
 namespace Spring2D
@@ -22,9 +23,9 @@ namespace Spring2D
 
       // Constructor
       UGrid (
-          const int CELL_SIZE,
-          const int X_EXTENT,
-          const int Y_EXTENT,
+          const unsigned CELL_SIZE,
+          const unsigned X_EXTENT,
+          const unsigned Y_EXTENT,
           const Vector2& ORIGIN = Vector2::ZERO) :
         cellSize_(CELL_SIZE),
         xExtent_(X_EXTENT),
@@ -47,18 +48,25 @@ namespace Spring2D
       void testBody (Shape*);
 
 
+      // TODO: TESTING
+      CellList* getCells () const
+      {
+        return cellList_;
+      }
+
+
     private:
 
       CellList   *cellList_;
 
 
-      int         cellSize_;
+      unsigned    cellSize_;
 
-      int         xExtent_;
+      unsigned    xExtent_;
 
-      int         yExtent_;
+      unsigned    yExtent_;
 
-      int         xyExtent_;
+      unsigned    xyExtent_;
 
       Vector2     origin_;
 

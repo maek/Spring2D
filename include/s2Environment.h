@@ -24,7 +24,7 @@ namespace Spring2D
       Environment (const Real TIME_STEP) : timeStep_(TIME_STEP)
       {
         // TODO: let be parametric
-        grid_ = new UGrid (100, 20, 20);
+        grid_ = new UGrid (100, 10, 10);
       }
 
       // Destructor
@@ -48,11 +48,18 @@ namespace Spring2D
       void findCollisionBroad ();
 
 
+      // TODO: TESTING
+      UGrid* getGrid () const
+      {
+        return grid_;
+      }
+
+
     private:
 
-      UGrid      *grid_;
-
       BodyList    bodyList_;
+
+      UGrid      *grid_;
 
       Real        timeStep_;
 
