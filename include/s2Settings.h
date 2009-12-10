@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cmath>
 #include <list>
+#include <set>
 #include <algorithm>
 #include <cassert>
 
@@ -42,6 +43,7 @@ namespace Spring2D
   class AABB;
   class Body;
   class CircleShape;
+  class CollisionNarrow;
   class Complex;
   class Engine;
   class Environment;

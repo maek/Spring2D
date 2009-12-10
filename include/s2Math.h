@@ -70,13 +70,13 @@ namespace Spring2D
 
 
       // Magnitude (length)
-      Real magnitude () const
+      Real getMagnitude () const
       {
         return s2hypot(x, y);
       }
 
       // Squared Magnitude
-      Real squaredMagnitude () const
+      Real getSquaredMagnitude () const
       {
         return (x * x + y * y);
       }
@@ -250,7 +250,7 @@ namespace Spring2D
 
       // Magnitude (length)
       // TODO: does it need ?
-      Real magnitude () const
+      Real getMagnitude () const
       {
         return s2hypot(r, i);
       }

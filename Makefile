@@ -10,7 +10,9 @@ OBJECTS = s2Engine.o\
 					s2Body.o\
 					s2Environment.o\
 					s2UGrid.o\
-					s2AABB.o
+					s2AABB.o\
+					s2CollisionNarrow.o
+
 
 CXX = g++
 CXXFLAGS = -Wall -fPIC
@@ -61,6 +63,11 @@ $(OBJDIR)/s2AABB.o:								$(SRCDIR)/s2AABB.cc\
 																	$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+$(OBJDIR)/s2CollisionNarrow.o:		$(SRCDIR)/s2CollisionNarrow.cc\
+																	$(INCDIR)/s2CollisionNarrow.h\
+																	$(INCDIR)/s2Settings.h\
+																	$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 
 .PHONY: clean
