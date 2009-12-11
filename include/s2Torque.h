@@ -7,7 +7,7 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // The Torque interface
+  // The torque interface
   class Torque
   {
     public:
@@ -15,6 +15,12 @@ namespace Spring2D
       virtual void apply () = 0;
 
   };
+
+
+
+  // ---------------------------------------------------------------------------
+  // The torque list
+  typedef std::list<Torque*> TorqueList;
 
 
 }

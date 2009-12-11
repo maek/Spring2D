@@ -42,8 +42,9 @@ namespace Spring2D
   // Class declarations (to decrease dependencies)
   class AABB;
   class Body;
+  class BroadPhaseDetector;
   class CircleShape;
-  class CollisionNarrow;
+  class CollisionDetector;
   class Complex;
   class Engine;
   class Environment;
@@ -51,6 +52,7 @@ namespace Spring2D
   class ForceGravity;
   class ForceRegister;
   class Matrix2x2;
+  class NarrowPhaseDetector;
   class RectShape;
   class Shape;
   class Torque;
@@ -60,6 +62,7 @@ namespace Spring2D
   class Vector2;
 
 }
+
 
 namespace s2 = Spring2D;
 

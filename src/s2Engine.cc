@@ -8,16 +8,16 @@ namespace Spring2D
   void Engine::runStep()
   {
     // Compute the net forces
-    forceRegister_->computeForces();
+    environment_->computeForces();
     // Compute the net torques
-    torqueRegister_->computeTorques();
+    environment_->computeTorques();
 
     // Update positions & velocities
-    environment_->integrateAllBody();
+    environment_->integrateBodies();
 
 
     // Find collision (broad phase)
-    environment_->findCollisionBroad();
+    collisionDetector_.findCollisions(environment_->getBodyList());
 
     // Increment the step counter
     stepCounter_++;

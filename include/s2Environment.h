@@ -3,8 +3,9 @@
 
 #include "s2Settings.h"
 #include "s2Math.h"
-#include "s2UGrid.h"
 #include "s2Body.h"
+#include "s2ForceRegister.h"
+#include "s2TorqueRegister.h"
 
 
 namespace Spring2D
@@ -15,24 +16,19 @@ namespace Spring2D
   {
     public:
 
-      typedef std::list<Body*> BodyList;
-
-
-    public:
-
       // Constructor
       Environment (const Real TIME_STEP) : timeStep_(TIME_STEP)
       {
-        // TODO: let be parametric
-        grid_ = new UGrid (100, 10, 10);
+        forceRegister_  = new ForceRegister();
+        torqueRegister_ = new TorqueRegister();
       }
 
       // Destructor
       ~Environment ()
       {
-        delete grid_;
+        delete forceRegister_;
+        delete torqueRegister_;
       }
-
 
       Body* createBody (
           const Vector2& POSITION = Vector2::ZERO,
@@ -42,27 +38,52 @@ namespace Spring2D
       void destroyBody (Body*);
 
 
-      void integrateAllBody ();
-
-
-      void findCollisionBroad ();
-
-
-      // TODO: TESTING
-      UGrid* getGrid () const
+      // Return a pointer to the body list
+      const BodyList& getBodyList ()
       {
-        return grid_;
+        return bodyList_;
+      }
+
+
+      // Compute the net force
+      void computeForces ()
+      {
+        forceRegister_->computeForces();
+      }
+
+      // Compute the net torque
+      void computeTorques ()
+      {
+        torqueRegister_->computeTorques();
+      }
+
+
+      void integrateBodies ();
+
+
+      // Get a pointer to the force register
+      ForceRegister* getForceRegister () const
+      {
+        return forceRegister_;
+      }
+
+      // Get a pointer to the torque register
+      TorqueRegister* getTorqueRegister () const
+      {
+        return torqueRegister_;
       }
 
 
     private:
 
-      BodyList    bodyList_;
+      Real              timeStep_;
 
-      UGrid      *grid_;
 
-      Real        timeStep_;
+      BodyList          bodyList_;
 
+      ForceRegister*    forceRegister_;
+
+      TorqueRegister*   torqueRegister_;
   };
 
 

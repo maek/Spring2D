@@ -17,6 +17,12 @@ namespace Spring2D
   };
 
 
+
+  // ---------------------------------------------------------------------------
+  // The force list
+  typedef std::list<Force*> ForceList;
+
+
 }
 
 

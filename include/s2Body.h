@@ -223,6 +223,12 @@ namespace Spring2D
   };
 
 
+
+  // ---------------------------------------------------------------------------
+  // The body list
+  typedef std::list<Body*> BodyList;
+
+
 }
 
 

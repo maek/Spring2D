@@ -13,9 +13,6 @@ namespace Spring2D
   {
     public:
 
-      typedef std::list<Torque*> TorqueList;
-
-
       // Register a new torque
       void addTorque (Torque* TORQUE)
       {
@@ -29,7 +26,7 @@ namespace Spring2D
       }
 
 
-      // Compute the net torques
+      // Compute the net torque
       void computeTorques ()
       {
         std::for_each (torqueList_.begin(), torqueList_.end(),

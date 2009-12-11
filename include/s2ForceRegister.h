@@ -13,9 +13,6 @@ namespace Spring2D
   {
     public:
 
-      typedef std::list<Force*> ForceList;
-
-
       // Register a new force
       void addForce (Force* FORCE)
       {
@@ -29,7 +26,7 @@ namespace Spring2D
       }
 
 
-      // Compute the net forces
+      // Compute the net force
       void computeForces ()
       {
         std::for_each (forceList_.begin(), forceList_.end(),

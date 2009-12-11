@@ -3,8 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Environment.h"
-#include "s2ForceRegister.h"
-#include "s2TorqueRegister.h"
+#include "s2CollisionDetector.h"
 
 
 namespace Spring2D
@@ -19,15 +18,11 @@ namespace Spring2D
       Engine (const Real TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
       {
         environment_    = new Environment(TIME_STEP);
-        forceRegister_  = new ForceRegister();
-        torqueRegister_  = new TorqueRegister();
       }
 
       // Destructor
       ~Engine ()
       {
-        delete torqueRegister_;
-        delete forceRegister_;
         delete environment_;
       }
 
@@ -37,18 +32,6 @@ namespace Spring2D
       {
         return environment_;
       }
-
-      // Get a pointer to the force register
-      ForceRegister* getForceRegister () const
-      {
-        return forceRegister_;
-      }
-      // Get a pointer to the torque register
-      TorqueRegister* getTorqueRegister () const
-      {
-        return torqueRegister_;
-      }
-
 
       // Return the current physical time
       Real getCurrentTime ()
@@ -62,15 +45,14 @@ namespace Spring2D
 
     private:
 
-      Real timeStep_;
+      Real                timeStep_;
 
-      int stepCounter_;
+      int                 stepCounter_;
 
-      Environment *environment_;
+      Environment*        environment_;
 
-      ForceRegister *forceRegister_;
+      CollisionDetector   collisionDetector_;
 
-      TorqueRegister *torqueRegister_;
   };
 
 

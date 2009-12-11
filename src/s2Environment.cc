@@ -25,7 +25,7 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Update positions & velocities for each dynamic body
-  void Environment::integrateAllBody ()
+  void Environment::integrateBodies ()
   {
     for (BodyList::iterator bodyI = bodyList_.begin(); bodyI != bodyList_.end();
         ++bodyI)
@@ -35,19 +35,5 @@ namespace Spring2D
     }
   }
 
-
-  // ---------------------------------------------------------------------------
-  // Do the collision broad phase
-  void Environment::findCollisionBroad ()
-  {
-    grid_->clear();
-
-    for (BodyList::iterator bodyI = bodyList_.begin(); bodyI != bodyList_.end();
-        ++bodyI)
-    {
-      // Add the body to the grid & automatic find collision
-      grid_->testBody((*bodyI)->getShape());
-    }
-  }
 
 }
