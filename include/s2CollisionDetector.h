@@ -34,6 +34,13 @@ namespace Spring2D
       void findCollisions (const BodyList&);
 
 
+      // Return a pointer to the contact set
+      ContactSet* getContacts ()
+      {
+        return &contactSet_;
+      }
+
+
     private:
 
       BroadPhaseDetector   *broadPhaseDetector_;

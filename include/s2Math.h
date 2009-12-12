@@ -381,6 +381,17 @@ namespace Spring2D
         return *this;
       }
 
+
+      // Return the inverse [transpose for rotations]
+      Matrix2x2 getInverse ()
+      {
+        return Matrix2x2(
+             entry[0],
+            -entry[1],
+            -entry[2],
+             entry[3]);
+      }
+
   };
 
 

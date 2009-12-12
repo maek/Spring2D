@@ -15,6 +15,8 @@ namespace Spring2D
 
       friend class Body;
 
+      enum ShapeType {CIRCLE, RECT};
+
 
     public:
 
@@ -34,6 +36,8 @@ namespace Spring2D
         return &aabb_;
       }
 
+
+      virtual ShapeType getType () const = 0;
 
       virtual void buildAABB (Vector2*) = 0;
 

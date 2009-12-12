@@ -8,6 +8,7 @@
 #include "s2BroadPhaseDetector.h"
 #include "s2CircleShape.h"
 #include "s2CollisionDetector.h"
+#include "s2Contact.h"
 #include "s2Engine.h"
 #include "s2Environment.h"
 #include "s2ForceGravity.h"

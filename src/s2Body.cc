@@ -24,6 +24,9 @@ namespace Spring2D
     orientation_.rotate(rotation_ * TIME_STEP);
 
 
+    // Update the AABB
+    shape_->updateAABB();
+
     // Normalize the orientation
     orientation_.normalize();
 

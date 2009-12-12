@@ -4,6 +4,7 @@
 #include "s2Settings.h"
 #include "s2Math.h"
 #include "s2Body.h"
+#include "s2Shape.h"
 #include "s2CircleShape.h"
 #include "s2RectShape.h"
 #include "s2Contact.h"
@@ -22,11 +23,11 @@ namespace Spring2D
 
     private:
 
-      bool testCircleCircle (CircleShape*, CircleShape*);
+      bool testCircleCircle (CircleShape*, CircleShape*, Contact*);
 
-      bool testCircleRect (CircleShape*, RectShape*);
+      bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
-      bool testRectRect (RectShape*, RectShape*);
+      bool testRectRect (RectShape*, RectShape*, Contact*);
 
   };
 

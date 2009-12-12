@@ -46,6 +46,7 @@ namespace Spring2D
   class CircleShape;
   class CollisionDetector;
   class Complex;
+  class Contact;
   class Engine;
   class Environment;
   class Force;

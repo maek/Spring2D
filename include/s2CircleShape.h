@@ -37,6 +37,13 @@ namespace Spring2D
       }
 
 
+      // Get the shape type
+      ShapeType getType () const
+      {
+        return Shape::CIRCLE;
+      }
+
+
       // Build the associated AABB
       void buildAABB (Vector2* CENTER)
       {

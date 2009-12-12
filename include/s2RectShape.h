@@ -37,6 +37,13 @@ namespace Spring2D
       }
 
 
+      // Get the shape type
+      ShapeType getType () const
+      {
+        return RECT;
+      }
+
+
       // Build the associated AABB
       // TODO: check for correctness
       void buildAABB (Vector2* CENTER)

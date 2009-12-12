@@ -43,6 +43,13 @@ namespace Spring2D
       void runStep ();
 
 
+      // TODO: TESTING
+      ContactSet* getContacts ()
+      {
+        return collisionDetector_.getContacts();
+      }
+
+
     private:
 
       Real                timeStep_;
