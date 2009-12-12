@@ -15,7 +15,7 @@ namespace Spring2D
 
       friend class Body;
 
-      enum ShapeType {CIRCLE, RECT};
+      enum ShapeType {CIRCLE, RECT, POLYGON};
 
 
     public:

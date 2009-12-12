@@ -54,6 +54,7 @@ namespace Spring2D
   class ForceRegister;
   class Matrix2x2;
   class NarrowPhaseDetector;
+  class PolygonShape;
   class RectShape;
   class Shape;
   class Torque;

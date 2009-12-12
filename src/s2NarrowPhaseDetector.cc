@@ -18,44 +18,66 @@ namespace Spring2D
       switch ((*contactI)->body[0]->getShape()->getType())
       {
 
-        case Shape::CIRCLE:
+        case Shape::CIRCLE :
           switch ((*contactI)->body[1]->getShape()->getType())
           {
-            case Shape::CIRCLE:  // CIRCLE - CIRCLE
+            case Shape::CIRCLE :    // CIRCLE - CIRCLE
               collision = testCircleCircle(
                   static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
                   static_cast<CircleShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
 
-            case Shape::RECT:    // CIRCLE - RECT
+            case Shape::RECT :      // CIRCLE - RECT
               collision = testCircleRect(
                   static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
                   static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
+
+            case Shape::POLYGON :   // CIRCLE - POLYGON
+              break;
           }
           break;
 
 
-        case Shape::RECT:
+        case Shape::RECT :
           switch ((*contactI)->body[1]->getShape()->getType())
           {
-            case Shape::CIRCLE:  // CIRCLE - RECT
+            case Shape::CIRCLE :    // RECT - CIRCLE
               collision = testCircleRect(
                   static_cast<CircleShape*>((*contactI)->body[1]->getShape()),
                   static_cast<RectShape*>((*contactI)->body[0]->getShape()),
                   (*contactI));
               break;
 
-            case Shape::RECT:    // RECT - RECT
+            case Shape::RECT :      // RECT - RECT
               collision = testRectRect(
                   static_cast<RectShape*>((*contactI)->body[0]->getShape()),
                   static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
+
+            case Shape::POLYGON :   // RECT - POLYGON
+              break;
           }
           break;
+
+
+        case Shape::POLYGON :
+          switch ((*contactI)->body[1]->getShape()->getType())
+          {
+            case Shape::CIRCLE :    // POLYGON - RECT
+              break;
+
+            case Shape::RECT :      // POLYGON - RECT
+              break;
+
+            case Shape::POLYGON :   // POLYGON - POLYGON
+              break;
+          }
+          break;
+
       }
 
 
