@@ -52,10 +52,6 @@ namespace Spring2D
               break;
 
             case Shape::RECT :      // RECT - RECT
-              collision = testRectRect(
-                  static_cast<RectShape*>((*contactI)->body[0]->getShape()),
-                  static_cast<RectShape*>((*contactI)->body[1]->getShape()),
-                  (*contactI));
               break;
 
             case Shape::POLYGON :   // RECT - POLYGON
@@ -74,10 +70,13 @@ namespace Spring2D
               break;
 
             case Shape::POLYGON :   // POLYGON - POLYGON
+              collision = testPolygonPolygon(
+                  static_cast<PolygonShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
+                  (*contactI));
               break;
           }
           break;
-
       }
 
 
@@ -131,6 +130,7 @@ namespace Spring2D
   }
 
 
+
   // ---------------------------------------------------------------------------
   // Check a circle against a rect
   bool NarrowPhaseDetector::testCircleRect (
@@ -145,12 +145,9 @@ namespace Spring2D
     // TODO: OPTIMIZATION -> early out (separation axis -> p. 285) needed ???
 
     // Transform the point in the local coordinates of the rect
-    // TODO: OPTIMIZATION -> in one step with Matrix2x3
     // TODO: OPTIMIZATION -> using projection axis (p. 133)
     Vector2 pointRect = circleCenter;
-    pointRect -= rectCenter;
-    pointRect  = RECT->getBody()->getOrientationMatrix().getInverse() *
-      pointRect;
+    RECT->getBody()->transformLocal(&pointRect);
 
     // Clamp it to the not oriented rect
     if (pointRect.x < -rectHalfSize.x)
@@ -176,9 +173,8 @@ namespace Spring2D
     // TODO: OPTIMIZATION -> in one step with Matrix2x3
     // TODO: OPTIMIZATION -> keep a circleCenter transfomed and do the check
     //                       with it before the re-transform
-    pointRect  = RECT->getBody()->getOrientationMatrix() *
-      pointRect;
-    pointRect += rectCenter;
+    RECT->getBody()->transformWorld(&pointRect);
+
 
     // Test for collision
     // TODO: check for correctness (squaredDistance == 0)
@@ -198,12 +194,154 @@ namespace Spring2D
   }
 
 
+
   // ---------------------------------------------------------------------------
-  // Check a rect against another one
-  bool NarrowPhaseDetector::testRectRect (
-      RectShape* RECT1, RectShape* RECT2, Contact* contact)
+  // Check a polygon against another one
+  bool NarrowPhaseDetector::testPolygonPolygon(
+      PolygonShape* POLYGON1, PolygonShape* POLYGON2, Contact* contact)
   {
+    Vector2 A1 = POLYGON1->getVertices()[0];
+    Vector2 B1 = POLYGON1->getVertices()[1];
+    Vector2 C1 = POLYGON1->getVertices()[2];
+
+    Vector2 p = POLYGON2->getBody()->getPosition() + POLYGON2->getVertices()[0];
+
+    // Transform the point in the local coordinates of the rect
+    POLYGON1->getBody()->transformLocal(&p);
+
+    // Find the point of minimum norm
+    p = pointOfMinimumNorm(p, A1, B1, C1);
+
+    // Re-transform the point in the world coordinates
+    POLYGON1->getBody()->transformWorld(&p);
+
+    contact->point = p;
     return true;
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Compute the point of minimum norm for a single point (1 vertex)
+  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
+      const Vector2& P,
+      const Vector2& A)
+  {
+    return A;
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Compute the point of minimum norm for a segment (2 vertices)
+  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
+      const Vector2& P,
+      const Vector2& A,
+      const Vector2& B)
+  {
+    Vector2 AB = B - A;
+
+    // Project P onto AB, but deferring the division
+    Real numerator = dotProduct(P - A, AB);
+    // If P is outside segment & on the A side
+    if (numerator < 0)
+    {
+      return A;
+    }
+    Real denominator = dotProduct(AB, AB);
+    // If P is outside segment & on the B side
+    if (numerator > denominator)
+    {
+      return B;
+    }
+    // P is on the segment
+    return (A + (numerator / denominator) * AB);
+
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Compute the point of minimum norm for a triangle (3 vertices)
+  // TODO: use cross products
+  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
+      const Vector2& P,
+      const Vector2& A,
+      const Vector2& B,
+      const Vector2& C)
+  {
+    Vector2 AB = B - A;
+    Vector2 AC = C - A;
+    Vector2 AP = P - A;
+
+    // Check if P is in vertex region outside A
+    Real d1 = dotProduct(AB, AP);
+    Real d2 = dotProduct(AC, AP);
+    if (d1 <= 0.0 && d2 <= 0.0)
+    {
+      // Barycentric coordinates (1, 0, 0)
+      return A;
+    }
+
+    // Check if P is in vertex region outside B
+    Vector2 BP = P - B;
+    Real d3 = dotProduct(AB, BP);
+    Real d4 = dotProduct(AC, BP);
+    if (d3 >= 0.0 && d4 <= d3)
+    {
+      // Barycentric coordinates (0, 1, 0)
+      return B;
+    }
+
+    // Check if P is in vertex region outside C
+    Vector2 CP = P - C;
+    Real d5 = dotProduct(AB, CP);
+    Real d6 = dotProduct(AC, CP);
+    if (d6 >= 0.0 && d5 <= d6)
+    {
+      // Barycentric coordinates (0, 0, 1)
+      return C;
+    }
+
+
+
+    // Check if P is in edge region of AB & if so return projection of P onto AB
+    Real vc = d1 * d4 - d3 * d2;
+    if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
+    {
+      // Barycentric coordinates (1 - v, v, 0)
+      Real v = d1 / (d1 - d3);
+      return (A + v * AB);
+    }
+
+    // Check if P is in edge region of AC & if so return projection of P onto AC
+    Real vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0)
+    {
+      // Barycentric coordinates (1 - w, 0, w)
+      Real w = d2 / (d2 - d6);
+      return (A + w * AC);
+    }
+
+    // Check if P is in edge region of BC & if so return projection of P onto BC
+    Real va = d3 * d6 - d5 * d4;
+    if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0)
+    {
+      // Barycentric coordinates (0, 1 - w, w)
+      Real w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+      return (B + w * (C - B));
+    }
+
+
+
+    // P is inside face region & return
+    // u * a + v * b + w * c
+    // u = va * denominator = 1.0 - v - w
+    Real denominator = 1.0 / (va + vb + vc);
+    Real v = vb * denominator;
+    Real w = vc * denominator;
+    return (A + AB * v + AC * w);
+
   }
 
 

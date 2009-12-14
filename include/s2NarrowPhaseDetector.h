@@ -7,6 +7,7 @@
 #include "s2Shape.h"
 #include "s2CircleShape.h"
 #include "s2RectShape.h"
+#include "s2PolygonShape.h"
 #include "s2Contact.h"
 
 
@@ -28,6 +29,18 @@ namespace Spring2D
       bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
       bool testRectRect (RectShape*, RectShape*, Contact*);
+
+      bool testPolygonPolygon (PolygonShape*, PolygonShape*, Contact*);
+
+
+      Vector2 pointOfMinimumNorm (const Vector2&,
+          const Vector2&);
+
+      Vector2 pointOfMinimumNorm (const Vector2&,
+          const Vector2&, const Vector2&);
+
+      Vector2 pointOfMinimumNorm (const Vector2&,
+          const Vector2&, const Vector2&, const Vector2&);
 
   };
 

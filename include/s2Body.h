@@ -163,6 +163,22 @@ namespace Spring2D
       }
 
 
+      // Transform the point in local coordinates
+      void transformLocal (Vector2* point) const
+      {
+        // TODO: OPTIMIZATION -> in one step with Matrix2x3
+        *point -= position_;
+        *point = this->getOrientationMatrix().getInverse() * *point;
+      }
+
+      // Transform the point from body to world coordinates
+      void transformWorld (Vector2* point)
+      {
+        *point = this->getOrientationMatrix() * *point;
+        *point += position_;
+      }
+
+
       // Apply a force
       void applyForce (const Vector2& FORCE)
       {
