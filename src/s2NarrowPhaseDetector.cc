@@ -36,6 +36,10 @@ namespace Spring2D
               break;
 
             case Shape::POLYGON :   // CIRCLE - POLYGON
+              collision = testCirclePolygon(
+                  static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
+                  (*contactI));
               break;
           }
           break;
@@ -64,6 +68,10 @@ namespace Spring2D
           switch ((*contactI)->body[1]->getShape()->getType())
           {
             case Shape::CIRCLE :    // POLYGON - RECT
+              collision = testCirclePolygon(
+                  static_cast<CircleShape*>((*contactI)->body[1]->getShape()),
+                  static_cast<PolygonShape*>((*contactI)->body[0]->getShape()),
+                  (*contactI));
               break;
 
             case Shape::RECT :      // POLYGON - RECT
@@ -196,6 +204,19 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
+  // Check a circle against a polygon
+  bool NarrowPhaseDetector::testCirclePolygon (
+      CircleShape* CIRCLE, PolygonShape* POLYGON, Contact* contact)
+  {
+    Vector2 point = supportMapping(CIRCLE, Vector2::XY);
+    contact->point = point;
+
+    return true;
+  }
+
+
+
+  // ---------------------------------------------------------------------------
   // Check a polygon against another one
   bool NarrowPhaseDetector::testPolygonPolygon(
       PolygonShape* POLYGON1, PolygonShape* POLYGON2, Contact* contact)
@@ -220,7 +241,6 @@ namespace Spring2D
 #endif
 
     Vector2 point = supportMapping(POLYGON1, -Vector2::Y);
-    POLYGON1->getBody()->transformWorld(&point);
     contact->point = point;
 
     return true;
@@ -310,7 +330,6 @@ namespace Spring2D
     }
 
 
-
     // Check if P is in edge region of AB & if so return projection of P onto AB
     Real vc = d1 * d4 - d3 * d2;
     if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
@@ -339,7 +358,6 @@ namespace Spring2D
     }
 
 
-
     // P is inside face region & return
     // u * a + v * b + w * c
     // u = va * denominator = 1.0 - v - w
@@ -351,8 +369,21 @@ namespace Spring2D
   }
 
 
+
   // ---------------------------------------------------------------------------
-  // Return the furthest point along the given direction
+  // Return the furthest point along the given direction [CIRCLE]
+  Vector2 NarrowPhaseDetector::supportMapping (
+      const CircleShape* CIRCLE, Vector2 direction) const
+  {
+    // center + radius * direction / ||direction||
+    return CIRCLE->getBody()->getPosition() +
+      (CIRCLE->getRadius() * direction.normalize());
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Return the furthest point along the given direction [POLYGON]
   Vector2 NarrowPhaseDetector::supportMapping (
       const PolygonShape* POLYGON, Vector2 direction) const
   {
@@ -404,10 +435,12 @@ namespace Spring2D
     // Pick the furthest
     if (dotProduct(pointCCW, direction) > projection)
     {
+      POLYGON->getBody()->transformWorld(&pointCCW);
       return pointCCW;
     }
     else
     {
+      POLYGON->getBody()->transformWorld(&pointCW);
       return pointCW;
     }
 

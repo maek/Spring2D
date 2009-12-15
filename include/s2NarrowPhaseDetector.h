@@ -28,7 +28,7 @@ namespace Spring2D
 
       bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
-      bool testRectRect (RectShape*, RectShape*, Contact*);
+      bool testCirclePolygon (CircleShape*, PolygonShape*, Contact*);
 
       bool testPolygonPolygon (PolygonShape*, PolygonShape*, Contact*);
 
@@ -42,6 +42,8 @@ namespace Spring2D
       Vector2 pointOfMinimumNorm (const Vector2&,
           const Vector2&, const Vector2&, const Vector2&) const;
 
+
+      Vector2 supportMapping (const CircleShape*, Vector2) const;
 
       Vector2 supportMapping (const PolygonShape*, Vector2) const;
 
