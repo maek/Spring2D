@@ -34,13 +34,16 @@ namespace Spring2D
 
 
       Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&);
+          const Vector2&) const;
 
       Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&, const Vector2&);
+          const Vector2&, const Vector2&) const;
 
       Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&, const Vector2&, const Vector2&);
+          const Vector2&, const Vector2&, const Vector2&) const;
+
+
+      Vector2 supportMapping (const PolygonShape*, Vector2) const;
 
   };
 

@@ -200,6 +200,7 @@ namespace Spring2D
   bool NarrowPhaseDetector::testPolygonPolygon(
       PolygonShape* POLYGON1, PolygonShape* POLYGON2, Contact* contact)
   {
+#if 0
     Vector2 A1 = POLYGON1->getVertices()[0];
     Vector2 B1 = POLYGON1->getVertices()[1];
     Vector2 C1 = POLYGON1->getVertices()[2];
@@ -216,6 +217,12 @@ namespace Spring2D
     POLYGON1->getBody()->transformWorld(&p);
 
     contact->point = p;
+#endif
+
+    Vector2 point = supportMapping(POLYGON1, -Vector2::Y);
+    POLYGON1->getBody()->transformWorld(&point);
+    contact->point = point;
+
     return true;
   }
 
@@ -225,7 +232,7 @@ namespace Spring2D
   // Compute the point of minimum norm for a single point (1 vertex)
   Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
       const Vector2& P,
-      const Vector2& A)
+      const Vector2& A) const
   {
     return A;
   }
@@ -237,7 +244,7 @@ namespace Spring2D
   Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
       const Vector2& P,
       const Vector2& A,
-      const Vector2& B)
+      const Vector2& B) const
   {
     Vector2 AB = B - A;
 
@@ -263,12 +270,11 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Compute the point of minimum norm for a triangle (3 vertices)
-  // TODO: use cross products
   Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
       const Vector2& P,
       const Vector2& A,
       const Vector2& B,
-      const Vector2& C)
+      const Vector2& C) const
   {
     Vector2 AB = B - A;
     Vector2 AC = C - A;
@@ -341,6 +347,69 @@ namespace Spring2D
     Real v = vb * denominator;
     Real w = vc * denominator;
     return (A + AB * v + AC * w);
+
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // Return the furthest point along the given direction
+  Vector2 NarrowPhaseDetector::supportMapping (
+      const PolygonShape* POLYGON, Vector2 direction) const
+  {
+    // Transform the direction in the local coordinates
+    direction =
+      POLYGON->getBody()->getOrientationMatrix().getInverse() * direction;
+
+    Vector2* VERTICES   = POLYGON->getVertices();
+    unsigned N_VERTICES = POLYGON->getNVertices();
+
+    Vector2 pointCW   = VERTICES[0];
+    Vector2 pointCCW  = VERTICES[0];
+
+    Real projection;
+    Real tprojection;
+
+    // Counter-clockwise
+    projection = dotProduct(pointCCW, direction);
+    for (unsigned i = 1; i < N_VERTICES; ++i)
+    {
+      tprojection = dotProduct(VERTICES[i], direction);
+      if (projection <= tprojection)
+      {
+        pointCCW = VERTICES[i];
+        projection = tprojection;
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    // Clockwise
+    projection = dotProduct(pointCW, direction);
+    for (unsigned i = N_VERTICES - 1; i > 0; --i)
+    {
+      tprojection = dotProduct(VERTICES[i], direction);
+      if (projection <= tprojection)
+      {
+        pointCW = VERTICES[i];
+        projection = tprojection;
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    // Pick the furthest
+    if (dotProduct(pointCCW, direction) > projection)
+    {
+      return pointCCW;
+    }
+    else
+    {
+      return pointCW;
+    }
 
   }
 
