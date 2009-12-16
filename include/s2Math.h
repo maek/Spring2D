@@ -96,6 +96,12 @@ namespace Spring2D
         return *this;
       }
 
+      // Get the normalized vector
+      Vector2 getNormalized ()
+      {
+        Vector2 vector = *this;
+        return vector.normalize();
+      }
 
   };
 

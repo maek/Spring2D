@@ -2,6 +2,7 @@
 #define __SPRING2D_H__
 
 // Include all header files of the library (for the applications)
+// TOOD: remove the implementation interfaces
 #include "s2Settings.h"
 #include "s2AABB.h"
 #include "s2Body.h"
@@ -19,6 +20,7 @@
 #include "s2PolygonShape.h"
 #include "s2RectShape.h"
 #include "s2Shape.h"
+#include "s2Simplex.h"
 #include "s2Torque.h"
 #include "s2TorqueMotor.h"
 #include "s2TorqueRegister.h"

@@ -11,6 +11,7 @@ OBJECTS = s2Engine.o\
 					s2Environment.o\
 					s2AABB.o\
 					s2BroadPhaseDetector.o\
+					s2Simplex.o\
 					s2NarrowPhaseDetector.o\
 					s2CollisionDetector.o
 
@@ -60,6 +61,12 @@ $(OBJDIR)/s2AABB.o:									$(SRCDIR)/s2AABB.cc\
 
 $(OBJDIR)/s2BroadPhaseDetector.o:		$(SRCDIR)/s2BroadPhaseDetector.cc\
 																		$(INCDIR)/s2BroadPhaseDetector.h\
+																		$(INCDIR)/s2Settings.h\
+																		$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2Simplex.o:							$(SRCDIR)/s2Simplex.cc\
+																		$(INCDIR)/s2Simplex.h\
 																		$(INCDIR)/s2Settings.h\
 																		$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

@@ -5,6 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2Shape.h"
+#include "s2Simplex.h"
 #include "s2CircleShape.h"
 #include "s2RectShape.h"
 #include "s2PolygonShape.h"
@@ -33,19 +34,12 @@ namespace Spring2D
       bool testPolygonPolygon (PolygonShape*, PolygonShape*, Contact*);
 
 
-      Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&) const;
-
-      Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&, const Vector2&) const;
-
-      Vector2 pointOfMinimumNorm (const Vector2&,
-          const Vector2&, const Vector2&, const Vector2&) const;
-
-
       Vector2 supportMapping (const CircleShape*, Vector2) const;
 
       Vector2 supportMapping (const PolygonShape*, Vector2) const;
+
+      Vector2 supportMappingMinkowsky (
+          const PolygonShape*, const PolygonShape*, Vector2) const;
 
   };
 

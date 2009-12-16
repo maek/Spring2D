@@ -57,6 +57,7 @@ namespace Spring2D
   class PolygonShape;
   class RectShape;
   class Shape;
+  class Simplex;
   class Torque;
   class TorqueMotor;
   class TorqueRegister;

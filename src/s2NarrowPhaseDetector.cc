@@ -217,155 +217,55 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // Check a polygon against another one
+  // Check a polygon against another one [GJK]
+  // TODO : does exist a better initial point (ISA) ???
   bool NarrowPhaseDetector::testPolygonPolygon(
       PolygonShape* POLYGON1, PolygonShape* POLYGON2, Contact* contact)
   {
-#if 0
-    Vector2 A1 = POLYGON1->getVertices()[0];
-    Vector2 B1 = POLYGON1->getVertices()[1];
-    Vector2 C1 = POLYGON1->getVertices()[2];
-
-    Vector2 p = POLYGON2->getBody()->getPosition() + POLYGON2->getVertices()[0];
-
-    // Transform the point in the local coordinates of the rect
-    POLYGON1->getBody()->transformLocal(&p);
-
-    // Find the point of minimum norm
-    p = pointOfMinimumNorm(p, A1, B1, C1);
-
-    // Re-transform the point in the world coordinates
-    POLYGON1->getBody()->transformWorld(&p);
-
-    contact->point = p;
-#endif
-
-    Vector2 point = supportMapping(POLYGON1, -Vector2::Y);
-    contact->point = point;
-
-    return true;
-  }
+    Real epsilon = 0.001;
+    Simplex Y;
+    Vector2 v;
+    Vector2 w;
 
 
+    // Get a start point from the Minkowsky difference
+    v = supportMappingMinkowsky(POLYGON1, POLYGON2, Vector2::XY);
+    std::cout << "v = " << v << "\n";
 
-  // ---------------------------------------------------------------------------
-  // Compute the point of minimum norm for a single point (1 vertex)
-  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
-      const Vector2& P,
-      const Vector2& A) const
-  {
-    return A;
-  }
-
-
-
-  // ---------------------------------------------------------------------------
-  // Compute the point of minimum norm for a segment (2 vertices)
-  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
-      const Vector2& P,
-      const Vector2& A,
-      const Vector2& B) const
-  {
-    Vector2 AB = B - A;
-
-    // Project P onto AB, but deferring the division
-    Real numerator = dotProduct(P - A, AB);
-    // If P is outside segment & on the A side
-    if (numerator < 0)
+    while (true)
     {
-      return A;
-    }
-    Real denominator = dotProduct(AB, AB);
-    // If P is outside segment & on the B side
-    if (numerator > denominator)
-    {
-      return B;
-    }
-    // P is on the segment
-    return (A + (numerator / denominator) * AB);
+      // Compute a support point in direction -v
+      w = supportMappingMinkowsky(POLYGON1, POLYGON2, -v.getNormalized());
+      std::cout << "w = " << w << "\n";
+      std::cout << "||v||^2 = " << v.getSquaredMagnitude() << "\n";
+      std::cout << "dot(v, w) = " << dotProduct(v, w) << "\n";
 
-  }
+      // If w is in Y OR
+      // v.getMagnitude() - dotProduct(v, w) <= epsilon^2 * v.getMagnitude()
+      // TODO: find a better exit condition
+      if (Y.hasVertex(w) ||
+          v.getSquaredMagnitude() - dotProduct(v, w) <=
+          epsilon * epsilon * v.getSquaredMagnitude())
+      {
+        std::cout << "=========================== " << v.getMagnitude() << "\n";
+        return false;
+      }
 
+      // Add w to the simplex
+      Y.expand(w);
+      // Get the point of minimum norm in the simplex
+      v = Y.getPointOfMinimumNorm();
+      std::cout << "v = " << v << "\n";
 
-
-  // ---------------------------------------------------------------------------
-  // Compute the point of minimum norm for a triangle (3 vertices)
-  Vector2 NarrowPhaseDetector::pointOfMinimumNorm (
-      const Vector2& P,
-      const Vector2& A,
-      const Vector2& B,
-      const Vector2& C) const
-  {
-    Vector2 AB = B - A;
-    Vector2 AC = C - A;
-    Vector2 AP = P - A;
-
-    // Check if P is in vertex region outside A
-    Real d1 = dotProduct(AB, AP);
-    Real d2 = dotProduct(AC, AP);
-    if (d1 <= 0.0 && d2 <= 0.0)
-    {
-      // Barycentric coordinates (1, 0, 0)
-      return A;
+      if (Y.hasOriginInside() == true)
+      {
+        std::cout << "collision [GJK]\n";
+        // TODO: call EPA
+        return true;
+      }
     }
 
-    // Check if P is in vertex region outside B
-    Vector2 BP = P - B;
-    Real d3 = dotProduct(AB, BP);
-    Real d4 = dotProduct(AC, BP);
-    if (d3 >= 0.0 && d4 <= d3)
-    {
-      // Barycentric coordinates (0, 1, 0)
-      return B;
-    }
-
-    // Check if P is in vertex region outside C
-    Vector2 CP = P - C;
-    Real d5 = dotProduct(AB, CP);
-    Real d6 = dotProduct(AC, CP);
-    if (d6 >= 0.0 && d5 <= d6)
-    {
-      // Barycentric coordinates (0, 0, 1)
-      return C;
-    }
-
-
-    // Check if P is in edge region of AB & if so return projection of P onto AB
-    Real vc = d1 * d4 - d3 * d2;
-    if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
-    {
-      // Barycentric coordinates (1 - v, v, 0)
-      Real v = d1 / (d1 - d3);
-      return (A + v * AB);
-    }
-
-    // Check if P is in edge region of AC & if so return projection of P onto AC
-    Real vb = d5 * d2 - d1 * d6;
-    if (vb <= 0.0 && d2 >= 0.0 && d6 <= 0.0)
-    {
-      // Barycentric coordinates (1 - w, 0, w)
-      Real w = d2 / (d2 - d6);
-      return (A + w * AC);
-    }
-
-    // Check if P is in edge region of BC & if so return projection of P onto BC
-    Real va = d3 * d6 - d5 * d4;
-    if (va <= 0.0 && (d4 - d3) >= 0.0 && (d5 - d6) >= 0.0)
-    {
-      // Barycentric coordinates (0, 1 - w, w)
-      Real w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-      return (B + w * (C - B));
-    }
-
-
-    // P is inside face region & return
-    // u * a + v * b + w * c
-    // u = va * denominator = 1.0 - v - w
-    Real denominator = 1.0 / (va + vb + vc);
-    Real v = vb * denominator;
-    Real w = vc * denominator;
-    return (A + AB * v + AC * w);
-
+    return false;
   }
 
 
@@ -444,6 +344,20 @@ namespace Spring2D
       return pointCW;
     }
 
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Return the furthest point along the given direction [MINKOWSKY]
+  // S   (d) = S (d) - S (-d)
+  //  a-b       a       b
+  inline Vector2 NarrowPhaseDetector::supportMappingMinkowsky (
+      const PolygonShape* POLYGON1, const PolygonShape* POLYGON2,
+      Vector2 direction) const
+  {
+    return (supportMapping(POLYGON1, direction) -
+        supportMapping(POLYGON2, -direction));
   }
 
 

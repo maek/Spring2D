@@ -19,7 +19,7 @@ namespace Spring2D
       PolygonShape (const unsigned N_VERTICES, Vector2* VERTICES)
         : nVertices_(N_VERTICES)
       {
-        assert(N_VERTICES > 0);
+        assert(N_VERTICES >= 3);
 
         // TODO: add the convexity test
 
@@ -66,6 +66,7 @@ namespace Spring2D
         Real ty;
         // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
         //                       (only if rotating)
+        // TODO: check if directionX & directionY are normalized
         Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
         Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
 
