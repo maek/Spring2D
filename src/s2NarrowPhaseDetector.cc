@@ -227,13 +227,23 @@ namespace Spring2D
     Vector2 v;
     Vector2 w;
 
-
     // Get a start point from the Minkowsky difference
-    v = supportMappingMinkowsky(POLYGON1, POLYGON2, Vector2::XY);
+    // TODO: grep body2pos - body1pos for the direction
+    v = supportMappingMinkowsky(POLYGON1, POLYGON2,
+        (POLYGON2->getBody()->getPosition() -
+         POLYGON1->getBody()->getPosition()).getNormalized());
     std::cout << "v = " << v << "\n";
 
     while (true)
     {
+      // TODO: remove for correctness ? (NO normal found)
+      //if (v == Vector2::ZERO)
+      //{
+      //  std::cout << "collision [GJK]\n";
+      //  // TODO: call EPA
+      //  return true;
+      //}
+
       // Compute a support point in direction -v
       w = supportMappingMinkowsky(POLYGON1, POLYGON2, -v.getNormalized());
       std::cout << "w = " << w << "\n";
@@ -242,12 +252,11 @@ namespace Spring2D
 
       // If w is in Y OR
       // v.getMagnitude() - dotProduct(v, w) <= epsilon^2 * v.getMagnitude()
-      // TODO: find a better exit condition
       if (Y.hasVertex(w) ||
-          v.getSquaredMagnitude() - dotProduct(v, w) <=
-          epsilon * epsilon * v.getSquaredMagnitude())
+          v.getSquaredMagnitude() * (1 - epsilon * epsilon) <= dotProduct(v, w))
+        // dotProduct(v, w) > 0)
       {
-        std::cout << "=========================== " << v.getMagnitude() << "\n";
+        std::cout << "[DISTANCE] =================== " << v.getMagnitude() << "\n";
         return false;
       }
 
@@ -257,15 +266,102 @@ namespace Spring2D
       v = Y.getPointOfMinimumNorm();
       std::cout << "v = " << v << "\n";
 
+      // Check for collision
       if (Y.hasOriginInside() == true)
       {
-        std::cout << "collision [GJK]\n";
+        std::cout << "collision [GJK] ==============================\n";
+        // Here Y contain exactly 3 points
+        std::cout << "dimension = " << Y.getDimension() << "\n";
+        std::cout << "P[0] = " << Y.P[0] << "\n";
+        std::cout << "P[1] = " << Y.P[1] << "\n";
+        std::cout << "P[2] = " << Y.P[2] << "\n";
+        EPA(Y, POLYGON1, POLYGON2, contact);
         // TODO: call EPA
         return true;
       }
     }
 
+    // Cosmetic return
     return false;
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Find the distance from the two intersecting polygons
+  void NarrowPhaseDetector::EPA (
+      const Simplex& Y,
+      PolygonShape* POLYGON1, PolygonShape* POLYGON2,
+      Contact* contact) const
+  {
+    std::priority_queue<Entry*, std::vector<Entry*>, PQComparison> Q;
+    Vector2 v;
+    Vector2 w;
+    Entry* entry;
+    Entry* entry1;
+    Entry* entry2;
+
+    // Build all entries
+    for (int i = 0; i < 3; ++i)
+    {
+      entry = new Entry();
+      if (entry->build(Y.P[i], Y.P[(i + 1) % 3]))
+      {
+        Q.push(entry);
+      }
+      else
+      {
+        delete entry;
+      }
+    }
+
+    // Compute the penetration distance
+    // TODO: resolve the memory leak
+    while (true)
+    {
+      entry = Q.top();
+      Q.pop();
+
+      v = entry->v;
+      // TODO: normalize ???
+      w = supportMappingMinkowsky(POLYGON1, POLYGON2, v);
+      std::cerr << "v = " << v << "\n";
+      std::cerr << "w = " << w << "\n";
+      std::cerr << (dotProduct(v, w) / v.getMagnitude() - v.getMagnitude()) << "\n";
+
+      // Close enough
+      if (dotProduct(v, w) / v.getMagnitude() - v.getMagnitude() <= 0.001)
+      {
+        std::cout << "[EPA] ======================== " << v.getMagnitude() << "\n";
+        break;
+      }
+
+
+      // Split the edge
+      entry1 = new Entry();
+      if (entry1->build(entry->y[0], w))
+      {
+        Q.push(entry1);
+      }
+      else
+      {
+        delete entry1;
+      }
+
+      entry2 = new Entry();
+      if (entry2->build(w, entry->y[1]))
+      {
+        Q.push(entry2);
+      }
+      else
+      {
+        delete entry2;
+      }
+
+      // TODO: here ???
+      delete entry;
+    }
+
   }
 
 

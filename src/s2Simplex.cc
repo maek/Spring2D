@@ -104,7 +104,7 @@ namespace Spring2D
       if (vc <= 0.0 && d1 >= 0.0 && d3 <= 0.0)
       {
         // Remove C & return the projection on AB
-        dimension_ -= 1;
+        dimension_--;
         Real v = d1 / (d1 - d3);
         return (A + v * AB);
       }
@@ -115,7 +115,7 @@ namespace Spring2D
       {
         // Remove B & return the projection on AC
         P[1] = P[2];
-        dimension_ -= 1;
+        dimension_--;
         Real w = d2 / (d2 - d6);
         return (A + w * AC);
       }
@@ -127,7 +127,7 @@ namespace Spring2D
         // Remove A & return the projection on BC
         P[0] = P[1];
         P[1] = P[2];
-        dimension_ -= 1;
+        dimension_--;
         Real w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
         return (B + w * (C - B));
       }

@@ -22,6 +22,13 @@ namespace Spring2D
       Simplex () : dimension_(-1), hasOrigin_(false) { }
 
 
+      // Return the simplex dimension
+      int getDimension ()
+      {
+        return dimension_;
+      }
+
+
       // Add a vertex to the simplex
       void expand (const Vector2& VERTEX)
       {

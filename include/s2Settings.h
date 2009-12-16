@@ -6,6 +6,7 @@
 #include <cmath>
 #include <list>
 #include <set>
+#include <queue>
 #include <algorithm>
 #include <cassert>
 
