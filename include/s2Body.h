@@ -168,13 +168,13 @@ namespace Spring2D
       {
         // TODO: OPTIMIZATION -> in one step with Matrix2x3
         *point -= position_;
-        *point = this->getOrientationMatrix().getInverse() * *point;
+        *point = getOrientationMatrix().getInverse() * *point;
       }
 
       // Transform the point from body to world coordinates
       void transformWorld (Vector2* point)
       {
-        *point = this->getOrientationMatrix() * *point;
+        *point = getOrientationMatrix() * *point;
         *point += position_;
       }
 

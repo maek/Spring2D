@@ -55,6 +55,14 @@ namespace Spring2D
       void updateAABB () { }
 
 
+      // Return the furthest point along the given direction
+      Vector2 getSupportPoint (const Vector2& DIRECTION) const
+      {
+        // center + radius * direction
+        return body_->getPosition() + (radius_ * DIRECTION);
+      }
+
+
     private:
 
       Real  radius_;

@@ -15,7 +15,7 @@ namespace Spring2D
 
       friend class Body;
 
-      enum ShapeType {CIRCLE, RECT, POLYGON};
+      enum ShapeType {CIRCLE, POLYGON, RECT};
 
 
     public:
@@ -42,6 +42,8 @@ namespace Spring2D
       virtual void buildAABB (Vector2*) = 0;
 
       virtual void updateAABB () = 0;
+
+      virtual Vector2 getSupportPoint (const Vector2&) const = 0;
 
 
     protected:

@@ -16,7 +16,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      PolygonShape (const unsigned N_VERTICES, Vector2* VERTICES)
+      PolygonShape (const int N_VERTICES, Vector2* VERTICES)
         : nVertices_(N_VERTICES)
       {
         assert(N_VERTICES >= 3);
@@ -24,7 +24,7 @@ namespace Spring2D
         // TODO: add the convexity test
 
         vertices_ = new Vector2[N_VERTICES];
-        for (unsigned i = 0; i < nVertices_; ++i)
+        for (int i = 0; i < nVertices_; ++i)
         {
           vertices_[i] = VERTICES[i];
         }
@@ -32,7 +32,7 @@ namespace Spring2D
 
 
       // Get the number of vertices
-      unsigned getNVertices() const
+      int getNVertices() const
       {
         return nVertices_;
       }
@@ -73,7 +73,7 @@ namespace Spring2D
         aabb_.halfSize_.x = s2fabs(dotProduct(vertices_[0], directionX));
         aabb_.halfSize_.y = s2fabs(dotProduct(vertices_[0], directionY));
 
-        for (unsigned i = 1; i < nVertices_; ++i)
+        for (int i = 1; i < nVertices_; ++i)
         {
           tx = s2fabs(dotProduct(vertices_[i], directionX));
           ty = s2fabs(dotProduct(vertices_[i], directionY));
@@ -92,9 +92,72 @@ namespace Spring2D
       }
 
 
+
+      // Return the furthest point along the given direction
+      Vector2 getSupportPoint (const Vector2& DIRECTION) const
+      {
+        // Transform the direction in the local coordinates
+        Vector2 direction = body_->getOrientationMatrix().getInverse() *
+          DIRECTION;
+
+        Vector2 pointCW   = vertices_[0];
+        Vector2 pointCCW  = vertices_[0];
+
+        Real projection;
+        Real tprojection;
+
+        // Counter-clockwise
+        projection = dotProduct(pointCCW, direction);
+        for (int i = 1; i < nVertices_; ++i)
+        {
+          tprojection = dotProduct(vertices_[i], direction);
+          if (projection <= tprojection)
+          {
+            pointCCW = vertices_[i];
+            projection = tprojection;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        // Clockwise
+        projection = dotProduct(pointCW, direction);
+        for (int i = nVertices_ - 1; i > 0; --i)
+        {
+          tprojection = dotProduct(vertices_[i], direction);
+          if (projection <= tprojection)
+          {
+            pointCW = vertices_[i];
+            projection = tprojection;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        // Pick the furthest
+        if (dotProduct(pointCCW, direction) > projection)
+        {
+          // Transform the point in the world coordinates
+          body_->transformWorld(&pointCCW);
+          return pointCCW;
+        }
+        else
+        {
+          // Transform the point in the world coordinates
+          body_->transformWorld(&pointCW);
+          return pointCW;
+        }
+
+      }
+
+
     private:
 
-      unsigned  nVertices_;
+      int       nVertices_;
 
       Vector2*  vertices_;
 

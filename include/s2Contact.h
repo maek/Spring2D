@@ -15,10 +15,13 @@ namespace Spring2D
     public:
 
       Contact (Body* BODY1, Body* BODY2)
-        : point(Vector2::ZERO), normal(Vector2::ZERO), penetrationDepth(0)
+        : penetrationDepth(0)
       {
         body[0] = BODY1;
         body[1] = BODY2;
+
+        point[0] = Vector2::ZERO;
+        point[1] = Vector2::ZERO;
       }
 
 
@@ -27,9 +30,7 @@ namespace Spring2D
       Body     *body[2];
 
 
-      Vector2   point;
-
-      Vector2   normal;
+      Vector2   point[2];
 
       Real      penetrationDepth;
 
@@ -38,7 +39,7 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // The compare function for the set of Contact
+  // The compare function for the set of Contacts
   class ContactCompare
   {
     public:

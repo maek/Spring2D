@@ -20,7 +20,6 @@
 #include "s2PolygonShape.h"
 #include "s2RectShape.h"
 #include "s2Shape.h"
-#include "s2Simplex.h"
 #include "s2Torque.h"
 #include "s2TorqueMotor.h"
 #include "s2TorqueRegister.h"

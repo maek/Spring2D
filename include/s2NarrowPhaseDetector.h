@@ -5,10 +5,9 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2Shape.h"
-#include "s2Simplex.h"
 #include "s2CircleShape.h"
-#include "s2RectShape.h"
 #include "s2PolygonShape.h"
+#include "s2RectShape.h"
 #include "s2Contact.h"
 
 
@@ -27,78 +26,151 @@ namespace Spring2D
 
       bool testCircleCircle (CircleShape*, CircleShape*, Contact*);
 
-      bool testCircleRect (CircleShape*, RectShape*, Contact*);
-
       bool testCirclePolygon (CircleShape*, PolygonShape*, Contact*);
+
+      bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
       bool testPolygonPolygon (PolygonShape*, PolygonShape*, Contact*);
 
+      bool testPolygonRect (PolygonShape*, RectShape*, Contact*);
 
-      Vector2 supportMapping (const CircleShape*, Vector2) const;
-
-      Vector2 supportMapping (const PolygonShape*, Vector2) const;
-
-      Vector2 supportMappingMinkowsky (
-          const PolygonShape*, const PolygonShape*, Vector2) const;
+      bool testRectRect (RectShape*, RectShape*, Contact*);
 
 
-      void EPA (const Simplex&, PolygonShape*, PolygonShape*, Contact*) const;
+      bool GJK (Simplex&, const Shape*, const Shape*) const;
+
+      void EPA (const Simplex&, const Shape*, const Shape*, Contact*) const;
 
   };
 
 
 
+
+
   // ---------------------------------------------------------------------------
-  class Entry
+  // A n-dimensional simplex (n = [0~2])
+  // TODO: use pointer
+  class Simplex
   {
     public:
 
-      // The endpoints of the edge
-      Vector2 y[2];
+      Vector2 vertices[3];
 
-      // The point on the edge closest to the origin
-      Vector2 v;
+      Vector2 supportPointsA[3];
 
-      // The distance of v from the origin
-      Real key;
+      Vector2 supportPointsB[3];
+
+      Real    bCoordinates[3];
+
+
+      int size;
+
+      bool includeOrigin;
 
 
     public:
 
-      bool build (const Vector2& A, const Vector2& B)
+      // Constructor
+      Simplex () : size(0), includeOrigin(false) { }
+
+
+      // Add a vertex to the simplex
+      void addVertex (const Vector2& VERTEX,
+          const Vector2& SUPPORT_POINT_A, const Vector2& SUPPORT_POINT_B)
       {
-        Vector2 O(0 ,0);
-        Vector2 AB = B - A;
-
-        // Project O onto AB, but deferring the division
-        Real numerator = dotProduct(O - A, AB);
-        // If O is outside segment & on the A side
-        if (numerator < 0) return false;
-        Real denominator = dotProduct(AB, AB);
-        // If O is outside segment & on the B side
-        if (numerator > denominator) return false;
-
-        // O is on the segment
-        y[0] = A;
-        y[1] = B;
-        v = (A + (numerator / denominator) * AB);
-        key = v.getMagnitude();
-        return true;
+        assert(size < 3);
+        vertices[size]       = VERTEX;
+        supportPointsA[size] = SUPPORT_POINT_A;
+        supportPointsB[size] = SUPPORT_POINT_B;
+        ++size;
       }
 
+      // Test if the given vertex is in the simplex
+      bool hasVertex (const Vector2& VERTEX)
+      {
+        for (int i = 0; i < size; ++i)
+        {
+          if (VERTEX == vertices[i])
+            return true;
+        }
+
+        return false;
+      }
+
+
+      // Return the point in A associated to the closest point to origin
+      Vector2 getPointA () const
+      {
+        Vector2 pointA = Vector2::ZERO;
+        for (int i = 0; i < size; ++i)
+        {
+          pointA += supportPointsA[i] * bCoordinates[i];
+        }
+        return pointA;
+      }
+
+      // Return the point in B associated to the closest point to origin
+      Vector2 getPointB () const
+      {
+        Vector2 pointB = Vector2::ZERO;
+        for (int i = 0; i < size; ++i)
+        {
+          pointB += supportPointsB[i] * bCoordinates[i];
+        }
+        return pointB;
+      }
+
+
+      Vector2 calculateClosestPointToOrigin ();
+
   };
 
 
 
+
+
   // ---------------------------------------------------------------------------
-  class PQComparison
+  // The edge for the EPA
+  class Edge
   {
     public:
 
-      bool operator() (const Entry* ENTRY1, const Entry* ENTRY2) const
+      Vector2 endpoints[2];
+
+      Vector2 supportPointsA[2];
+
+      Vector2 supportPointsB[2];
+
+
+      Vector2 v;
+
+      Real key;
+
+      Real t;
+
+
+    public:
+
+      bool construct (
+          const Vector2&, const Vector2&, const Vector2&,
+          const Vector2&, const Vector2&, const Vector2&);
+
+  };
+
+
+
+
+
+  // ---------------------------------------------------------------------------
+  // The compare function for the priority-queue of Edges
+  class EdgeCompare
+  {
+    public:
+
+      bool operator() (const Edge* EDGE1, const Edge* EDGE2) const
       {
-        // TODO: comment minimum
-        return (ENTRY1->key > ENTRY2->key);
+        // Keep a decreasing sorting (best = minimum)
+        return (EDGE1->key > EDGE2->key);
       }
 
   };

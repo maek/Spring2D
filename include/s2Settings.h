@@ -40,6 +40,11 @@ namespace Spring2D
   // Physics constants
   const Real G = 9.80665;
 
+  // Absolute error
+  const Real EPSILON = 0.001;
+  const Real EPSILON_2 = EPSILON * EPSILON;
+
+
   // Class declarations (to decrease dependencies)
   class AABB;
   class Body;

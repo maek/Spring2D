@@ -103,8 +103,17 @@ namespace Spring2D
       }
 
 
+      // Return the furthest point along the given direction
+      Vector2 getSupportPoint (const Vector2& DIRECTION)
+      {
+        // TODO: implement
+        return Vector2::ZERO;
+      }
+
+
     private:
 
+      // TODO: change name -> extent
       Vector2   halfSize_;
 
   };
