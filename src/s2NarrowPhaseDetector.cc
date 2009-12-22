@@ -57,12 +57,16 @@ namespace Spring2D
 
             case Shape::POLYGON :   // POLYGON - POLYGON
               collision = testPolygonPolygon(
-                  static_cast<PolygonShape*>((*contactI)->body[0]->getShape()),
-                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
                   (*contactI));
               break;
 
             case Shape::RECT :      // POLYGON - RECT
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
               break;
           }
           break;
@@ -79,9 +83,17 @@ namespace Spring2D
               break;
 
             case Shape::POLYGON :   // RECT - POLYGON
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
               break;
 
             case Shape::RECT :      // RECT - RECT
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
               break;
           }
           break;
@@ -115,22 +127,27 @@ namespace Spring2D
   bool NarrowPhaseDetector::testCircleCircle (
       CircleShape* CIRCLE1, CircleShape* CIRCLE2, Contact* contact)
   {
-    Vector2 circle1Center = CIRCLE1->getBody()->getPosition();
-    Vector2 circle2Center = CIRCLE2->getBody()->getPosition();
+    Vector2 center1 = CIRCLE1->getBody()->getPosition();
+    Real radius1    = CIRCLE1->getRadius();
+    Vector2 center2 = CIRCLE2->getBody()->getPosition();
+    Real radius2    = CIRCLE2->getRadius();
 
-    Vector2 midLine = circle2Center - circle1Center;
+    // Early out if the two circle is concentric (NO normal possible)
+    if (center1 == center2)
+    {
+      return false;
+    }
+
+    Vector2 midLine = center2 - center1;
     Real squaredDistance = midLine.getSquaredMagnitude();
-    Real radiusSum = CIRCLE1->getRadius() + CIRCLE2->getRadius();
+    Real radiusSum = radius1 + radius2;
 
     // Comparing the squared distance avoid the computation of the radix
-    // TODO: check for correctness (squaredDistance == 0)
-    if (squaredDistance <= (radiusSum * radiusSum))
+    if (squaredDistance < (radiusSum * radiusSum))
     {
-      // TODO: fix contact points
-      contact->point[0] = circle1Center;
-      contact->point[1] = circle2Center;
       contact->penetrationDepth = radiusSum - s2sqrt(squaredDistance);
-      std::cerr << "CIRCLE - CIRCLE\n";
+      contact->point[0] = center2 - midLine.getNormalizedCopy() * radius2;
+      contact->point[1] = center1 + midLine.getNormalizedCopy() * radius1;
 
       return true;
     }
@@ -145,36 +162,36 @@ namespace Spring2D
   bool NarrowPhaseDetector::testCircleRect (
       CircleShape* CIRCLE, RectShape* RECT, Contact* contact)
   {
-    Vector2 circleCenter  = CIRCLE->getBody()->getPosition();
-    Real circleRadius     = CIRCLE->getRadius();
+    Vector2 centerC   = CIRCLE->getBody()->getPosition();
+    Real radius       = CIRCLE->getRadius();
 
-    Vector2 rectCenter    = RECT->getBody()->getPosition();
-    Vector2 rectHalfSize  = RECT->getHalfSize();
+    Vector2 centerR   = RECT->getBody()->getPosition();
+    Vector2 halfSize  = RECT->getHalfSize();
 
     // TODO: OPTIMIZATION -> early out (separation axis -> p. 285) needed ???
 
     // Transform the point in the local coordinates of the rect
     // TODO: OPTIMIZATION -> using projection axis (p. 133)
-    Vector2 pointRect = circleCenter;
+    Vector2 pointRect = centerC;
     RECT->getBody()->transformLocal(&pointRect);
 
     // Clamp it to the not oriented rect
-    if (pointRect.x < -rectHalfSize.x)
+    if (pointRect.x < -halfSize.x)
     {
-      pointRect.x = -rectHalfSize.x;
+      pointRect.x = -halfSize.x;
     }
-    if (pointRect.y < -rectHalfSize.y)
+    if (pointRect.y < -halfSize.y)
     {
-      pointRect.y = -rectHalfSize.y;
+      pointRect.y = -halfSize.y;
     }
 
-    if (pointRect.x > rectHalfSize.x)
+    if (pointRect.x > halfSize.x)
     {
-      pointRect.x = rectHalfSize.x;
+      pointRect.x = halfSize.x;
     }
-    if (pointRect.y > rectHalfSize.y)
+    if (pointRect.y > halfSize.y)
     {
-      pointRect.y = rectHalfSize.y;
+      pointRect.y = halfSize.y;
     }
 
 
@@ -187,14 +204,12 @@ namespace Spring2D
 
     // Test for collision
     // TODO: check for correctness (squaredDistance == 0)
-    Real squaredDistance = (pointRect - circleCenter).getSquaredMagnitude();
-    if (squaredDistance <= (circleRadius * circleRadius))
+    Real squaredDistance = (pointRect - centerC).getSquaredMagnitude();
+    if (squaredDistance < (radius * radius))
     {
-      // TODO: fix contact points
-      contact->point[0] = circleCenter;
+      contact->point[0] = centerC + (pointRect - centerC).getNormalizedCopy() * radius;
       contact->point[1] = pointRect;
-      contact->penetrationDepth = circleRadius - s2sqrt(squaredDistance);
-      std::cerr << "CIRCLE - RECT\n";
+      contact->penetrationDepth = radius - s2sqrt(squaredDistance);
 
       return true;
     }
@@ -209,7 +224,19 @@ namespace Spring2D
   bool NarrowPhaseDetector::testCirclePolygon (
       CircleShape* CIRCLE, PolygonShape* POLYGON, Contact* contact)
   {
-    return true;
+    Simplex W;
+    Vector2 centerC = CIRCLE->getBody()->getPosition();
+    Real radius     = CIRCLE->getRadius();
+
+    Vector2 distance = GJK(W, CIRCLE, POLYGON);
+    if (distance.getSquaredMagnitude() < radius * radius)
+    {
+      contact->penetrationDepth = radius - distance.getMagnitude();
+      contact->point[0] = centerC - distance.getNormalizedCopy() * radius;
+      contact->point[1] = centerC - distance;
+      return true;
+    }
+    return false;
   }
 
 
@@ -217,12 +244,12 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Check a polygon against another one
   bool NarrowPhaseDetector::testPolygonPolygon(
-      PolygonShape* POLYGON1, PolygonShape* POLYGON2, Contact* contact)
+      Shape* SHAPE1, Shape* SHAPE2, Contact* contact)
   {
-    Simplex Y;
-    if (GJK(Y, POLYGON1, POLYGON2) == true)
+    Simplex W;
+    if (GJK(W, SHAPE1, SHAPE2).isZero())
     {
-      EPA(Y, POLYGON1, POLYGON2, contact);
+      EPA(W, SHAPE1, SHAPE2, contact);
       return true;
     }
     return false;
@@ -234,75 +261,116 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Find if two shape is intersecting [GJK]
-  bool NarrowPhaseDetector::GJK (
-      Simplex& Y,
+  Vector2 NarrowPhaseDetector::GJK (
+      Simplex& W,
       const Shape* SHAPE1, const Shape* SHAPE2) const
   {
+    Simplex Y;
     Vector2 v;
     Vector2 w;
     Vector2 sA;
     Vector2 sB;
 
     // Get a start point from the Minkowsky difference
-    // TODO: grep body2pos - body1pos for the direction
-    sA = SHAPE1->getSupportPoint(Vector2::X);
-    sB = SHAPE1->getSupportPoint(-Vector2::X);
+    sA = SHAPE1->getSupportPoint0();
+    sB = SHAPE2->getSupportPoint0();
     v = sA - sB;
-    std::cerr << "v = " << v << "\n";
+    //v = Vector2::XY;
+    std::cerr << "sA          = " << sA << "\n";
+    std::cerr << "sB          = " << sB << "\n";
 
-    Real mu = 0;
-    Real delta;
-    Real vLength;
-    while (v.isZero() == false)
+    while (v.isNotZero())
     {
-      std::cerr << "INIZIO ===========================================\n";
+      std::cerr << "START ============================================\n";
 
       // Compute a support point in direction -v
       sA = SHAPE1->getSupportPoint(-v.getNormalizedCopy());
       sB = SHAPE2->getSupportPoint(v.getNormalizedCopy());
       w = sA - sB;
-      std::cerr << "w = " << w << "\n";
-      std::cerr << "||v||^2 = " << v.getSquaredMagnitude() << "\n";
-      std::cerr << "dot(v, w) = " << dotProduct(v, w) << "\n";
+      std::cerr << "v           = " << v << "\n";
+      std::cerr << "sA          = " << sA << "\n";
+      std::cerr << "sB          = " << sB << "\n";
+      std::cerr << "w           = " << w << "\n";
+      std::cerr << "|v|         = " << v.getMagnitude() << "\n";
+      std::cerr << "|v|^2       = " << v.getSquaredMagnitude() << "\n";
+      std::cerr << "dot(v, w)   = " << dot(v, w) << "\n";
 
 
-      vLength = v.getMagnitude();
-      delta = dotProduct(v, w) / vLength;
-      mu = std::max(mu, delta);
-
-      // If w is in Y OR
-      // v.getMagnitude() - dotProduct(v, w) <= epsilon^2 * v.getMagnitude()
-      if (Y.hasVertex(w) ||
-          vLength - mu <= EPSILON * vLength)
-        //    v.getSquaredMagnitude() * (1 - EPSILON_2) <= dotProduct(v, w))
-        // dotProduct(v, w) > 0)
+      // If w is in Y
+      if (Y.hasVertex(w))
       {
-        return false;
+        std::cerr << "Y has w\n";
+        // Objects don't penetrate each other
+        return v;
       }
 
-      // Add w to the simplex
-      Y.addVertex(w, sA, sB);
-      // Get the point of minimum norm in the simplex
-      v = Y.calculateClosestPointToOrigin();
-      std::cerr << "v = " << v << "\n";
+      // If |v|^2 - dot(v, w) <= EPSILON_REL_2 * |v|^2
+      if (v.getSquaredMagnitude() - dot(v, w) <= EPSILON_REL_2 * v.getSquaredMagnitude())
+      {
+        std::cerr << "|v|^2 - dot(v, w) <= EP_R_2 * |v|^2\n";
+        // Objects don't penetrate each other
+        return v;
+      }
 
-      // Check for collision
-      if (Y.includeOrigin == true)
+      // Add w to the simplex W
+      W.addVertex(w, sA, sB);
+      Y = W;
+      // Get the point of minimum norm in the simplex
+      v = W.calculateClosestPointToOrigin();
+      std::cerr << "v (new)     = " << v << "\n";
+      std::cerr << "|v|         = " << v.getMagnitude() << "\n";
+      std::cerr << "|v|^2       = " << v.getSquaredMagnitude() << "\n";
+      std::cerr << "size        = " << W.size << "\n";
+
+
+      // Check for collisions
+      // TODO: W.size == 3
+      if (W.includeOrigin == true)
       {
         std::cerr << "collision [GJK] ==============================\n";
-        // Here Y contain exactly 3 points
-        std::cerr << "size = " << Y.size << "\n";
-        std::cerr << "P[0] = " << Y.vertices[0] << "\n";
-        std::cerr << "P[1] = " << Y.vertices[1] << "\n";
-        std::cerr << "P[2] = " << Y.vertices[2] << "\n";
-        return true;
+        //assert(false);
+        // Here W contain exactly 3 points
+        std::cerr << "size = " << W.size << "\n";
+        std::cerr << std::endl;
+        std::cerr << "P[0] = " << W.vertices[0] << "\n";
+        std::cerr << "A[0] = " << W.supportPointsA[0] << "\n";
+        std::cerr << "B[0] = " << W.supportPointsB[0] << "\n";
+        std::cerr << std::endl;
+        std::cerr << "P[1] = " << W.vertices[1] << "\n";
+        std::cerr << "A[1] = " << W.supportPointsA[1] << "\n";
+        std::cerr << "B[1] = " << W.supportPointsB[1] << "\n";
+        std::cerr << std::endl;
+        std::cerr << "P[2] = " << W.vertices[2] << "\n";
+        std::cerr << "A[2] = " << W.supportPointsA[2] << "\n";
+        std::cerr << "B[2] = " << W.supportPointsB[2] << "\n";
+        std::cerr << std::endl;
+        return Vector2::ZERO;
       }
-      std::cerr << "FINE =============================================\n";
+
+
+      for (int i = 0; i < W.size; ++i)
+      {
+        std::cerr << "P[" << i << "]        = " << W.vertices[i] << "\n";
+        std::cerr << "|P[" << i << "]|      = " << W.vertices[i].getMagnitude() << "\n";
+        std::cerr << "E*|P[" << i << "]|^2  = " << 100 * EPSILON_TOL * W.vertices[i].getSquaredMagnitude() << "\n";
+      }
+
+      std::cerr << "END ==============================================\n";
     }
 
-    // Dummy return
-    return false;
+
+    std::cerr << "v is zero\n";
+    // Return no intersection if objects touch each other but not penetrate
+    return Vector2::ZERO;
   }
+
+
+
+
+
+
+
+
 
 
 
@@ -320,6 +388,7 @@ namespace Spring2D
     Edge* edge;
     Edge* edge1;
     Edge* edge2;
+    Real mu = INFINITE;
     std::priority_queue<Edge*, std::vector<Edge*>, EdgeCompare> Q;
     std::priority_queue<Edge*, std::vector<Edge*>, EdgeCompare> R;
 
@@ -341,9 +410,7 @@ namespace Spring2D
       }
     }
 
-    // TODO: fix
-    Real mu = HUGE_VALF;
-    Real delta;
+    edge = 0;
     // Compute the penetration distance
     // TODO: remove all memory leaks
     do
@@ -375,9 +442,8 @@ namespace Spring2D
 
 
 
+      delete edge;
       edge = Q.top();
-      std::cerr << "vA = " << edge->endpoints[0] << "\n";
-      std::cerr << "vB = " << edge->endpoints[1] << "\n\n";
       Q.pop();
 
       v = edge->v;
@@ -388,21 +454,20 @@ namespace Spring2D
       std::cerr << "epa\n";
       std::cerr << "v = " << v << "\n";
       std::cerr << "w = " << w << "\n";
-      std::cerr << "dotProduct(v, w) = " << dotProduct(v, w) << "\n";
-      std::cerr << "delta = " << dotProduct(v, w) * dotProduct(v, w) / edge->key << "\n";
+      std::cerr << "dot(v, w) = " << dot(v, w) << "\n";
+      std::cerr << "delta = " << dot(v, w) * dot(v, w) / v.getSquaredMagnitude() << "\n";
       std::cerr << "mu = " << mu << "\n";
 
 
 
-      delta = dotProduct(v, w) * dotProduct(v, w) / edge->key;
-      mu = (mu < delta ? mu : delta);
+      mu = std::min(mu, dot(v, w) * dot(v, w) / v.getSquaredMagnitude());
       std::cerr << "mu = " << mu << "\n";
-      std::cerr << "condition = " << (1 + EPSILON) * (1 + EPSILON) * edge->key << "\n";
+      std::cerr << "condition = " << (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude() << "\n";
 
       // Close enough
-      if (mu <= (1 + EPSILON) * (1 + EPSILON) * edge->key)
-        //if (dotProduct(v, w) / v.getMagnitude() - v.getMagnitude() <= EPSILON)
+      if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude())
       {
+        std::cerr << "conditions MET\n";
         break;
       }
 
@@ -413,8 +478,12 @@ namespace Spring2D
             edge->endpoints[0],
             edge->supportPointsA[0], edge->supportPointsB[0],
             w,
-            sA, sB))
+            sA, sB) &&
+          v.getSquaredMagnitude() <= edge1->key && edge1->key <= mu)
       {
+        if (edge->endpoints[0] == edge1->endpoints[0] &&
+            edge->endpoints[1] == edge1->endpoints[1])
+          break;
         std::cerr << "A1 = " << edge1->endpoints[0] << "\n";
         std::cerr << "B1 = " << edge1->endpoints[1] << "\n\n";
         Q.push(edge1);
@@ -429,8 +498,12 @@ namespace Spring2D
             w,
             sA, sB,
             edge->endpoints[1],
-            edge->supportPointsA[1], edge->supportPointsB[1]))
+            edge->supportPointsA[1], edge->supportPointsB[1]) &&
+          v.getSquaredMagnitude() <= edge2->key && edge2->key <= mu)
       {
+        if (edge->endpoints[0] == edge2->endpoints[0] &&
+            edge->endpoints[1] == edge2->endpoints[1])
+          break;
         std::cerr << "A2 = " << edge2->endpoints[0] << "\n";
         std::cerr << "B2 = " << edge2->endpoints[1] << "\n\n";
         Q.push(edge2);
@@ -439,17 +512,16 @@ namespace Spring2D
       {
         delete edge2;
       }
-
-      //delete edge;
     }
-    while(Q.top()->key <= mu);
+    while(Q.size() > 0 && Q.top()->key <= mu);
 
 
-    std::cerr << "[EPA] ======================== " << v.getMagnitude() << "\n";
+    std::cerr << "[EPA] #################################################################################################### " << v.getMagnitude() << "\n";
     contact->point[0] = edge->supportPointsA[0] * (1 - edge->t) +
       edge->supportPointsA[1] * edge->t;
     contact->point[1] = edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
+    contact->penetrationDepth = v.getMagnitude();
 
 
     delete edge;
@@ -473,143 +545,127 @@ namespace Spring2D
   {
     if (size == 1) // single point (1 vertex)
     {
-      std::cerr << "size = 1\n";
-      std::cerr << "vertices[0] = " << vertices[0] << "\n";
-      bCoordinates[0] = 1;
+      bCoordinates[0] = 1.0;
       return vertices[0];
     }
 
 
     else if (size == 2) // segment (2 vertices)
     {
-      std::cerr << "size = 2\n";
-      std::cerr << "vertices[0] = " << vertices[0] << "\n";
-      std::cerr << "vertices[1] = " << vertices[1] << "\n";
       Vector2 A = vertices[0];
       Vector2 B = vertices[1];
-      Vector2 O(0 ,0);
 
       // Check if O is in vertex region outside A
       Vector2 AB = B - A;
-      Real numerator = dotProduct(O - A, AB);
-      if (numerator < 0)
+      Real numerator = dot(-A, AB);
+      if (numerator <= 0)
       {
         // Remove B & return A
         size--;
-        bCoordinates[0] = 1;
+        bCoordinates[0] = 1.0;
         return A;
       }
 
       // Check if O is in vertex region outside B
-      Real denominator = dotProduct(AB, AB);
-      if (numerator > denominator)
+      Real denominator = dot(AB, AB);
+      if (numerator >= denominator)
       {
         // Remove A & return B
         vertices[0]       = vertices[1];
         supportPointsA[0] = supportPointsA[1];
         supportPointsB[0] = supportPointsB[1];
         size--;
-        bCoordinates[0] = 1;
+        bCoordinates[0] = 1.0;
         return B;
       }
       // O is on AB
       // Return the projection on AB
       Real v = numerator / denominator;
-      bCoordinates[0] = 1 - v;
+      bCoordinates[0] = 1.0 - v;
       bCoordinates[1] = v;
       return (A + v * AB);
+
+
+      //TODO: OPTIMIZATION -> find the shortcut
+#if 0
+      Vector2 A = vertices[0];
+      Vector2 B = vertices[1];
+
+      Vector2 AB = B - A;
+
+      // Check if O is in vertex region outside B
+      Real lambda = dot(AB, B);
+      // TODO: check also length > 0 ???
+      if (lambda <= 0)
+      {
+        // Remove B & return A
+        vertices[0]       = vertices[1];
+        supportPointsA[0] = supportPointsA[1];
+        supportPointsB[0] = supportPointsB[1];
+        size--;
+        bCoordinates[0] = 1.0;
+        return B;
+      }
+
+      // O is on AB
+      lambda /= dot(AB, AB);
+      bCoordinates[0] = 1.0 - lambda;
+      bCoordinates[1] = lambda;
+      return (A + lambda * AB);
+#endif
     }
 
 
     else // triangle (3 vertices)
     {
-      std::cerr << "size = 3\n";
-      std::cerr << "vertices[0] = " << vertices[0] << "\n";
-      std::cerr << "vertices[1] = " << vertices[1] << "\n";
-      std::cerr << "vertices[2] = " << vertices[2] << "\n";
       Vector2 A = vertices[0];
       Vector2 B = vertices[1];
       Vector2 C = vertices[2];
-      Vector2 O(0 ,0);
 
-
-      // Check if O is in vertex region outside A
       Vector2 AB = B - A;
       Vector2 AC = C - A;
-      Vector2 AO = O - A;
-      Real d1 = dotProduct(AB, AO);
-      Real d2 = dotProduct(AC, AO);
-      if (d1 <= 0 && d2 <= 0)
-      {
-        // Remove B and C & return A
-        size -= 2;
-        bCoordinates[0] = 1;
-        return A;
-      }
+      Vector2 BC = C - B;
 
-      // Check if O is in vertex region outside B
-      Vector2 BO = O - B;
-      Real d3 = dotProduct(AB, BO);
-      Real d4 = dotProduct(AC, BO);
-      if (d3 >= 0 && d4 <= d3)
-      {
-        // Remove A and C & return B
-        vertices[0]       = vertices[1];
-        supportPointsA[0] = supportPointsA[1];
-        supportPointsB[0] = supportPointsB[1];
-        size -= 2;
-        bCoordinates[0] = 1;
-        return B;
-      }
+      // TODO: remove
+      Real snum   = -dot(AB, A);
+      Real sdenom =  dot(AB, B);
+      Real tnum   = -dot(AC, A);
+      Real tdenom =  dot(AC, C);
+      Real unum   = -dot(BC, B);
+      Real udenom =  dot(BC, C);
+
 
       // Check if O is in vertex region outside C
-      Vector2 CO = O - C;
-      Real d5 = dotProduct(AB, CO);
-      Real d6 = dotProduct(AC, CO);
-      if (d6 >= 0 && d5 <= d6)
+      if (tdenom <= 0 && udenom <= 0)
       {
         // Remove A and B & return C
         vertices[0]       = vertices[2];
         supportPointsA[0] = supportPointsA[2];
         supportPointsB[0] = supportPointsB[2];
         size -= 2;
-        bCoordinates[0] = 1;
+        bCoordinates[0] = 1.0;
         return C;
       }
 
+      // Should not be in vertex a or b region.
+      // TODO: remove
+      assert(snum > 0 || tnum > 0);
+      assert(sdenom > 0 || unum > 0);
 
-      // Check if O is in edge region of AB
-      Real vc = d1 * d4 - d3 * d2;
-      if (vc <= 0 && d1 >= 0 && d3 <= 0)
-      {
-        // Remove C & return the projection on AB
-        size--;
-        Real v = d1 / (d1 - d3);
-        bCoordinates[0] = 1 - v;
-        bCoordinates[1] = v;
-        return (A + v * AB);
-      }
+      Real n = cross(AB, AC);
 
-      // Check if O is in edge region of AC
-      Real vb = d5 * d2 - d1 * d6;
-      if (vb <= 0 && d2 >= 0 && d6 <= 0)
-      {
-        // Remove B & return the projection on AC
-        vertices[1]       = vertices[2];
-        supportPointsA[1] = supportPointsA[2];
-        supportPointsB[1] = supportPointsB[2];
-        size--;
-        Real v = d2 / (d2 - d6);
-        bCoordinates[0] = 1 - v;
-        bCoordinates[1] = v;
-        return (A + v * AC);
-      }
+      // Should not be in edge ab region.
+      // TODO: remove
+      Real vc = n * cross(A, B);
+      assert(vc > 0 || snum > 0 || sdenom > 0);
+
 
       // Check if O is in edge region of BC
-      Real va = d3 * d6 - d5 * d4;
-      if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0)
+      Real va = n * cross(B, C);
+      if (va <= 0 && unum >= 0 && udenom >= 0 && (unum + udenom) > 0.0f)
       {
         // Remove A & return the projection on BC
+        // TODO: OPTIMIZATION -> switch A <> C
         vertices[0]       = vertices[1];
         supportPointsA[0] = supportPointsA[1];
         supportPointsB[0] = supportPointsB[1];
@@ -617,23 +673,41 @@ namespace Spring2D
         supportPointsA[1] = supportPointsA[2];
         supportPointsB[1] = supportPointsB[2];
         size--;
-        Real v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
-        bCoordinates[0] = 1 - v;
-        bCoordinates[1] = v;
-        return (B + v * (C - B));
+        Real lambda = unum / (unum + udenom);
+        bCoordinates[0] = 1.0 - lambda;
+        bCoordinates[1] = lambda;
+        return (B + lambda * BC);
       }
 
 
-      // O is inside face region
-      // Return the projection on ABC
+      // Check if O is in edge region of AC
+      Real vb = n * cross(C, A);
+      if (vb <= 0 && tnum >= 0 && tdenom >= 0 && (tnum + tdenom) > 0)
+      {
+        // Remove B & return the projection on AC
+        vertices[1]       = vertices[2];
+        supportPointsA[1] = supportPointsA[2];
+        supportPointsB[1] = supportPointsB[2];
+        size--;
+        Real lambda = tnum / (tnum + tdenom);
+        bCoordinates[0] = 1.0 - lambda;
+        bCoordinates[1] = lambda;
+        return (A + lambda * AC);
+      }
+
+
+      // O is inside the triangle
       includeOrigin = true;
-      Real denominator = 1.0 / (va + vb + vc);
-      Real v = vb * denominator;
-      Real w = vc * denominator;
-      bCoordinates[0] = 1 - v - w;
+      Real denom = va + vb + vc;
+      denom = 1 / denom;
+
+      Real u = va * denom;
+      Real v = vb * denom;
+      Real w = 1 - u - v;
+      bCoordinates[0] = u;
       bCoordinates[1] = v;
       bCoordinates[2] = w;
-      return (A + AB * v + AC * w);
+      return (u * A + v * B + w * C);
     }
 
   }
@@ -650,11 +724,9 @@ namespace Spring2D
       const Vector2& B,
       const Vector2& SUPPORT_POINT_A_1, const Vector2& SUPPORT_POINT_B_1)
   {
-    Vector2 O(0 ,0);
-
     // Check if O is in any vertex region
     Vector2 AB = B - A;
-    t = dotProduct(O - A, AB) / dotProduct(AB, AB);
+    t = dot(-A, AB) / dot(AB, AB);
     if (t <= 0 || t >= 1)
     {
       return false;

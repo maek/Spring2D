@@ -45,8 +45,16 @@ namespace Spring2D
       bool isZero () const
       {
         return (
-            s2fabs(x) <= EPSILON &&
-            s2fabs(y) <= EPSILON);
+            s2fabs(x) <= EPSILON_ABS &&
+            s2fabs(y) <= EPSILON_ABS);
+      }
+
+      // Check if is not ZERO
+      bool isNotZero () const
+      {
+        return (
+            s2fabs(x) > EPSILON_ABS ||
+            s2fabs(y) > EPSILON_ABS);
       }
 
 
@@ -121,8 +129,7 @@ namespace Spring2D
   inline bool operator== (const Vector2& V1, const Vector2& V2)
   {
     return (
-        s2fabs(V1.x - V2.x) <= EPSILON &&
-        s2fabs(V1.y - V2.y) <= EPSILON);
+        V1.x == V2.x && V1.y == V2.y);
   }
 
   // ---------------------------------------------------------------------------
@@ -187,14 +194,14 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Dot (scalar) product [Vector2]
-  inline Real dotProduct (const Vector2& V1, const Vector2& V2)
+  inline Real dot (const Vector2& V1, const Vector2& V2)
   {
     return (V1.x * V2.x + V1.y * V2.y);
   }
 
   // ---------------------------------------------------------------------------
   // Cross (vector) product [Vector2]
-  inline Real crossProduct (const Vector2& V1, const Vector2& V2)
+  inline Real cross (const Vector2& V1, const Vector2& V2)
   {
     return (V1.x * V2.y - V1.y * V2.x);
   }
@@ -297,8 +304,7 @@ namespace Spring2D
   inline bool operator== (const Complex& C1, const Complex& C2)
   {
     return (
-        s2fabs(C1.r - C2.r) <= EPSILON &&
-        s2fabs(C1.i - C2.i) <= EPSILON);
+        C1.r == C2.r && C1.i == C2.i);
   }
 
   // ---------------------------------------------------------------------------
@@ -420,10 +426,10 @@ namespace Spring2D
   inline bool operator== (const Matrix2x2& M1, const Matrix2x2& M2)
   {
     return (
-        s2fabs(M1.entry[0] - M2.entry[0]) <= EPSILON &&
-        s2fabs(M1.entry[1] - M2.entry[1]) <= EPSILON &&
-        s2fabs(M1.entry[2] - M2.entry[2]) <= EPSILON &&
-        s2fabs(M1.entry[3] - M2.entry[3]) <= EPSILON);
+        M1.entry[0] == M2.entry[0] &&
+        M1.entry[1] == M2.entry[1] &&
+        M1.entry[2] == M2.entry[2] &&
+        M1.entry[3] == M2.entry[3]);
   }
 
   // ---------------------------------------------------------------------------

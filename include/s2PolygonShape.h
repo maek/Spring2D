@@ -70,13 +70,13 @@ namespace Spring2D
         Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
         Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
 
-        aabb_.halfSize_.x = s2fabs(dotProduct(vertices_[0], directionX));
-        aabb_.halfSize_.y = s2fabs(dotProduct(vertices_[0], directionY));
+        aabb_.halfSize_.x = s2fabs(dot(vertices_[0], directionX));
+        aabb_.halfSize_.y = s2fabs(dot(vertices_[0], directionY));
 
         for (int i = 1; i < nVertices_; ++i)
         {
-          tx = s2fabs(dotProduct(vertices_[i], directionX));
-          ty = s2fabs(dotProduct(vertices_[i], directionY));
+          tx = s2fabs(dot(vertices_[i], directionX));
+          ty = s2fabs(dot(vertices_[i], directionY));
 
           if (tx > aabb_.halfSize_.x)
           {
@@ -89,6 +89,14 @@ namespace Spring2D
 
         }
 
+      }
+
+
+
+      // Return any vertex as the initial support point
+      Vector2 getSupportPoint0 () const
+      {
+        return body_->getPosition() + body_->getOrientationMatrix() * vertices_[0];
       }
 
 
@@ -107,10 +115,10 @@ namespace Spring2D
         Real tprojection;
 
         // Counter-clockwise
-        projection = dotProduct(pointCCW, direction);
+        projection = dot(pointCCW, direction);
         for (int i = 1; i < nVertices_; ++i)
         {
-          tprojection = dotProduct(vertices_[i], direction);
+          tprojection = dot(vertices_[i], direction);
           if (projection <= tprojection)
           {
             pointCCW = vertices_[i];
@@ -123,10 +131,10 @@ namespace Spring2D
         }
 
         // Clockwise
-        projection = dotProduct(pointCW, direction);
+        projection = dot(pointCW, direction);
         for (int i = nVertices_ - 1; i > 0; --i)
         {
-          tprojection = dotProduct(vertices_[i], direction);
+          tprojection = dot(vertices_[i], direction);
           if (projection <= tprojection)
           {
             pointCW = vertices_[i];
@@ -139,7 +147,7 @@ namespace Spring2D
         }
 
         // Pick the furthest
-        if (dotProduct(pointCCW, direction) > projection)
+        if (dot(pointCCW, direction) > projection)
         {
           // Transform the point in the world coordinates
           body_->transformWorld(&pointCCW);

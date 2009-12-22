@@ -30,14 +30,10 @@ namespace Spring2D
 
       bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
-      bool testPolygonPolygon (PolygonShape*, PolygonShape*, Contact*);
-
-      bool testPolygonRect (PolygonShape*, RectShape*, Contact*);
-
-      bool testRectRect (RectShape*, RectShape*, Contact*);
+      bool testPolygonPolygon (Shape*, Shape*, Contact*);
 
 
-      bool GJK (Simplex&, const Shape*, const Shape*) const;
+      Vector2 GJK (Simplex&, const Shape*, const Shape*) const;
 
       void EPA (const Simplex&, const Shape*, const Shape*, Contact*) const;
 
@@ -72,6 +68,26 @@ namespace Spring2D
 
       // Constructor
       Simplex () : size(0), includeOrigin(false) { }
+
+
+      // Assignment
+      Simplex& operator= (const Simplex& S)
+      {
+        size = S.size;
+        switch (size)
+        {
+          case 3:
+            vertices[3] = S.vertices[3];
+          case 2:
+            vertices[2] = S.vertices[2];
+          case 1:
+            vertices[1] = S.vertices[1];
+          default:
+            break;
+        }
+
+        return *this;
+      }
 
 
       // Add a vertex to the simplex

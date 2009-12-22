@@ -43,6 +43,9 @@ namespace Spring2D
 
       virtual void updateAABB () = 0;
 
+
+      virtual Vector2 getSupportPoint0 () const = 0;
+
       virtual Vector2 getSupportPoint (const Vector2&) const = 0;
 
 

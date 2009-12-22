@@ -55,11 +55,16 @@ namespace Spring2D
       void updateAABB () { }
 
 
-      // Return the furthest point along the given direction
+      // TODO: comment this
+      Vector2 getSupportPoint0 () const
+      {
+        return body_->getPosition();
+      }
+
+      // TODO: comment this
       Vector2 getSupportPoint (const Vector2& DIRECTION) const
       {
-        // center + radius * direction
-        return body_->getPosition() + (radius_ * DIRECTION);
+        return body_->getPosition();
       }
 
 

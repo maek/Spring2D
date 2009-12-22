@@ -196,7 +196,7 @@ namespace Spring2D
         // Rotate the point
         Vector2 worldPoint = Matrix2x2(orientation_) * POINT;
         // Apply the torque as point CROSS force
-        netTorque_ += crossProduct(worldPoint, FORCE);
+        netTorque_ += cross(worldPoint, FORCE);
       }
 
 
