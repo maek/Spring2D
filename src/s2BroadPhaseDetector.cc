@@ -17,8 +17,6 @@ namespace Spring2D
       {
         // Insert all pairs
         contactSet->insert(new Contact((*bodyI), (*otherBodyI)));
-        // TODO: TESTING
-        std::cout << "collision [BROAD] (" << contactSet->size() << ")\n";
       }
     }
   }

@@ -4,6 +4,7 @@
 #include "s2Settings.h"
 #include "s2Environment.h"
 #include "s2CollisionDetector.h"
+#include "s2CollisionSolver.h"
 
 
 namespace Spring2D
@@ -59,6 +60,8 @@ namespace Spring2D
       Environment*        environment_;
 
       CollisionDetector   collisionDetector_;
+
+      CollisionSolver     collisionSolver_;
 
   };
 

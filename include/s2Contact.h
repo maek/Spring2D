@@ -32,7 +32,11 @@ namespace Spring2D
 
       Vector2   point[2];
 
+      Vector2   normal;
+
       Real      penetrationDepth;
+
+      Real      restitution;
 
   };
 

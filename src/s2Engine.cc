@@ -16,8 +16,12 @@ namespace Spring2D
     environment_->integrateBodies();
 
 
-    // Find collision (broad phase)
+    // Find collision
     collisionDetector_.findCollisions(environment_->getBodyList());
+
+    // Solve collision
+    collisionSolver_.solveCollisions(collisionDetector_.getContacts());
+
 
     // Increment the step counter
     stepCounter_++;

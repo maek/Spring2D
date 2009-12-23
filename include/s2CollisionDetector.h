@@ -3,6 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Math.h"
+#include "s2Contact.h"
 #include "s2Body.h"
 #include "s2BroadPhaseDetector.h"
 #include "s2NarrowPhaseDetector.h"
@@ -11,7 +12,7 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // The collision detector
+  // The collisions detector
   class CollisionDetector
   {
     public:
