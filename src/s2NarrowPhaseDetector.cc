@@ -249,8 +249,11 @@ namespace Spring2D
     Simplex W;
     if (GJK(W, SHAPE1, SHAPE2).isZero())
     {
-      EPA(W, SHAPE1, SHAPE2, contact);
-      return true;
+      if (W.size == 3)
+      {
+        EPA(W, SHAPE1, SHAPE2, contact);
+        return true;
+      }
     }
     return false;
   }
@@ -266,48 +269,25 @@ namespace Spring2D
       const Shape* SHAPE1, const Shape* SHAPE2) const
   {
     Simplex Y;
-    Vector2 v;
     Vector2 w;
     Vector2 sA;
     Vector2 sB;
 
     // Get a start point from the Minkowsky difference
-    sA = SHAPE1->getSupportPoint0();
-    sB = SHAPE2->getSupportPoint0();
-    v = sA - sB;
-    //v = Vector2::XY;
-    std::cerr << "sA          = " << sA << "\n";
-    std::cerr << "sB          = " << sB << "\n";
+    Vector2 v = SHAPE1->getSupportPoint0() - SHAPE2->getSupportPoint0();
 
     while (v.isNotZero())
     {
-      std::cerr << "START ============================================\n";
-
       // Compute a support point in direction -v
       sA = SHAPE1->getSupportPoint(-v.getNormalizedCopy());
       sB = SHAPE2->getSupportPoint(v.getNormalizedCopy());
       w = sA - sB;
-      std::cerr << "v           = " << v << "\n";
-      std::cerr << "sA          = " << sA << "\n";
-      std::cerr << "sB          = " << sB << "\n";
-      std::cerr << "w           = " << w << "\n";
-      std::cerr << "|v|         = " << v.getMagnitude() << "\n";
-      std::cerr << "|v|^2       = " << v.getSquaredMagnitude() << "\n";
-      std::cerr << "dot(v, w)   = " << dot(v, w) << "\n";
 
-
-      // If w is in Y
-      if (Y.hasVertex(w))
+      // If w is in Y || |v|^2 - dot(v, w) <= EPSILON_REL_2 * |v|^2
+      if (Y.hasVertex(w) ||
+          v.getSquaredMagnitude() - dot(v, w) <=
+          EPSILON_REL_2 * v.getSquaredMagnitude())
       {
-        std::cerr << "Y has w\n";
-        // Objects don't penetrate each other
-        return v;
-      }
-
-      // If |v|^2 - dot(v, w) <= EPSILON_REL_2 * |v|^2
-      if (v.getSquaredMagnitude() - dot(v, w) <= EPSILON_REL_2 * v.getSquaredMagnitude())
-      {
-        std::cerr << "|v|^2 - dot(v, w) <= EP_R_2 * |v|^2\n";
         // Objects don't penetrate each other
         return v;
       }
@@ -315,69 +295,28 @@ namespace Spring2D
       // Add w to the simplex W
       W.addVertex(w, sA, sB);
       Y = W;
-      // Get the point of minimum norm in the simplex
+      // Get the closest point to origin from the simplex
       v = W.calculateClosestPointToOrigin();
-      std::cerr << "v (new)     = " << v << "\n";
-      std::cerr << "|v|         = " << v.getMagnitude() << "\n";
-      std::cerr << "|v|^2       = " << v.getSquaredMagnitude() << "\n";
-      std::cerr << "size        = " << W.size << "\n";
-
 
       // Check for collisions
-      // TODO: W.size == 3
-      if (W.includeOrigin == true)
+      if (W.includeOrigin == 3)
       {
-        std::cerr << "collision [GJK] ==============================\n";
-        //assert(false);
-        // Here W contain exactly 3 points
-        std::cerr << "size = " << W.size << "\n";
-        std::cerr << std::endl;
-        std::cerr << "P[0] = " << W.vertices[0] << "\n";
-        std::cerr << "A[0] = " << W.supportPointsA[0] << "\n";
-        std::cerr << "B[0] = " << W.supportPointsB[0] << "\n";
-        std::cerr << std::endl;
-        std::cerr << "P[1] = " << W.vertices[1] << "\n";
-        std::cerr << "A[1] = " << W.supportPointsA[1] << "\n";
-        std::cerr << "B[1] = " << W.supportPointsB[1] << "\n";
-        std::cerr << std::endl;
-        std::cerr << "P[2] = " << W.vertices[2] << "\n";
-        std::cerr << "A[2] = " << W.supportPointsA[2] << "\n";
-        std::cerr << "B[2] = " << W.supportPointsB[2] << "\n";
-        std::cerr << std::endl;
+        // Collision found
         return Vector2::ZERO;
       }
 
-
-      for (int i = 0; i < W.size; ++i)
-      {
-        std::cerr << "P[" << i << "]        = " << W.vertices[i] << "\n";
-        std::cerr << "|P[" << i << "]|      = " << W.vertices[i].getMagnitude() << "\n";
-        std::cerr << "E*|P[" << i << "]|^2  = " << 100 * EPSILON_TOL * W.vertices[i].getSquaredMagnitude() << "\n";
-      }
-
-      std::cerr << "END ==============================================\n";
     }
 
-
-    std::cerr << "v is zero\n";
-    // Return no intersection if objects touch each other but not penetrate
+    // No intersection if objects touch each other but don't penetrate
     return Vector2::ZERO;
   }
-
-
-
-
-
-
-
-
 
 
 
   // ---------------------------------------------------------------------------
   // Find the distance & the intersection points of two overlapping shapes [EPA]
   void NarrowPhaseDetector::EPA (
-      const Simplex& Y,
+      const Simplex& P,
       const Shape* SHAPE1, const Shape* SHAPE2,
       Contact* contact) const
   {
@@ -390,17 +329,16 @@ namespace Spring2D
     Edge* edge2;
     Real mu = INFINITE;
     std::priority_queue<Edge*, std::vector<Edge*>, EdgeCompare> Q;
-    std::priority_queue<Edge*, std::vector<Edge*>, EdgeCompare> R;
 
     // Construct all edges
     for (int i = 0; i < 3; ++i)
     {
       edge = new Edge();
       if (edge->construct(
-            Y.vertices[i],
-            Y.supportPointsA[i], Y.supportPointsB[i],
-            Y.vertices[(i + 1) % 3],
-            Y.supportPointsA[(i + 1) % 3], Y.supportPointsB[(i + 1) % 3]))
+            P.vertices[i],
+            P.supportPointsA[i], P.supportPointsB[i],
+            P.vertices[(i + 1) % 3],
+            P.supportPointsA[(i + 1) % 3], P.supportPointsB[(i + 1) % 3]))
       {
         Q.push(edge);
       }
@@ -411,63 +349,24 @@ namespace Spring2D
     }
 
     edge = 0;
+
     // Compute the penetration distance
-    // TODO: remove all memory leaks
     do
     {
-      // TODO: print Q
-      Edge* e;
-      int qsize = Q.size();
-      std::cerr << "Qsize = " << qsize << "\n";
-      while (R.size())
-        R.pop();
-      for (int i = 0; i < qsize; ++i)
-      {
-        e = Q.top();
-        std::cerr << "A[" << i << "] = " << e->endpoints[0] << "\n";
-        std::cerr << "B[" << i << "] = " << e->endpoints[1] << "\n\n";
-        Q.pop();
-        R.push(e);
-      }
-      int rsize = R.size();
-      std::cerr << "Rsize = " << rsize << "\n";
-      for (int i = 0; i < rsize; ++i)
-      {
-        e = R.top();
-        R.pop();
-        Q.push(e);
-      }
-      std::cerr << "Qsize = " << Q.size() << "\n";
-
-
-
-
       delete edge;
       edge = Q.top();
       Q.pop();
 
       v = edge->v;
-      // TODO: normalize ???
       sA = SHAPE1->getSupportPoint(v.getNormalizedCopy());
       sB = SHAPE2->getSupportPoint(-v.getNormalizedCopy());
       w = sA - sB;
-      std::cerr << "epa\n";
-      std::cerr << "v = " << v << "\n";
-      std::cerr << "w = " << w << "\n";
-      std::cerr << "dot(v, w) = " << dot(v, w) << "\n";
-      std::cerr << "delta = " << dot(v, w) * dot(v, w) / v.getSquaredMagnitude() << "\n";
-      std::cerr << "mu = " << mu << "\n";
-
-
 
       mu = std::min(mu, dot(v, w) * dot(v, w) / v.getSquaredMagnitude());
-      std::cerr << "mu = " << mu << "\n";
-      std::cerr << "condition = " << (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude() << "\n";
 
       // Close enough
       if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude())
       {
-        std::cerr << "conditions MET\n";
         break;
       }
 
@@ -483,9 +382,10 @@ namespace Spring2D
       {
         if (edge->endpoints[0] == edge1->endpoints[0] &&
             edge->endpoints[1] == edge1->endpoints[1])
+        {
+          delete edge1;
           break;
-        std::cerr << "A1 = " << edge1->endpoints[0] << "\n";
-        std::cerr << "B1 = " << edge1->endpoints[1] << "\n\n";
+        }
         Q.push(edge1);
       }
       else
@@ -503,27 +403,32 @@ namespace Spring2D
       {
         if (edge->endpoints[0] == edge2->endpoints[0] &&
             edge->endpoints[1] == edge2->endpoints[1])
+        {
+          delete edge2;
           break;
-        std::cerr << "A2 = " << edge2->endpoints[0] << "\n";
-        std::cerr << "B2 = " << edge2->endpoints[1] << "\n\n";
+        }
         Q.push(edge2);
       }
       else
       {
         delete edge2;
       }
+
     }
     while(Q.size() > 0 && Q.top()->key <= mu);
 
 
-    std::cerr << "[EPA] #################################################################################################### " << v.getMagnitude() << "\n";
-    contact->point[0] = edge->supportPointsA[0] * (1 - edge->t) +
+    // Set the contact data
+    contact->point[0] =
+      edge->supportPointsA[0] * (1 - edge->t) +
       edge->supportPointsA[1] * edge->t;
-    contact->point[1] = edge->supportPointsB[0] * (1 - edge->t) +
+    contact->point[1] =
+      edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
     contact->penetrationDepth = v.getMagnitude();
 
 
+    // Free the memory
     delete edge;
     int qsize = Q.size();
     for (int i = 0; i < qsize; ++i)
