@@ -66,6 +66,7 @@ namespace Spring2D
   class BroadPhaseDetector;
   class CircleShape;
   class CollisionDetector;
+  class CollisionSolver;
   class Complex;
   class Contact;
   class Engine;
@@ -73,6 +74,7 @@ namespace Spring2D
   class Force;
   class ForceGravity;
   class ForceRegister;
+  class InterpenetrationSolver;
   class Matrix2x2;
   class NarrowPhaseDetector;
   class PolygonShape;
@@ -84,6 +86,7 @@ namespace Spring2D
   class TorqueRegister;
   class UGrid;
   class Vector2;
+  class VelocitySolver;
 
 }
 
