@@ -113,13 +113,21 @@ namespace Spring2D
         return *this;
       }
 
-      // Get the a normalized copy of the vector
-      Vector2 getNormalizedCopy ()
+      // Get a normalized copy of the vector
+      Vector2 getNormalizedCopy () const
       {
         Vector2 tthis = *this;
         return tthis.normalize();
       }
 
+      // Get a perpendicular copy of the vector
+      Vector2 getPerpendicularCopy () const
+      {
+        Vector2 tthis = *this;
+        tthis.x = -y;
+        tthis.y = x;
+        return tthis;
+      }
   };
 
 

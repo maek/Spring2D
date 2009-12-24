@@ -122,6 +122,24 @@ namespace Spring2D
       }
 
 
+      // Set the body moment of inertia
+      void setMomentOfInertia (const Real MOMENT_OF_INERTIA)
+      {
+        if (MOMENT_OF_INERTIA <= 0)
+        {
+          return;
+        }
+
+        momentOfInertia_ = MOMENT_OF_INERTIA;
+      }
+
+      // Get the body moment of inertia
+      Real getMomentOfInertia () const
+      {
+        return momentOfInertia_;
+      }
+
+
       // Set the shape
       void setShape (Shape* shape)
       {
