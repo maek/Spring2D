@@ -51,11 +51,52 @@ namespace Spring2D
     Complex oa(contact->body[0]->getOrientation());
     Complex ob(contact->body[1]->getOrientation());
 
+
+    Real lMa =  p * lIa * itI;
+    Real lMb = -p * lIb * itI;
+
+    Real aMa =  p * aIa * itI;
+    Real aMb = -p * aIb * itI;
+
     std::cerr << "itI = " << itI << "\n";
-    std::cerr << "lMa = " <<  p * lIa * itI * n << "\n";
-    std::cerr << "lMb = " << -p * lIb * itI * n << "\n";
-    std::cerr << "aMa = " <<  p * aIa * itI  << "\n";
-    std::cerr << "aMb = " << -p * aIb * itI  << "\n";
+    std::cerr << "lMa = " << lMa * n << "\n";
+    std::cerr << "lMb = " << lMb * n << "\n";
+    std::cerr << "aMa = " << aMa << "\n";
+    std::cerr << "aMb = " << aMb << "\n";
+
+
+
+    // Angular correction
+#if 1
+    const Real angularLimitConstant = 0.2;
+
+    Real aLa = angularLimitConstant * Rap.getMagnitude();
+    Real aLb = angularLimitConstant * Rbp.getMagnitude();
+
+    if (s2fabs(aMa) > aLa)
+    {
+      Real tM = lMa + aMa;
+
+      (aMa > 0) ? aMa = aLa : aMa = -aLa;
+
+      lMa = tM - aMa;
+    }
+
+    if (s2fabs(aMb) > aLb)
+    {
+      Real tM = lMb + aMb;
+
+      (aMb > 0) ? aMb = aLb : aMb = -aLb;
+
+      lMb = tM - aMb;
+    }
+#endif
+
+    std::cerr << "lMa = " << lMa * n << "\n";
+    std::cerr << "lMb = " << lMb * n << "\n";
+    std::cerr << "aMa = " << aMa << "\n";
+    std::cerr << "aMb = " << aMb << "\n";
+
 
     contact->body[0]->setPosition(pa1 + p * lIa * itI * n);
     contact->body[1]->setPosition(pb1 - p * lIb * itI * n);
