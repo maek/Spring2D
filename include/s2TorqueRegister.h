@@ -29,8 +29,11 @@ namespace Spring2D
       // Compute the net torque
       void computeTorques ()
       {
-        std::for_each (torqueList_.begin(), torqueList_.end(),
-            std::mem_fun(&Torque::apply));
+        for (TorqueList::iterator torqueListI = torqueList_.begin();
+            torqueListI != torqueList_.end(); ++torqueListI)
+        {
+          (*torqueListI)->apply();
+        }
       }
 
 

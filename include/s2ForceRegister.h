@@ -29,8 +29,11 @@ namespace Spring2D
       // Compute the net force
       void computeForces ()
       {
-        std::for_each (forceList_.begin(), forceList_.end(),
-            std::mem_fun(&Force::apply));
+        for (ForceList::iterator forceListI = forceList_.begin();
+            forceListI != forceList_.end(); ++forceListI)
+        {
+          (*forceListI)->apply();
+        }
       }
 
 

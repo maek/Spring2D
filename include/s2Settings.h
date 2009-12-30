@@ -5,8 +5,6 @@
 #include <iostream>
 #include <list>
 #include <queue>
-#include <algorithm>
-#include <functional>
 #include <cmath>
 #include <cfloat>
 #include <cassert>
