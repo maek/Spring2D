@@ -58,6 +58,10 @@ namespace Spring2D
 #endif
 
 
+  // Utility functions
+  #define s2sqr(x)              (x) * (x)
+
+
   // Physics constants
   const Real G = 9.80665;
 

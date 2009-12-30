@@ -16,10 +16,14 @@ namespace Spring2D
     public:
 
       // Constructor
-      CircleShape (const Real RADIUS)
+      CircleShape (const Real RADIUS, const Real DENSITY = 1)
         : radius_(RADIUS)
       {
         assert(RADIUS > 0);
+        assert(DENSITY > 0);
+
+        density_ = DENSITY;
+        area_ = M_PI * RADIUS * RADIUS;
       }
 
 
@@ -44,28 +48,15 @@ namespace Spring2D
       }
 
 
-      // Build the associated AABB
-      void buildAABB (Vector2* CENTER)
-      {
-        aabb_.center_   = CENTER;
-        aabb_.halfSize_ = Vector2(radius_, radius_);
-      }
+      void buildAABB (Vector2*);
 
-      // Update the associated AABB
-      void updateAABB () { }
+      void updateAABB ();
 
+      Real calculateMomentOfInertia () const;
 
-      // TODO: comment this
-      Vector2 getSupportPoint0 () const
-      {
-        return body_->getPosition();
-      }
+      Vector2 getSupportPoint0 () const;
 
-      // TODO: comment this
-      Vector2 getSupportPoint (const Vector2& DIRECTION) const
-      {
-        return body_->getPosition();
-      }
+      Vector2 getSupportPoint (const Vector2&) const;
 
 
     private:

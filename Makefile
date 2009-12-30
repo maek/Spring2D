@@ -7,6 +7,9 @@ INCDIR = include
 
 OBJECTS = s2Engine.o\
 				 	s2Math.o\
+					s2CircleShape.o\
+					s2PolygonShape.o\
+					s2RectShape.o\
 					s2Body.o\
 					s2Environment.o\
 					s2AABB.o\
@@ -38,6 +41,24 @@ $(OBJDIR)/s2Engine.o:										$(SRCDIR)/s2Engine.cc\
 $(OBJDIR)/s2Math.o:											$(SRCDIR)/s2Math.cc\
 																				$(INCDIR)/s2Math.h\
 																				$(INCDIR)/s2Settings.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2CircleShape.o:							$(SRCDIR)/s2CircleShape.cc\
+																				$(INCDIR)/s2CircleShape.h\
+																				$(INCDIR)/s2Settings.h\
+																				$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2PolygonShape.o:							$(SRCDIR)/s2PolygonShape.cc\
+																				$(INCDIR)/s2PolygonShape.h\
+																				$(INCDIR)/s2Settings.h\
+																				$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2RectShape.o:								$(SRCDIR)/s2RectShape.cc\
+																				$(INCDIR)/s2RectShape.h\
+																				$(INCDIR)/s2Settings.h\
+																				$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJDIR)/s2Body.o:											$(SRCDIR)/s2Body.cc\

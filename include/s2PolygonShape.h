@@ -16,18 +16,32 @@ namespace Spring2D
     public:
 
       // Constructor
-      PolygonShape (const int N_VERTICES, Vector2* VERTICES)
+      PolygonShape (const int N_VERTICES, Vector2* VERTICES,
+          const Real DENSITY = 1)
         : nVertices_(N_VERTICES)
       {
         assert(N_VERTICES >= 3);
+        assert(DENSITY > 0);
 
         // TODO: add the convexity test
 
         vertices_ = new Vector2[N_VERTICES];
-        for (int i = 0; i < nVertices_; ++i)
+        for (int i = 0; i < N_VERTICES; ++i)
         {
           vertices_[i] = VERTICES[i];
         }
+
+        density_ = DENSITY;
+        area_ =
+          VERTICES[N_VERTICES - 1].x * VERTICES[0].y -
+          VERTICES[0].x * VERTICES[N_VERTICES - 1].y;
+        for (int i = 0; i < N_VERTICES - 1; ++i)
+        {
+          area_ +=
+            VERTICES[i].x * VERTICES[i + 1].y -
+            VERTICES[i + 1].x * VERTICES[i].y;
+        }
+        area_ /= 2;
       }
 
 
@@ -51,116 +65,15 @@ namespace Spring2D
       }
 
 
-      // Build the associated AABB
-      // TODO: check for correctness
-      void buildAABB (Vector2* CENTER)
-      {
-        aabb_.center_ = CENTER;
-        updateAABB();
-      }
+      void buildAABB (Vector2*);
 
-      // Update the associated AABB
-      void updateAABB ()
-      {
-        Real tx;
-        Real ty;
-        // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
-        //                       (only if rotating)
-        // TODO: check if directionX & directionY are normalized
-        Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
-        Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
+      void updateAABB ();
 
-        aabb_.halfSize_.x = s2fabs(dot(vertices_[0], directionX));
-        aabb_.halfSize_.y = s2fabs(dot(vertices_[0], directionY));
+      Real calculateMomentOfInertia () const;
 
-        for (int i = 1; i < nVertices_; ++i)
-        {
-          tx = s2fabs(dot(vertices_[i], directionX));
-          ty = s2fabs(dot(vertices_[i], directionY));
+      Vector2 getSupportPoint0 () const;
 
-          if (tx > aabb_.halfSize_.x)
-          {
-            aabb_.halfSize_.x = tx;
-          }
-          if (ty > aabb_.halfSize_.y)
-          {
-            aabb_.halfSize_.y = ty;
-          }
-
-        }
-
-      }
-
-
-
-      // Return any vertex as the initial support point
-      Vector2 getSupportPoint0 () const
-      {
-        return body_->getPosition() + body_->getOrientationMatrix() * vertices_[0];
-      }
-
-
-
-      // Return the furthest point along the given direction
-      Vector2 getSupportPoint (const Vector2& DIRECTION) const
-      {
-        // Transform the direction in the local coordinates
-        Vector2 direction = body_->getOrientationMatrix().getInverse() *
-          DIRECTION;
-
-        Vector2 pointCW   = vertices_[0];
-        Vector2 pointCCW  = vertices_[0];
-
-        Real projection;
-        Real tprojection;
-
-        // Counter-clockwise
-        projection = dot(pointCCW, direction);
-        for (int i = 1; i < nVertices_; ++i)
-        {
-          tprojection = dot(vertices_[i], direction);
-          if (projection <= tprojection)
-          {
-            pointCCW = vertices_[i];
-            projection = tprojection;
-          }
-          else
-          {
-            break;
-          }
-        }
-
-        // Clockwise
-        projection = dot(pointCW, direction);
-        for (int i = nVertices_ - 1; i > 0; --i)
-        {
-          tprojection = dot(vertices_[i], direction);
-          if (projection <= tprojection)
-          {
-            pointCW = vertices_[i];
-            projection = tprojection;
-          }
-          else
-          {
-            break;
-          }
-        }
-
-        // Pick the furthest
-        if (dot(pointCCW, direction) > projection)
-        {
-          // Transform the point in the world coordinates
-          body_->transformWorld(&pointCCW);
-          return pointCCW;
-        }
-        else
-        {
-          // Transform the point in the world coordinates
-          body_->transformWorld(&pointCW);
-          return pointCW;
-        }
-
-      }
+      Vector2 getSupportPoint (const Vector2&) const;
 
 
     private:

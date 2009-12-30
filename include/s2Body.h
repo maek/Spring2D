@@ -15,9 +15,6 @@ namespace Spring2D
     public:
 
       // Constructor
-      // TODO: get the moment of intertia from the shape (otherwise 0)
-      //  CIRCLE  = (m * r^2) / 2
-      //  RECT    = (m * (b^2 + h^2)) / 12
       Body (
           const Vector2& POSITION = Vector2::ZERO,
           const Vector2& VELOCITY = Vector2::ZERO,
@@ -104,33 +101,10 @@ namespace Spring2D
       }
 
 
-      // Set the body mass
-      void setMass (const Real MASS)
-      {
-        if (MASS <= 0)
-        {
-          return;
-        }
-
-        mass_ = MASS;
-      }
-
       // Get the body mass
       Real getMass () const
       {
         return mass_;
-      }
-
-
-      // Set the body moment of inertia
-      void setMomentOfInertia (const Real MOMENT_OF_INERTIA)
-      {
-        if (MOMENT_OF_INERTIA <= 0)
-        {
-          return;
-        }
-
-        momentOfInertia_ = MOMENT_OF_INERTIA;
       }
 
       // Get the body moment of inertia
@@ -141,11 +115,13 @@ namespace Spring2D
 
 
       // Set the shape
-      void setShape (Shape* shape)
+      void setShape (Shape* SHAPE)
       {
-        shape_ = shape;
+        shape_ = SHAPE;
         shape_->body_ = this;
         shape_->buildAABB(&position_);
+        mass_ = shape_->calculateMass();
+        momentOfInertia_ = shape_->calculateMomentOfInertia();
       }
 
       // Get the shape

@@ -5,6 +5,7 @@
 #include "s2Body.h"
 #include "s2AABB.h"
 
+
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
@@ -36,6 +37,24 @@ namespace Spring2D
         return &aabb_;
       }
 
+      // Return the density of the shape
+      Real getDensity ()
+      {
+        return density_;
+      }
+
+      // Return the area of the shape
+      Real getArea ()
+      {
+        return area_;
+      }
+
+      // Calculate the mass of the shape
+      Real calculateMass () const
+      {
+        return area_ * density_;
+      }
+
 
       virtual ShapeType getType () const = 0;
 
@@ -43,6 +62,7 @@ namespace Spring2D
 
       virtual void updateAABB () = 0;
 
+      virtual Real calculateMomentOfInertia () const = 0;
 
       virtual Vector2 getSupportPoint0 () const = 0;
 
@@ -54,6 +74,10 @@ namespace Spring2D
       Body*     body_;
 
       AABB      aabb_;
+
+      Real      density_;
+
+      Real      area_;
 
   };
 
