@@ -6,7 +6,7 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Compute a conservative approximate list of collisions [DEFAULT = all pairs]
   void BroadPhaseDetector::findCollisions (
-      const BodyList& bodyList, ContactSet* contactSet)
+      const BodyList& bodyList, ContactList* contactList)
   {
     for (BodyList::const_iterator bodyI = bodyList.begin();
         bodyI != bodyList.end(); ++bodyI)
@@ -16,7 +16,7 @@ namespace Spring2D
       for (; otherBodyI != bodyList.end(); ++otherBodyI)
       {
         // Insert all pairs
-        contactSet->insert(new Contact((*bodyI), (*otherBodyI)));
+        contactList->push_back(new Contact((*bodyI), (*otherBodyI)));
       }
     }
   }

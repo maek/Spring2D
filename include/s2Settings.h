@@ -4,9 +4,9 @@
 // Include all the external headers
 #include <iostream>
 #include <list>
-#include <set>
 #include <queue>
 #include <algorithm>
+#include <functional>
 #include <cmath>
 #include <cfloat>
 #include <cassert>
@@ -34,6 +34,7 @@ namespace Spring2D
   #define s2sin(x)              sin(x)
   #define s2cos(x)              cos(x)
   #define s2atan2(x, y)         atan2(x, y)
+  #define s2copysign(x, y)      copysign(x, y)
   #define s2fabs(x)             fabs(x)
 
 #else
@@ -51,6 +52,7 @@ namespace Spring2D
   #define s2sin(x)              sinf(x)
   #define s2cos(x)              cosf(x)
   #define s2atan2(x, y)         atan2f(x, y)
+  #define s2copysign(x, y)      copysignf(x, y)
   #define s2fabs(x)             fabsf(x)
 
 #endif
@@ -74,7 +76,6 @@ namespace Spring2D
   class Force;
   class ForceGravity;
   class ForceRegister;
-  class InterpenetrationSolver;
   class Matrix2x2;
   class NarrowPhaseDetector;
   class PolygonShape;
@@ -86,7 +87,6 @@ namespace Spring2D
   class TorqueRegister;
   class UGrid;
   class Vector2;
-  class VelocitySolver;
 
 }
 

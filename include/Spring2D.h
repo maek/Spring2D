@@ -16,7 +16,6 @@
 #include "s2ForceGravity.h"
 #include "s2Force.h"
 #include "s2ForceRegister.h"
-#include "s2InterpenetrationSolver.h"
 #include "s2Math.h"
 #include "s2NarrowPhaseDetector.h"
 #include "s2PolygonShape.h"
@@ -25,7 +24,6 @@
 #include "s2Torque.h"
 #include "s2TorqueMotor.h"
 #include "s2TorqueRegister.h"
-#include "s2VelocitySolver.h"
 
 
 #endif // __SPRING2D_H__

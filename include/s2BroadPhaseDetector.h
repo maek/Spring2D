@@ -15,7 +15,7 @@ namespace Spring2D
   {
     public:
 
-      void findCollisions (const BodyList&, ContactSet*);
+      void findCollisions (const BodyList&, ContactList*);
 
   };
 

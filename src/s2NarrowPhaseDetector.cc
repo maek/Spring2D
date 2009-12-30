@@ -6,13 +6,12 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Compute the exact list of collisions
   void NarrowPhaseDetector::findCollisions (
-      const BodyList& bodyList, ContactSet* contactSet)
+      const BodyList& bodyList, ContactList* contactList)
   {
     bool collision;
-    ContactSet::iterator contactI = contactSet->begin();
-    ContactSet::iterator tcontactI;
+    ContactList::iterator contactI = contactList->begin();
 
-    while (contactI != contactSet->end())
+    while (contactI != contactList->end())
     {
       // Do an exact test
       switch ((*contactI)->body[0]->getShape()->getType())
@@ -107,9 +106,7 @@ namespace Spring2D
         delete *contactI;
 
         // Remove the contact
-        tcontactI = contactI;
-        ++contactI;
-        contactSet->erase(tcontactI);
+        contactI = contactList->erase(contactI);
       }
       else
       {

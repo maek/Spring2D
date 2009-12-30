@@ -37,6 +37,7 @@ namespace Spring2D
     private:
 
       Body* body_;
+
       Vector2 gravityAcceleration_;
 
   };

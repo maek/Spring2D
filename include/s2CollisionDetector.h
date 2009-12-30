@@ -35,10 +35,10 @@ namespace Spring2D
       void findCollisions (const BodyList&);
 
 
-      // Return a pointer to the contact set
-      ContactSet* getContacts ()
+      // Return a pointer to the contact list
+      ContactList* getContacts ()
       {
-        return &contactSet_;
+        return &contactList_;
       }
 
 
@@ -49,7 +49,7 @@ namespace Spring2D
       NarrowPhaseDetector  *narrowPhaseDetector_;
 
 
-      ContactSet            contactSet_;
+      ContactList           contactList_;
 
   };
 

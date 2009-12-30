@@ -19,7 +19,7 @@ namespace Spring2D
   {
     public:
 
-      void findCollisions (const BodyList&, ContactSet*);
+      void findCollisions (const BodyList&, ContactList*);
 
 
     private:
@@ -178,7 +178,7 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // The compare function for the priority-queue of Edges
+  // The compare functor for the priority-queue of Edges
   class EdgeCompare
   {
     public:

@@ -13,8 +13,6 @@ OBJECTS = s2Engine.o\
 					s2BroadPhaseDetector.o\
 					s2NarrowPhaseDetector.o\
 					s2CollisionDetector.o\
-					s2InterpenetrationSolver.o\
-					s2VelocitySolver.o\
 					s2CollisionSolver.o
 
 
@@ -75,18 +73,6 @@ $(OBJDIR)/s2NarrowPhaseDetector.o:			$(SRCDIR)/s2NarrowPhaseDetector.cc\
 
 $(OBJDIR)/s2CollisionDetector.o:				$(SRCDIR)/s2CollisionDetector.cc\
 																				$(INCDIR)/s2CollisionDetector.h\
-																				$(INCDIR)/s2Settings.h\
-																				$(INCDIR)/s2Math.h
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OBJDIR)/s2InterpenetrationSolver.o:		$(SRCDIR)/s2InterpenetrationSolver.cc\
-																				$(INCDIR)/s2InterpenetrationSolver.h\
-																				$(INCDIR)/s2Settings.h\
-																				$(INCDIR)/s2Math.h
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
-$(OBJDIR)/s2VelocitySolver.o:						$(SRCDIR)/s2VelocitySolver.cc\
-																				$(INCDIR)/s2VelocitySolver.h\
 																				$(INCDIR)/s2Settings.h\
 																				$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

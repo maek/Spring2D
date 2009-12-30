@@ -15,13 +15,9 @@ namespace Spring2D
     public:
 
       Contact (Body* BODY1, Body* BODY2)
-        : penetrationDepth(0)
       {
         body[0] = BODY1;
         body[1] = BODY2;
-
-        point[0] = Vector2::ZERO;
-        point[1] = Vector2::ZERO;
       }
 
 
@@ -32,34 +28,28 @@ namespace Spring2D
 
       Vector2   point[2];
 
-      Vector2   normal;
-
       Real      penetrationDepth;
 
       Real      restitution;
 
-  };
 
+      Vector2   normal;
 
+      Vector2   relativeContactPoint[2];
 
-  // ---------------------------------------------------------------------------
-  // The compare function for the set of Contacts
-  class ContactCompare
-  {
-    public:
+      Real      closingVelocity;
 
-      bool operator() (Contact* CONTACT1, Contact* CONTACT2) const
-      {
-        return (CONTACT1->penetrationDepth < CONTACT2->penetrationDepth);
-      }
+      Real      linearInertia[2];
+
+      Real      angularInertia[2];
 
   };
 
 
 
   // ---------------------------------------------------------------------------
-  // The contact set
-  typedef std::multiset<Contact*, ContactCompare> ContactSet;
+  // The contact list
+  typedef std::list<Contact*> ContactList;
 
 
 }

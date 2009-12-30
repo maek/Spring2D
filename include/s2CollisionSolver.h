@@ -5,8 +5,6 @@
 #include "s2Math.h"
 #include "s2Contact.h"
 #include "s2Body.h"
-#include "s2InterpenetrationSolver.h"
-#include "s2VelocitySolver.h"
 
 
 namespace Spring2D
@@ -17,16 +15,24 @@ namespace Spring2D
   {
     public:
 
-      void solveCollisions (ContactSet*);
+      void solveCollisions (ContactList*);
 
 
     private:
 
-      InterpenetrationSolver  interpenetrationSolver_;
+      void preprocessContacts (ContactList*);
 
-      VelocitySolver          velocitySolver_;
+      void solveInterpenetration (Contact*);
+
+      void solveVelocity (Contact*);
 
   };
+
+
+
+  bool interpenetrationCompare (Contact*, Contact*);
+
+  bool velocityCompare (Contact*, Contact*);
 
 
 }
