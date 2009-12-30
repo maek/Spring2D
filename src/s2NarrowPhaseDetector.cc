@@ -296,7 +296,7 @@ namespace Spring2D
       v = W.calculateClosestPointToOrigin();
 
       // Check for collisions
-      if (W.includeOrigin == 3)
+      if (W.size == 3)
       {
         // Collision found
         return Vector2::ZERO;
