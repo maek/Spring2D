@@ -266,7 +266,7 @@ namespace Spring2D
     // Restitution
     // b = before, a = after
     // e = -(v1a - v2a) / (v1b - v2b)
-    contact->restitution = 1;
+    contact->restitution = 0.5;
     Vector2 n = contact->normal;
 
     Vector2 Rap = contact->relativeContactPoint[0];

@@ -32,6 +32,8 @@ namespace Spring2D
 
       bool testPolygonPolygon (Shape*, Shape*, Contact*);
 
+      bool testRectRect (RectShape*, RectShape*, Contact*);
+
 
       Vector2 GJK (Simplex&, const Shape*, const Shape*) const;
 

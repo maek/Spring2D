@@ -89,9 +89,9 @@ namespace Spring2D
               break;
 
             case Shape::RECT :      // RECT - RECT
-              collision = testPolygonPolygon(
-                  (*contactI)->body[0]->getShape(),
-                  (*contactI)->body[1]->getShape(),
+              collision = testRectRect(
+                  static_cast<RectShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
           }
@@ -240,7 +240,7 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Check a polygon against another one
-  bool NarrowPhaseDetector::testPolygonPolygon(
+  bool NarrowPhaseDetector::testPolygonPolygon (
       Shape* SHAPE1, Shape* SHAPE2, Contact* contact)
   {
     Simplex W;
@@ -253,6 +253,309 @@ namespace Spring2D
       }
     }
     return false;
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Check a rect against another one
+  bool NarrowPhaseDetector::testRectRect (
+      RectShape* RECT1, RectShape* RECT2, Contact* contact)
+  {
+    Vector2 halfSize1(RECT1->getHalfSize());
+    Vector2 halfSize2(RECT2->getHalfSize());
+
+    Vector2 points1A[4];
+    Vector2 points1B[4];
+    Vector2 points2A[4];
+    Vector2 points2B[4];
+
+    points1A[0] = Vector2(-halfSize1.x, -halfSize1.y);
+    points1A[1] = Vector2( halfSize1.x, -halfSize1.y);
+    points1A[2] = Vector2( halfSize1.x,  halfSize1.y);
+    points1A[3] = Vector2(-halfSize1.x,  halfSize1.y);
+
+    points2B[0] = Vector2(-halfSize2.x, -halfSize2.y);
+    points2B[1] = Vector2( halfSize2.x, -halfSize2.y);
+    points2B[2] = Vector2( halfSize2.x,  halfSize2.y);
+    points2B[3] = Vector2(-halfSize2.x,  halfSize2.y);
+
+
+    // Transform B into local coordinates of A
+    for (int i = 0; i < 4; ++i)
+    {
+      points2A[i] = points2B[i];
+      RECT2->getBody()->transformWorld(&points2A[i]);
+      RECT1->getBody()->transformLocal(&points2A[i]);
+    }
+
+    // Test for collisions
+    if (
+        (points2A[0].x < points1A[0].x &&
+         points2A[1].x < points1A[0].x &&
+         points2A[2].x < points1A[0].x &&
+         points2A[3].x < points1A[0].x) ||
+        (points2A[0].x > points1A[2].x &&
+         points2A[1].x > points1A[2].x &&
+         points2A[2].x > points1A[2].x &&
+         points2A[3].x > points1A[2].x) ||
+        (points2A[0].y < points1A[0].y &&
+         points2A[1].y < points1A[0].y &&
+         points2A[2].y < points1A[0].y &&
+         points2A[3].y < points1A[0].y) ||
+        (points2A[0].y > points1A[2].y &&
+         points2A[1].y > points1A[2].y &&
+         points2A[2].y > points1A[2].y &&
+         points2A[3].y > points1A[2].y)
+       )
+    {
+      return false;
+    }
+
+
+
+    // Transform A into local coordinates of B
+    for (int i = 0; i < 4; ++i)
+    {
+      points1B[i] = points1A[i];
+      RECT1->getBody()->transformWorld(&points1B[i]);
+      RECT2->getBody()->transformLocal(&points1B[i]);
+    }
+
+    // Test for collisions
+    if (
+        (points1B[0].x < points2B[0].x &&
+         points1B[1].x < points2B[0].x &&
+         points1B[2].x < points2B[0].x &&
+         points1B[3].x < points2B[0].x) ||
+        (points1B[0].x > points2B[2].x &&
+         points1B[1].x > points2B[2].x &&
+         points1B[2].x > points2B[2].x &&
+         points1B[3].x > points2B[2].x) ||
+        (points1B[0].y < points2B[0].y &&
+         points1B[1].y < points2B[0].y &&
+         points1B[2].y < points2B[0].y &&
+         points1B[3].y < points2B[0].y) ||
+        (points1B[0].y > points2B[2].y &&
+         points1B[1].y > points2B[2].y &&
+         points1B[2].y > points2B[2].y &&
+         points1B[3].y > points2B[2].y)
+       )
+    {
+      return false;
+    }
+
+
+    // We have a collision so find the collision points
+    enum {LEFT, RIGHT } sideX;
+    enum {DOWN, UP} sideY;
+
+    Vector2 pointA[2];
+    Real pA = 0;
+    Real dX = 0;
+    Real dY = 0;
+
+
+    Vector2 center2A = RECT2->getBody()->getPosition();
+    RECT1->getBody()->transformLocal(&center2A);
+
+    // Test for collisions in A
+    for (int i = 0; i < 4; ++i)
+    {
+      // Check if the vertex is internal
+      if (points2A[i].x > points1A[0].x &&
+          points2A[i].x < points1A[2].x &&
+          points2A[i].y > points1A[0].y &&
+          points2A[i].y < points1A[2].y)
+      {
+        // Find the separating distance
+        // (skip points aligned with center)
+        if (center2A.x - points2A[i].x > 0) // left side point
+        {
+          dX = points1A[2].x - points2A[i].x;
+          sideX = LEFT;
+        }
+        if (center2A.x - points2A[i].x < 0) // right side point
+        {
+          dX = points2A[i].x - points1A[0].x;
+          sideX = RIGHT;
+        }
+
+        if (center2A.y - points2A[i].y > 0) // down side point
+        {
+          dY = points1A[2].y - points2A[i].y;
+          sideY = DOWN;
+        }
+        if (center2A.y - points2A[i].y < 0) // up side point
+        {
+          dY = points2A[i].y - points1A[0].y;
+          sideY = UP;
+        }
+
+
+        // Check if this distance is the best until now
+        if (dX <= dY)
+        {
+          if (dX > pA && sideX == LEFT)
+          {
+            pointA[0].x = points1A[2].x;
+            pointA[0].y = points2A[i].y;
+            pointA[1].x = points2A[i].x;
+            pointA[1].y = points2A[i].y;
+            pA = dX;
+          }
+          if (dX > pA && sideX == RIGHT)
+          {
+            pointA[0].x = points1A[0].x;
+            pointA[0].y = points2A[i].y;
+            pointA[1].x = points2A[i].x;
+            pointA[1].y = points2A[i].y;
+            pA = dX;
+          }
+        }
+        else // dY < dX
+        {
+          if (dY > pA && sideY == DOWN)
+          {
+            pointA[0].x = points2A[i].x;
+            pointA[0].y = points1A[2].y;
+            pointA[1].x = points2A[i].x;
+            pointA[1].y = points2A[i].y;
+            pA = dY;
+          }
+          if (dY > pA && sideY == UP)
+          {
+            pointA[0].x = points2A[i].x;
+            pointA[0].y = points1A[0].y;
+            pointA[1].x = points2A[i].x;
+            pointA[1].y = points2A[i].y;
+            pA = dY;
+          }
+        }
+      }
+
+    }
+
+
+    Vector2 pointB[2];
+    Real pB = 0;
+    dX = 0;
+    dY = 0;
+
+    Vector2 center1B = RECT1->getBody()->getPosition();
+    RECT2->getBody()->transformLocal(&center1B);
+
+    // Test for collisions in B
+    for (int i = 0; i < 4; ++i)
+    {
+      // Check if the vertex is internal
+      if (points1B[i].x > points2B[0].x &&
+          points1B[i].x < points2B[2].x &&
+          points1B[i].y > points2B[0].y &&
+          points1B[i].y < points2B[2].y)
+      {
+        // Find the separating distance
+        // (skip points aligned with center)
+        if (center1B.x - points1B[i].x > 0) // left side point
+        {
+          dX = points2B[2].x - points1B[i].x;
+          sideX = LEFT;
+        }
+        if (center1B.x - points1B[i].x < 0) // right side point
+        {
+          dX = points1B[i].x - points2B[0].x;
+          sideX = RIGHT;
+        }
+
+        if (center1B.y - points1B[i].y > 0) // down side point
+        {
+          dY = points2B[2].y - points1B[i].y;
+          sideY = DOWN;
+        }
+        if (center1B.y - points1B[i].y < 0) // up side point
+        {
+          dY = points1B[i].y - points2B[0].y;
+          sideY = UP;
+        }
+
+
+        // Check if this distance is the best until now
+        if (dX < dY)
+        {
+          if (dX > pB && sideX == LEFT)
+          {
+            pointB[0].x = points1B[i].x;
+            pointB[0].y = points1B[i].y;
+            pointB[1].x = points2B[2].x;
+            pointB[1].y = points1B[i].y;
+            pB = dX;
+          }
+          if (dX > pB && sideX == RIGHT)
+          {
+            pointB[0].x = points1B[i].x;
+            pointB[0].y = points1B[i].y;
+            pointB[1].x = points2B[0].x;
+            pointB[1].y = points1B[i].y;
+            pB = dX;
+          }
+        }
+        else // dY <= dX
+        {
+          if (dY > pB && sideY == DOWN)
+          {
+            pointB[0].x = points1B[i].x;
+            pointB[0].y = points1B[i].y;
+            pointB[1].x = points1B[i].x;
+            pointB[1].y = points2B[2].y;
+            pB = dY;
+          }
+          if (dY > pB && sideY == UP)
+          {
+            pointB[0].x = points1B[i].x;
+            pointB[0].y = points1B[i].y;
+            pointB[1].x = points1B[i].x;
+            pointB[1].y = points2B[0].y;
+            pB = dY;
+          }
+        }
+      }
+
+    }
+
+
+    // TODO: check edges
+    if (pA == 0 && pB == 0)
+    {
+      std::cerr << "Huston, we have a problem!!!\n";
+      return false;
+    }
+
+
+    if ((pA < pB && pA != 0) || pB == 0)
+    {
+      RECT1->getBody()->transformWorld(&pointA[0]);
+      RECT1->getBody()->transformWorld(&pointA[1]);
+      contact->point[0] = pointA[0];
+      contact->point[1] = pointA[1];
+      contact->penetrationDepth = pA;
+    }
+    if ((pB < pA && pB != 0) || pA == 0)
+    {
+      RECT2->getBody()->transformWorld(&pointB[0]);
+      RECT2->getBody()->transformWorld(&pointB[1]);
+      contact->point[0] = pointB[0];
+      contact->point[1] = pointB[1];
+      contact->penetrationDepth = pB;
+    }
+
+
+    // Robustness check
+    if (contact->penetrationDepth <= EPSILON_ABS)
+    {
+      return false;
+    }
+
+    return true;
   }
 
 
