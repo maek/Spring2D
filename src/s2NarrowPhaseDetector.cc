@@ -204,6 +204,8 @@ namespace Spring2D
     Real squaredDistance = (pointRect - centerC).getSquaredMagnitude();
     if (squaredDistance < (radius * radius))
     {
+      contact->body[0] = CIRCLE->getBody();
+      contact->body[1] = RECT->getBody();
       contact->point[0] = centerC + (pointRect - centerC).getNormalizedCopy() * radius;
       contact->point[1] = pointRect;
       contact->penetrationDepth = radius - s2sqrt(squaredDistance);
@@ -229,6 +231,8 @@ namespace Spring2D
     if (distance.getSquaredMagnitude() < radius * radius)
     {
       contact->penetrationDepth = radius - distance.getMagnitude();
+      contact->body[0] = CIRCLE->getBody();
+      contact->body[1] = POLYGON->getBody();
       contact->point[0] = centerC - distance.getNormalizedCopy() * radius;
       contact->point[1] = centerC - distance;
       return true;

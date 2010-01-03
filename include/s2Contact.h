@@ -24,11 +24,17 @@ namespace Spring2D
 
       Vector2   normal;
 
+      Vector2   tangent;
+
       Real      restitution;
+
+      Real      friction;
 
       Vector2   relativeContactPoint[2];
 
       Real      closingVelocity;
+
+      Real      slidingVelocity;
 
       Real      linearInertia[2];
 
