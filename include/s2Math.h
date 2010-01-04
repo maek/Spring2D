@@ -120,6 +120,16 @@ namespace Spring2D
         return tthis.normalize();
       }
 
+
+      // Perpendicularize
+      Vector2& perpendicularize ()
+      {
+        Real t = x;
+        x = -y;
+        y = t;
+        return *this;
+      }
+
       // Get a perpendicular copy of the vector
       Vector2 getPerpendicularCopy () const
       {

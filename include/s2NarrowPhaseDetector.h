@@ -39,6 +39,7 @@ namespace Spring2D
 
       void EPA (const Simplex&, const Shape*, const Shape*, Contact*) const;
 
+      bool MPR (const Shape*, const Shape*, Contact*) const;
   };
 
 
@@ -46,7 +47,7 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // A n-dimensional simplex (n = [0~2])
+  // A n-dimensional simplex (n = [0-2])
   // TODO: use pointer
   class Simplex
   {
@@ -63,13 +64,11 @@ namespace Spring2D
 
       int size;
 
-      bool includeOrigin;
-
 
     public:
 
       // Constructor
-      Simplex () : size(0), includeOrigin(false) { }
+      Simplex () : size(0) { }
 
 
       // Assignment
@@ -193,6 +192,37 @@ namespace Spring2D
 
   };
 
+
+
+
+
+  // ---------------------------------------------------------------------------
+  // The point for the MPR
+  class Point
+  {
+    public:
+
+      Vector2 pointA;
+
+      Vector2 pointB;
+
+      Vector2 minkowsky;
+
+
+    public:
+
+      void set (const Vector2& P1, const Vector2& P2)
+      {
+        pointA = P1;
+        pointB = P2;
+
+        minkowsky = P1 - P2;
+      }
+
+  };
+
+
+  Real calculateTriangleArea2 ( const Vector2&, const Vector2&, const Vector2&);
 
 }
 
