@@ -125,12 +125,6 @@ namespace Spring2D
   // Solve interpenetrations
   void CollisionSolver::solveInterpenetration (Contact* contact)
   {
-    std::cerr << "<< PENETRATION >>\n";
-    std::cerr << "normal  = " << contact->normal << "\n";
-    std::cerr << "penetration = " << contact->penetrationDepth << "\n";
-    std::cerr << "p1 = " << contact->point[0] << "\n";
-    std::cerr << "p2 = " << contact->point[1] << "\n";
-
     Vector2 Rap = contact->relativeContactPoint[0];
     Vector2 Rbp;
     Vector2 n   = contact->normal;
@@ -141,10 +135,6 @@ namespace Spring2D
     Real aIa    = contact->angularInertia[0];
     Real aIb;
 
-    std::cerr << "Rap = " << Rap << "\n";
-    std::cerr << "lIa = " << lIa << "\n";
-    std::cerr << "aIa = " << aIa << "\n";
-
     Real tI     = lIa + aIa;
 
     if (contact->body[1]->isDynamic())
@@ -153,10 +143,6 @@ namespace Spring2D
 
       lIb = contact->linearInertia[1];
       aIb = contact->angularInertia[1];
-
-      std::cerr << "Rbp = " << Rbp << "\n";
-      std::cerr << "lIb = " << lIb << "\n";
-      std::cerr << "aIb = " << aIb << "\n";
 
       tI += lIb + aIb;
     }
@@ -169,18 +155,10 @@ namespace Spring2D
     Real aMa =  p * aIa * itI;
     Real aMb;
 
-    std::cerr << "itI = " << itI << "\n";
-    std::cerr << "lMa = " << lMa * n << "\n";
-    std::cerr << "aMa = " << aMa << "\n";
-
-
     if (contact->body[1]->isDynamic())
     {
       lMb = -p * lIb * itI;
       aMb = -p * aIb * itI;
-
-      std::cerr << "lMb = " << lMb * n << "\n";
-      std::cerr << "aMb = " << aMb << "\n";
     }
 
 
@@ -191,8 +169,6 @@ namespace Spring2D
 
     Real aLa = angularLimitConstant * Rap.getMagnitude();
     Real aLb;
-
-    std::cerr << "aLa = " << aLa << "\n";
 
     if (s2fabs(aMa) > aLa)
     {
@@ -207,8 +183,6 @@ namespace Spring2D
     {
       aLb = angularLimitConstant * Rbp.getMagnitude();
 
-      std::cerr << "aLb = " << aLb << "\n";
-
       if (s2fabs(aMb) > aLb)
       {
         Real tM = lMb + aMb;
@@ -220,44 +194,27 @@ namespace Spring2D
     }
 #endif
 
-    std::cerr << "lMa = " << lMa * n << "\n";
-    std::cerr << "aMa = " << aMa << "\n";
 
     Vector2 pa1 = contact->body[0]->getPosition();
     Vector2 pb1;
     contact->body[0]->setPosition(pa1 + lMa * n);
 
-    std::cerr << "la = " << lMa * n << "\n";
-
     Complex oa(contact->body[0]->getOrientation());
     Complex ob;
-
-    std::cerr << "oa = " << oa << "\n";
 
     oa.rotate(s2copysign(1, cross(Rap, n)) * aMa / Rap.getMagnitude());
     contact->body[0]->setOrientation(oa);
 
-    std::cerr << "oa = " << oa << "\n";
-
 
     if (contact->body[1]->isDynamic())
     {
-      std::cerr << "lMb = " << lMb * n << "\n";
-      std::cerr << "aMb = " << aMb << "\n";
-
       pb1 = contact->body[1]->getPosition();
       contact->body[1]->setPosition(pb1 + lMb * n);
 
-      std::cerr << "lb = " << lMb * n << "\n";
-
       ob = Complex(contact->body[1]->getOrientation());
-
-      std::cerr << "ob = " << ob << "\n";
 
       ob.rotate(s2copysign(1, cross(Rbp, n)) * aMb / Rbp.getMagnitude());
       contact->body[1]->setOrientation(ob);
-
-      std::cerr << "ob = " << ob << "\n";
     }
   }
 
@@ -267,16 +224,6 @@ namespace Spring2D
   // Solve velocities
   void CollisionSolver::solveVelocity (Contact* contact)
   {
-    std::cerr << "<< VELOCITY >>\n";
-    std::cerr << "normal  = " << contact->normal << "\n";
-    std::cerr << "penetration = " << contact->penetrationDepth << "\n";
-    std::cerr << "p1 = " << contact->point[0] << "\n";
-    std::cerr << "p2 = " << contact->point[1] << "\n";
-    std::cerr << "v1 = " << contact->body[0]->getVelocity() << "\n";
-    std::cerr << "w1 = " << contact->body[0]->getRotation() << "\n";
-    std::cerr << "v2 = " << contact->body[1]->getVelocity() << "\n";
-    std::cerr << "w2 = " << contact->body[1]->getRotation() << "\n";
-
     // Restitution
     // b = before, a = after
     // e = -(v1a - v2a) / (v1b - v2b)
@@ -302,7 +249,6 @@ namespace Spring2D
 
 
     Real cV = contact->closingVelocity;
-    std::cerr << "cV = " << cV << "\n";
 
     // TODO: check =
     if (cV >= 0)
@@ -344,14 +290,8 @@ namespace Spring2D
 
     }
 
-    std::cerr << "Jnorm = " << Jnorm << "\n";
-
 
     Real sV = contact->slidingVelocity;
-
-    std::cout << "normal = " << contact->normal << "\n";
-    std::cout << "tangent = " << contact->tangent << "\n";
-    std::cout << "sV = " << contact->slidingVelocity << "\n";
 
     // Calculate the angular inertia on the tangent
     Real angularInertia[2];
@@ -395,11 +335,7 @@ namespace Spring2D
       Jtang = s2copysign(Jnorm * contact->friction, Jtang);
     }
 
-    std::cerr << "Jtang = " << Jtang << "\n";
-
     Vector2 J = Jnorm * contact->normal + Jtang * contact->tangent;
-
-    std::cerr << "J = " << J << "\n";
 
 
     // Apply the impulse (velocity)
@@ -408,9 +344,6 @@ namespace Spring2D
     // Apply the impulse (rotation)
     contact->body[0]->setRotation(Wa1 + cross(Rap, J) * (1.0 / Ia));
 
-    std::cerr << "v1 = " << contact->body[0]->getVelocity() << "\n";
-    std::cerr << "w1 = " << contact->body[0]->getRotation() << "\n";
-
 
     if (contact->body[1]->isDynamic())
     {
@@ -418,9 +351,6 @@ namespace Spring2D
       contact->body[1]->setVelocity(Vb1 - J * (1.0 / Mb));
       // Apply the impulse (rotation)
       contact->body[1]->setRotation(Wb1 - cross(Rbp, J) * (1.0 / Ib));
-
-      std::cerr << "v2 = " << contact->body[1]->getVelocity() << "\n";
-      std::cerr << "w2 = " << contact->body[1]->getRotation() << "\n";
     }
 
   }

@@ -253,6 +253,10 @@ namespace Spring2D
       if (W.size == 3)
       {
         EPA(W, SHAPE1, SHAPE2, contact);
+        if (contact->penetrationDepth == 0)
+        {
+          return false;
+        }
         return true;
       }
     }
@@ -608,7 +612,6 @@ namespace Spring2D
         // Collision found
         return Vector2::ZERO;
       }
-
     }
 
     // No intersection if objects touch each other but don't penetrate
@@ -632,7 +635,8 @@ namespace Spring2D
     Edge* edge1;
     Edge* edge2;
     Real mu = INFINITE;
-    std::priority_queue<Edge*, std::vector<Edge*>, EdgeCompare> Q;
+    EdgeQueue Q;
+
 
     // Construct all edges
     for (int i = 0; i < 3; ++i)
@@ -652,6 +656,7 @@ namespace Spring2D
       }
     }
 
+    bool error = true;
     edge = 0;
 
     // Compute the penetration distance
@@ -666,11 +671,20 @@ namespace Spring2D
       sB = SHAPE2->getSupportPoint(-v.getNormalizedCopy());
       w = sA - sB;
 
-      mu = std::min(mu, dot(v, w) * dot(v, w) / v.getSquaredMagnitude());
+      if (dot(v.getNormalizedCopy(), w) > mu)
+      {
+        break;
+      }
+
+
+      //mu = std::min(mu, dot(v, w) * dot(v, w) / v.getSquaredMagnitude());
+      mu = std::min(mu, dot(v.getNormalizedCopy(), w));
 
       // Close enough
-      if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude())
+      //if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude())
+      if (mu <= (1 + EPSILON_REL) * v.getMagnitude())
       {
+        error = false;
         break;
       }
 
@@ -682,18 +696,32 @@ namespace Spring2D
             edge->supportPointsA[0], edge->supportPointsB[0],
             w,
             sA, sB) &&
-          v.getSquaredMagnitude() <= edge1->key && edge1->key <= mu)
+          v.getMagnitude() <= edge1->v.getMagnitude() && edge1->v.getMagnitude() <= mu)
+        //v.getSquaredMagnitude() <= edge1->key && edge1->key <= mu)
       {
-        if (edge->endpoints[0] == edge1->endpoints[0] &&
-            edge->endpoints[1] == edge1->endpoints[1])
+        if (
+            Q.hasEdge(edge1) ||
+            (edge->endpoints[0] == edge1->endpoints[0] && edge->endpoints[1] == edge1->endpoints[1]) ||
+            (edge->endpoints[0] == edge1->endpoints[1] && edge->endpoints[1] == edge1->endpoints[0])
+           )
         {
           delete edge1;
+          error = false;
           break;
         }
         Q.push(edge1);
       }
       else
       {
+        if (
+            (edge->endpoints[0] == edge1->endpoints[0] && edge->endpoints[1] == edge1->endpoints[1]) ||
+            (edge->endpoints[0] == edge1->endpoints[1] && edge->endpoints[1] == edge1->endpoints[0])
+           )
+        {
+          delete edge1;
+          error = false;
+          break;
+        }
         delete edge1;
       }
 
@@ -703,24 +731,39 @@ namespace Spring2D
             sA, sB,
             edge->endpoints[1],
             edge->supportPointsA[1], edge->supportPointsB[1]) &&
-          v.getSquaredMagnitude() <= edge2->key && edge2->key <= mu)
-      {
-        if (edge->endpoints[0] == edge2->endpoints[0] &&
-            edge->endpoints[1] == edge2->endpoints[1])
+          //v.getSquaredMagnitude() <= edge2->key && edge2->key <= mu)
+        v.getMagnitude() <= edge2->v.getMagnitude() && edge2->v.getMagnitude() <= mu)
         {
-          delete edge2;
-          break;
+          if (
+              Q.hasEdge(edge2) ||
+              (edge->endpoints[0] == edge2->endpoints[0] && edge->endpoints[1] == edge2->endpoints[1]) ||
+              (edge->endpoints[0] == edge2->endpoints[1] && edge->endpoints[1] == edge2->endpoints[0])
+             )
+          {
+            delete edge2;
+            error = false;
+            break;
+          }
+          Q.push(edge2);
         }
-        Q.push(edge2);
-      }
       else
       {
+        if (
+            (edge->endpoints[0] == edge2->endpoints[0] && edge->endpoints[1] == edge2->endpoints[1]) ||
+            (edge->endpoints[0] == edge2->endpoints[1] && edge->endpoints[1] == edge2->endpoints[0])
+           )
+        {
+          delete edge2;
+          error = false;
+          break;
+        }
         delete edge2;
       }
 
     }
-    while(Q.size() > 0 && Q.top()->key <= mu);
-
+    //while(Q.size() > 0 && Q.top()->key <= mu);
+    while (Q.size() > 0 && Q.top()->v.getMagnitude() <= mu);
+    //while (Q.size() > 0);
 
     // Set the contact data
     contact->point[0] =
@@ -732,7 +775,15 @@ namespace Spring2D
     contact->penetrationDepth = v.getMagnitude();
 
 
+    // Skip collision if EPA fails
+    if (error)
+    {
+      contact->penetrationDepth = 0;
+    }
+
+
     // Free the memory
+    // TODO: implement in priority queue a method for this
     delete edge;
     int qsize = Q.size();
     for (int i = 0; i < qsize; ++i)
@@ -924,6 +975,8 @@ namespace Spring2D
         // Remove B & return A
         size--;
         bCoordinates[0] = 1.0;
+        // TODO: this should never happen
+        assert(false);
         return A;
       }
 
@@ -1027,12 +1080,15 @@ namespace Spring2D
       {
         // Remove A & return the projection on BC
         // TODO: OPTIMIZATION -> switch A <> C
-        vertices[0]       = vertices[1];
-        supportPointsA[0] = supportPointsA[1];
-        supportPointsB[0] = supportPointsB[1];
-        vertices[1]       = vertices[2];
-        supportPointsA[1] = supportPointsA[2];
-        supportPointsB[1] = supportPointsB[2];
+        //vertices[0]       = vertices[1];
+        //supportPointsA[0] = supportPointsA[1];
+        //supportPointsB[0] = supportPointsB[1];
+        //vertices[1]       = vertices[2];
+        //supportPointsA[1] = supportPointsA[2];
+        //supportPointsB[1] = supportPointsB[2];
+        vertices[0]       = vertices[2];
+        supportPointsA[0] = supportPointsA[2];
+        supportPointsB[0] = supportPointsB[2];
         size--;
         Real lambda = unum / (unum + udenom);
         bCoordinates[0] = 1.0 - lambda;
@@ -1084,12 +1140,20 @@ namespace Spring2D
       const Vector2& B,
       const Vector2& SUPPORT_POINT_A_1, const Vector2& SUPPORT_POINT_B_1)
   {
+    bool valid;
+
     // Check if O is in any vertex region
     Vector2 AB = B - A;
     t = dot(-A, AB) / dot(AB, AB);
     if (t <= 0 || t >= 1)
     {
-      return false;
+      // TODO: does it need ???
+      //t <= 0 ? t = 0 : t = 1;
+      valid = false;
+    }
+    else
+    {
+      valid = true;
     }
 
     // O is on AB
@@ -1101,7 +1165,8 @@ namespace Spring2D
     supportPointsB[1] = SUPPORT_POINT_B_1;
     v = (A + t * AB);
     key = v.getSquaredMagnitude();
-    return true;
+
+    return valid;
   }
 
 

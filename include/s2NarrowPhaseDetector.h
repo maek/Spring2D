@@ -179,16 +179,72 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // The compare functor for the priority-queue of Edges
-  class EdgeCompare
+  // The priority-queue of Edges
+  class EdgeQueue
   {
     public:
 
-      bool operator() (const Edge* EDGE1, const Edge* EDGE2) const
+      // Return the number of elements in the queue
+      int size () const
       {
-        // Keep a decreasing sorting (best = minimum)
-        return (EDGE1->key > EDGE2->key);
+        return edgeList_.size();
       }
+
+
+      // Insert element
+      void push (Edge* EDGE)
+      {
+        std::list<Edge*>::iterator edgeI;
+        for (edgeI = edgeList_.begin(); edgeI != edgeList_.end(); ++edgeI)
+        {
+          // Keep a decreasing sorting (best (minor) = back)
+          if (EDGE->key > (*edgeI)->key)
+          {
+            edgeList_.insert(edgeI, EDGE);
+            return;
+          }
+        }
+
+        edgeList_.push_back(EDGE);
+      }
+
+      // Access top element
+      Edge* top () const
+      {
+        return edgeList_.back();
+      }
+
+      // Remove top element
+      void pop ()
+      {
+        edgeList_.pop_back();
+      }
+
+
+      // Test if the given Edge is in the queue
+      bool hasEdge (Edge* EDGE)
+      {
+        std::list<Edge*>::iterator edgeI;
+        for (edgeI = edgeList_.begin(); edgeI != edgeList_.end(); ++edgeI)
+        {
+          if (
+              ((*edgeI)->endpoints[0] == EDGE->endpoints[0] &&
+               (*edgeI)->endpoints[1] == EDGE->endpoints[1]) ||
+              ((*edgeI)->endpoints[0] == EDGE->endpoints[1] &&
+               (*edgeI)->endpoints[1] == EDGE->endpoints[0])
+             )
+          {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+
+    private:
+
+      std::list<Edge*> edgeList_;
 
   };
 
