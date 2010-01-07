@@ -38,8 +38,6 @@ namespace Spring2D
       Vector2 GJK (Simplex&, const Shape*, const Shape*) const;
 
       void EPA (const Simplex&, const Shape*, const Shape*, Contact*) const;
-
-      bool MPR (const Shape*, const Shape*, Contact*) const;
   };
 
 
@@ -248,37 +246,6 @@ namespace Spring2D
 
   };
 
-
-
-
-
-  // ---------------------------------------------------------------------------
-  // The point for the MPR
-  class Point
-  {
-    public:
-
-      Vector2 pointA;
-
-      Vector2 pointB;
-
-      Vector2 minkowsky;
-
-
-    public:
-
-      void set (const Vector2& P1, const Vector2& P2)
-      {
-        pointA = P1;
-        pointB = P2;
-
-        minkowsky = P1 - P2;
-      }
-
-  };
-
-
-  Real calculateTriangleArea2 ( const Vector2&, const Vector2&, const Vector2&);
 
 }
 
