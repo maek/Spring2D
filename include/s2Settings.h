@@ -41,7 +41,7 @@ namespace Spring2D
 
   const float INFINITE        = FLT_MAX;
   const float EPSILON_TOL     = FLT_EPSILON;
-  const float EPSILON_ABS     = 0.0001f;
+  const float EPSILON_ABS     = 0.00005f;
   const float EPSILON_REL     = 0.01f;
   const float EPSILON_REL_2   = 0.0001f;
 

@@ -20,7 +20,9 @@ namespace Spring2D
     collisionDetector_.findCollisions(environment_->getBodyList());
 
     // Solve collision
-    collisionSolver_.solveCollisions(collisionDetector_.getContacts());
+    collisionSolver_.solveCollisions(
+        collisionDetector_.getFrontContacts(),
+        collisionDetector_.getBackContacts());
 
 
     // Increment the step counter

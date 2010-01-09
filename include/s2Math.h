@@ -147,14 +147,17 @@ namespace Spring2D
   inline bool operator== (const Vector2& V1, const Vector2& V2)
   {
     return (
-        V1.x == V2.x && V1.y == V2.y);
+        s2fabs(V1.x - V2.x) <= EPSILON_ABS &&
+        s2fabs(V1.y - V2.y) <= EPSILON_ABS);
   }
 
   // ---------------------------------------------------------------------------
   // Not Equal [Vector2]
   inline bool operator!= (const Vector2& V1, const Vector2& V2)
   {
-    return (V1.x != V2.x || V1.y != V2.y);
+    return (
+        s2fabs(V1.x - V2.x) > EPSILON_ABS ||
+        s2fabs(V1.y - V2.y) > EPSILON_ABS);
   }
 
 

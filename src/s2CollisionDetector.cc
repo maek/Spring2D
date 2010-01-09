@@ -7,20 +7,21 @@ namespace Spring2D
   // Find collisions
   void CollisionDetector::findCollisions (const BodyList& bodyList)
   {
-    // Clear the contact list
-    for (ContactList::iterator contactI = contactList_.begin();
-        contactI != contactList_.end(); ++contactI)
+    // Clear the back contact list
+    for (ContactList::iterator contactI = contactListBack_.begin();
+        contactI != contactListBack_.end(); ++contactI)
     {
       // Delete
       delete (*contactI);
     }
-    contactList_.clear();
+    contactListBack_ = contactListFront_;
+    contactListFront_.clear();
 
-    // Find the collision (BROAD phase)
-    broadPhaseDetector_->findCollisions(bodyList, &contactList_);
+    // Find the collisions (BROAD phase)
+    broadPhaseDetector_->findCollisions(bodyList, &contactListFront_);
 
-    // Find the collision (NARROW phase)
-    narrowPhaseDetector_->findCollisions(bodyList, &contactList_);
+    // Find the collisions (NARROW phase)
+    narrowPhaseDetector_->findCollisions(bodyList, &contactListFront_);
   }
 
 

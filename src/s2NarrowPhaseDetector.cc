@@ -8,11 +8,24 @@ namespace Spring2D
   void NarrowPhaseDetector::findCollisions (
       const BodyList& bodyList, ContactList* contactList)
   {
-    bool collision;
     ContactList::iterator contactI = contactList->begin();
+    bool collision;
+    Body* tbody;
 
     while (contactI != contactList->end())
     {
+      // Skip static geometry checks
+      if ((*contactI)->body[0]->isStatic() &&
+          (*contactI)->body[1]->isStatic())
+      {
+        // Delete the contact data
+        delete *contactI;
+
+        // Remove the contact
+        contactI = contactList->erase(contactI);
+        continue;
+      }
+
       // Do an exact test
       switch ((*contactI)->body[0]->getShape()->getType())
       {
@@ -48,9 +61,12 @@ namespace Spring2D
           switch ((*contactI)->body[1]->getShape()->getType())
           {
             case Shape::CIRCLE :    // POLYGON - CIRCLE
+              tbody                 = (*contactI)->body[0];
+              (*contactI)->body[0]  = (*contactI)->body[1];
+              (*contactI)->body[1]  = tbody;
               collision = testCirclePolygon(
-                  static_cast<CircleShape*>((*contactI)->body[1]->getShape()),
-                  static_cast<PolygonShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
 
@@ -75,9 +91,12 @@ namespace Spring2D
           switch ((*contactI)->body[1]->getShape()->getType())
           {
             case Shape::CIRCLE :    // RECT - CIRCLE
+              tbody                 = (*contactI)->body[0];
+              (*contactI)->body[0]  = (*contactI)->body[1];
+              (*contactI)->body[1]  = tbody;
               collision = testCircleRect(
-                  static_cast<CircleShape*>((*contactI)->body[1]->getShape()),
-                  static_cast<RectShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
 
@@ -107,10 +126,13 @@ namespace Spring2D
 
         // Remove the contact
         contactI = contactList->erase(contactI);
+        continue;
       }
       else
       {
+        (*contactI)->nContacts = 1;
         ++contactI;
+        continue;
       }
 
     }
@@ -204,11 +226,9 @@ namespace Spring2D
     Real squaredDistance = (pointRect - centerC).getSquaredMagnitude();
     if (squaredDistance < (radius * radius))
     {
-      contact->body[0] = CIRCLE->getBody();
-      contact->body[1] = RECT->getBody();
+      contact->penetrationDepth = radius - s2sqrt(squaredDistance);
       contact->point[0] = centerC + (pointRect - centerC).getNormalizedCopy() * radius;
       contact->point[1] = pointRect;
-      contact->penetrationDepth = radius - s2sqrt(squaredDistance);
 
       return true;
     }
@@ -231,8 +251,6 @@ namespace Spring2D
     if (distance.getSquaredMagnitude() < radius * radius)
     {
       contact->penetrationDepth = radius - distance.getMagnitude();
-      contact->body[0] = CIRCLE->getBody();
-      contact->body[1] = POLYGON->getBody();
       contact->point[0] = centerC - distance.getNormalizedCopy() * radius;
       contact->point[1] = centerC - distance;
       return true;
@@ -543,17 +561,17 @@ namespace Spring2D
     {
       RECT1->getBody()->transformWorld(&pointA[0]);
       RECT1->getBody()->transformWorld(&pointA[1]);
+      contact->penetrationDepth = pA;
       contact->point[0] = pointA[0];
       contact->point[1] = pointA[1];
-      contact->penetrationDepth = pA;
     }
     if ((pB < pA && pB != 0) || pA == 0)
     {
       RECT2->getBody()->transformWorld(&pointB[0]);
       RECT2->getBody()->transformWorld(&pointB[1]);
+      contact->penetrationDepth = pB;
       contact->point[0] = pointB[0];
       contact->point[1] = pointB[1];
-      contact->penetrationDepth = pB;
     }
 
 
@@ -766,13 +784,13 @@ namespace Spring2D
     //while (Q.size() > 0);
 
     // Set the contact data
+    contact->penetrationDepth = v.getMagnitude();
     contact->point[0] =
       edge->supportPointsA[0] * (1 - edge->t) +
       edge->supportPointsA[1] * edge->t;
     contact->point[1] =
       edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
-    contact->penetrationDepth = v.getMagnitude();
 
 
     // Skip collision if EPA fails

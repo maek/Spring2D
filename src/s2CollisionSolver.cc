@@ -5,37 +5,39 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // Solve collisions
-  void CollisionSolver::solveCollisions (ContactList* contacts)
+  void CollisionSolver::solveCollisions (
+      ContactList* frontContacts,
+      ContactList* backContacts)
   {
     // Early out
-    if (contacts->empty())
+    if (frontContacts->empty())
     {
       return;
     }
 
     // Preprocess contacts
-    preprocessContacts(contacts);
+    preprocessContacts(frontContacts, backContacts);
 
 
     // Sort in penetration depth decreasing order
-    contacts->sort(interpenetrationCompare);
+    frontContacts->sort(interpenetrationCompare);
 
     // Solve interpenetration
     // TODO: update & sort again
     //       extract from the main list, sort in a new list & merge
-    for (ContactList::iterator contactI = contacts->begin();
-        contactI != contacts->end(); ++contactI)
+    for (ContactList::iterator contactI = frontContacts->begin();
+        contactI != frontContacts->end(); ++contactI)
     {
       solveInterpenetration(*contactI);
     }
 
 
     // Sort in closing velocity decreasing order
-    contacts->sort(velocityCompare);
+    frontContacts->sort(velocityCompare);
 
     // Solve velocities
-    for (ContactList::iterator contactI = contacts->begin();
-        contactI != contacts->end(); ++contactI)
+    for (ContactList::iterator contactI = frontContacts->begin();
+        contactI != frontContacts->end(); ++contactI)
     {
       solveVelocity(*contactI);
     }
@@ -46,16 +48,230 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Preprocess the Contact list
-  void CollisionSolver::preprocessContacts (ContactList* contacts)
+  void CollisionSolver::preprocessContacts (
+      ContactList* frontContacts,
+      ContactList* backContacts)
   {
-    for (ContactList::iterator contactI = contacts->begin();
-        contactI != contacts->end(); ++contactI)
+    for (ContactList::iterator contactI = frontContacts->begin();
+        contactI != frontContacts->end(); ++contactI)
     {
       // Swap if needed
       if ((*contactI)->body[0]->isStatic())
       {
         (*contactI)->swap();
       }
+
+
+      // Save the contact point for persistence
+      (*contactI)->persistencePoint[0][0] = (*contactI)->point[0];
+      (*contactI)->body[0]->transformLocal(&(*contactI)->persistencePoint[0][0]);
+      (*contactI)->persistencePoint[0][1] = (*contactI)->point[1];
+      (*contactI)->body[1]->transformLocal(&(*contactI)->persistencePoint[0][1]);
+
+
+      // Check the shapes for contact persistence (only RECT & POLYGON)
+      if ((*contactI)->body[0]->getShape()->getType() != Shape::CIRCLE &&
+          (*contactI)->body[1]->getShape()->getType() != Shape::CIRCLE)
+      {
+        // Search for a contact in the last frame
+        // TODO: optimize
+        for (ContactList::iterator contactY = backContacts->begin();
+            contactY != backContacts->end(); ++contactY)
+        {
+          if ((*contactI)->body[0] == (*contactY)->body[0] &&
+              (*contactI)->body[1] == (*contactY)->body[1])
+          {
+            std::cerr << "##################################################\n";
+            std::cerr << "Found a previous contact\n";
+            Vector2 point[2];
+
+            switch ((*contactY)->nContacts)
+            {
+
+              case 1: // Found a previous single contact
+                //std::cerr << "p[0] = " << point[0] << "\n";
+                //std::cerr << "P[0] = " << (*contactY)->persistencePoint[0][0] << "\n";
+                //std::cerr << point[0] - (*contactY)->persistencePoint[0][0] << "\n";
+                //std::cerr << "p[1] = " << point[1] << "\n";
+                //std::cerr << "P[1] = " << (*contactY)->persistencePoint[0][1] << "\n";
+                //std::cerr << point[1] - (*contactY)->persistencePoint[0][1] << "\n";
+
+                // If it is not the same
+                if (
+                    ((*contactI)->persistencePoint[0][0] !=
+                     (*contactY)->persistencePoint[0][0]) &&
+                    ((*contactI)->persistencePoint[0][1] !=
+                     (*contactY)->persistencePoint[0][1])
+                   )
+                {
+                  // Check if the previous contact is still valid
+                  point[0] = (*contactY)->persistencePoint[0][0];
+                  point[1] = (*contactY)->persistencePoint[0][1];
+                  (*contactI)->body[0]->transformWorld(&point[0]);
+                  (*contactI)->body[1]->transformWorld(&point[1]);
+                  // TODO: define a constant for persistence distance
+                  if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
+                      (point[1] - point[0]).getMagnitude() < 0.05)
+                  {
+                    // Add the current point for the persistence
+                    (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
+                    (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                    (*contactI)->nContacts = 2;
+                    std::cerr << "Found a contact suitable for persistence [1]\n";
+                  }
+                }
+                break;
+
+
+              case 2: // Found a previous double (persistence) contact
+                // Check if the previous contact 0 is valid
+                point[0] = (*contactY)->persistencePoint[0][0];
+                point[1] = (*contactY)->persistencePoint[0][1];
+                (*contactI)->body[0]->transformWorld(&point[0]);
+                (*contactI)->body[1]->transformWorld(&point[1]);
+                // TODO: define a constant for persistence distance
+                if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
+                    (point[1] - point[0]).getMagnitude() < 0.05)
+                {
+                  (*contactI)->nContacts = 2;
+                }
+                else // Not valid
+                {
+                  (*contactI)->nContacts = 1;
+                }
+
+                // Check if the previous contact 1 is valid
+                point[0] = (*contactY)->persistencePoint[1][0];
+                point[1] = (*contactY)->persistencePoint[1][1];
+                (*contactI)->body[0]->transformWorld(&point[0]);
+                (*contactI)->body[1]->transformWorld(&point[1]);
+                // TODO: define a constant for persistence distance
+                if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
+                    (point[0] - point[1]).getMagnitude() < 0.05)
+                {
+                  if ((*contactI)->nContacts == 2) // (V, V)
+                  {
+                    Vector2 tpoint[2];
+                    Vector2 midPoint[3];
+
+                    tpoint[0] = (*contactY)->persistencePoint[0][0];
+                    (*contactI)->body[0]->transformWorld(&tpoint[0]);
+                    tpoint[1] = (*contactY)->persistencePoint[0][1];
+                    (*contactI)->body[1]->transformWorld(&tpoint[1]);
+                    midPoint[0] = (tpoint[0] + tpoint[1]) * 0.5;
+
+                    tpoint[0] = (*contactY)->persistencePoint[1][0];
+                    (*contactI)->body[0]->transformWorld(&tpoint[0]);
+                    tpoint[1] = (*contactY)->persistencePoint[1][1];
+                    (*contactI)->body[1]->transformWorld(&tpoint[1]);
+                    midPoint[1] = (tpoint[0] + tpoint[1]) * 0.5;
+
+                    midPoint[2] = ((*contactI)->point[0] + (*contactI)->point[1]) * 0.5;
+
+                    // Keep the two furthest points
+                    if (dot(midPoint[0], (*contactI)->tangent) >
+                        dot(midPoint[1], (*contactI)->tangent))
+                    {
+                      if (dot(midPoint[2], (*contactI)->tangent) >=
+                          dot(midPoint[0], (*contactI)->tangent))   // (2, 0, 1)
+                      {
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                      }
+                      else if (dot(midPoint[2], (*contactI)->tangent) <=
+                          dot(midPoint[1], (*contactI)->tangent))   // (0, 1, 2)
+                      {
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                      }
+                      else                                          // (0, 2, 1)
+                      {
+                        (*contactI)->persistencePoint[0][0] = (*contactY)->persistencePoint[0][0];
+                        (*contactI)->persistencePoint[0][1] = (*contactY)->persistencePoint[0][1];
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                      }
+                    }
+                    else // (1 > 0)
+                    {
+                      if (dot(midPoint[2], (*contactI)->tangent) >=
+                          dot(midPoint[1], (*contactI)->tangent))   // (2, 1, 0)
+                      {
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                      }
+                      else if (dot(midPoint[2], (*contactI)->tangent) <=
+                          dot(midPoint[0], (*contactI)->tangent))   // (1, 0, 2)
+                      {
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                      }
+                      else                                          // (1, 2, 0)
+                      {
+                        (*contactI)->persistencePoint[0][0] = (*contactY)->persistencePoint[0][0];
+                        (*contactI)->persistencePoint[0][1] = (*contactY)->persistencePoint[0][1];
+                        (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
+                        (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                      }
+
+                    }
+
+                    (*contactI)->point[0] =
+                      ((*contactY)->persistencePoint[0][0] +
+                       (*contactY)->persistencePoint[1][0]) * 0.5;
+                    (*contactI)->body[0]->transformWorld(&(*contactI)->point[0]);
+                    (*contactI)->point[1] =
+                      ((*contactY)->persistencePoint[0][1] +
+                       (*contactY)->persistencePoint[1][1]) * 0.5;
+                    (*contactI)->body[1]->transformWorld(&(*contactI)->point[1]);
+                    (*contactI)->penetrationDepth =
+                      ((*contactI)->point[0] -
+                       (*contactI)->point[1]).getMagnitude();
+                    std::cerr << "Found a contact suitable for persistence [2]\n";
+                    std::cerr << "Persistence (V, V)\n";
+                  }
+                  else // (X, V)
+                  {
+                    // Add the current point for the persistence
+                    (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
+                    (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                    (*contactI)->nContacts = 2;
+                    std::cerr << "Persistence (X, V)\n";
+                    std::cerr << "Found a contact suitable for persistence [1]\n";
+                  }
+                }
+                else // Not valid
+                {
+                  if ((*contactI)->nContacts == 2) // (V, X)
+                  {
+                    // Add the current point for the persistence
+                    (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
+                    (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                    (*contactI)->nContacts = 2;
+                    std::cerr << "Persistence (V, X)\n";
+                    std::cerr << "Found a contact suitable for persistence [1]\n";
+                  }
+                  else // (X, X)
+                  {
+                    // Keep only the current point
+                    //(*contactI)->nContacts = 1;
+                    std::cerr << "Persistence (X, X)\n";
+                  }
+                }
+                break;
+
+
+              default:
+                // This should never happens
+                assert(false);
+            }
+
+            std::cerr << "##################################################\n";
+            break;
+          }
+        }
+      }
+
 
       // Calculate the normal
       (*contactI)->normal = ((*contactI)->point[1] - (*contactI)->point[0]);
@@ -114,7 +330,6 @@ namespace Spring2D
         (*contactI)->angularInertia[1] = tcross * tcross /
           (*contactI)->body[1]->getMomentOfInertia();
       }
-
     }
 
   }

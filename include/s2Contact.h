@@ -16,11 +16,14 @@ namespace Spring2D
 
       Body*     body[2];
 
+      int       nContacts;
+
+      Vector2   persistencePoint[2][2];
+
 
       Vector2   point[2];
 
       Real      penetrationDepth;
-
 
       Vector2   normal;
 
@@ -44,26 +47,32 @@ namespace Spring2D
     public:
 
       // Constructor
-      Contact (Body* BODY1, Body* BODY2)
+      Contact (Body* BODY1, Body* BODY2) : nContacts(0)
       {
         body[0] = BODY1;
         body[1] = BODY2;
       }
 
 
-      // Swap the body if the first is static
+      // Swap the data
       void swap ()
       {
+        // Body
         Body* tbody = body[0];
-        body[0] = body[1];
-        body[1] = tbody;
+        body[0]     = body[1];
+        body[1]     = tbody;
 
+        // Contact point
         Vector2 tpoint = point[0];
-        point[0] = point[1];
-        point[1] = tpoint;
+        point[0]       = point[1];
+        point[1]       = tpoint;
+
+        // The penetrationDepth is the same
       }
 
   };
+
+
 
 
 
