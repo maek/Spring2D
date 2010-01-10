@@ -69,6 +69,14 @@ namespace Spring2D
       (*contactI)->body[1]->transformLocal(&(*contactI)->persistencePoint[0][1]);
 
 
+      // Calculate the normal
+      (*contactI)->normal = ((*contactI)->point[1] - (*contactI)->point[0]);
+      (*contactI)->normal.normalize();
+
+      // Calculate the tangent
+      (*contactI)->tangent = (*contactI)->normal.getPerpendicularCopy();
+
+
       // Check the shapes for contact persistence (only RECT & POLYGON)
       if ((*contactI)->body[0]->getShape()->getType() != Shape::CIRCLE &&
           (*contactI)->body[1]->getShape()->getType() != Shape::CIRCLE)
@@ -85,17 +93,13 @@ namespace Spring2D
             std::cerr << "Found a previous contact\n";
             Vector2 point[2];
 
+            // TODO: check with normal I
+            std::cerr << "nI = " << (*contactI)->normal << "\n";
+            std::cerr << "nY = " << (*contactY)->normal << "\n";
             switch ((*contactY)->nContacts)
             {
 
               case 1: // Found a previous single contact
-                //std::cerr << "p[0] = " << point[0] << "\n";
-                //std::cerr << "P[0] = " << (*contactY)->persistencePoint[0][0] << "\n";
-                //std::cerr << point[0] - (*contactY)->persistencePoint[0][0] << "\n";
-                //std::cerr << "p[1] = " << point[1] << "\n";
-                //std::cerr << "P[1] = " << (*contactY)->persistencePoint[0][1] << "\n";
-                //std::cerr << point[1] - (*contactY)->persistencePoint[0][1] << "\n";
-
                 // If it is not the same
                 if (
                     ((*contactI)->persistencePoint[0][0] !=
@@ -110,8 +114,8 @@ namespace Spring2D
                   (*contactI)->body[0]->transformWorld(&point[0]);
                   (*contactI)->body[1]->transformWorld(&point[1]);
                   // TODO: define a constant for persistence distance
-                  if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
-                      (point[1] - point[0]).getMagnitude() < 0.05)
+                  if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
+                      (point[1] - point[0]).getMagnitude() < 0.01)
                   {
                     // Add the current point for the persistence
                     (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
@@ -130,8 +134,8 @@ namespace Spring2D
                 (*contactI)->body[0]->transformWorld(&point[0]);
                 (*contactI)->body[1]->transformWorld(&point[1]);
                 // TODO: define a constant for persistence distance
-                if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
-                    (point[1] - point[0]).getMagnitude() < 0.05)
+                if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
+                    (point[1] - point[0]).getMagnitude() < 0.01)
                 {
                   (*contactI)->nContacts = 2;
                 }
@@ -146,8 +150,8 @@ namespace Spring2D
                 (*contactI)->body[0]->transformWorld(&point[0]);
                 (*contactI)->body[1]->transformWorld(&point[1]);
                 // TODO: define a constant for persistence distance
-                if (dot(point[1] - point[0], (*contactY)->normal) > 0 ||
-                    (point[0] - point[1]).getMagnitude() < 0.05)
+                if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
+                    (point[0] - point[1]).getMagnitude() < 0.01)
                 {
                   if ((*contactI)->nContacts == 2) // (V, V)
                   {
@@ -216,13 +220,14 @@ namespace Spring2D
 
                     }
 
+                    // Use the midpoint of the 2 persistence point
                     (*contactI)->point[0] =
-                      ((*contactY)->persistencePoint[0][0] +
-                       (*contactY)->persistencePoint[1][0]) * 0.5;
+                      ((*contactI)->persistencePoint[0][0] +
+                       (*contactI)->persistencePoint[1][0]) * 0.5;
                     (*contactI)->body[0]->transformWorld(&(*contactI)->point[0]);
                     (*contactI)->point[1] =
-                      ((*contactY)->persistencePoint[0][1] +
-                       (*contactY)->persistencePoint[1][1]) * 0.5;
+                      ((*contactI)->persistencePoint[0][1] +
+                       (*contactI)->persistencePoint[1][1]) * 0.5;
                     (*contactI)->body[1]->transformWorld(&(*contactI)->point[1]);
                     (*contactI)->penetrationDepth =
                       ((*contactI)->point[0] -
