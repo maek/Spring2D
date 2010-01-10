@@ -11,16 +11,20 @@ namespace Spring2D
     if (static_)
       return;
 
-    // (1a) Update the velocity
-    velocity_ += netForce_  * (1.0 / mass_) * TIME_STEP;
+    // Update the acceleration
+    acceleration_ = netForce_  * (1.0 / mass_);
+    velocityFromAcceleration_ = acceleration_ * TIME_STEP;
 
-    // (1b) Update the rotation
+    // Update the velocity
+    velocity_ += velocityFromAcceleration_;
+
+    // Update the rotation
     rotation_ += netTorque_ * (1.0 / momentOfInertia_) * TIME_STEP;
 
-    // (2a) Update the position
+    // Update the position
     position_ += (velocity_ * TIME_STEP);
 
-    // (2b) Update the orientation
+    // Update the orientation
     orientation_.rotate(rotation_ * TIME_STEP);
 
 

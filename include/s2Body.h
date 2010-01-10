@@ -63,6 +63,18 @@ namespace Spring2D
         return velocity_;
       }
 
+      // Get the body acceleration
+      Vector2 getAcceleration () const
+      {
+        return acceleration_;
+      }
+
+      // Get the body velocity caused only from acceleration
+      Vector2 getVelocityFromAcceleration () const
+      {
+        return velocityFromAcceleration_;
+      }
+
 
       // Set the body orientation
       void setOrientation (const Complex& ORIENTATION)
@@ -210,6 +222,11 @@ namespace Spring2D
       Vector2     position_;
 
       Vector2     velocity_;
+
+      Vector2     acceleration_;
+
+      Vector2     velocityFromAcceleration_;
+
 
       Complex     orientation_;
 

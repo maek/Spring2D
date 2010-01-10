@@ -79,7 +79,7 @@ namespace Spring2D
 
       // Check the shapes for contact persistence (only RECT & POLYGON)
       if ((*contactI)->body[0]->getShape()->getType() != Shape::CIRCLE &&
-          (*contactI)->body[1]->getShape()->getType() != Shape::CIRCLE)
+          (*contactI)->body[1]->getShape()->getType() != Shape::CIRCLE && false)
       {
         // Search for a contact in the last frame
         // TODO: optimize
@@ -113,9 +113,14 @@ namespace Spring2D
                   point[1] = (*contactY)->persistencePoint[0][1];
                   (*contactI)->body[0]->transformWorld(&point[0]);
                   (*contactI)->body[1]->transformWorld(&point[1]);
+                  std::cerr << "dotN = " << dot(point[1] - point[0], (*contactI)->normal) << "\n";
+                  std::cerr << "dotT = " << dot(point[1] - point[0], (*contactI)->tangent) << "\n";
                   // TODO: define a constant for persistence distance
-                  if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
-                      (point[1] - point[0]).getMagnitude() < 0.01)
+                  // TODO: define a constant for persistence distance 2
+                  if (dot(point[1] - point[0], (*contactI)->normal) > -0.01 &&
+                      s2fabs(dot(point[1] - point[0], (*contactI)->normal)) * 10 >
+                      s2fabs(dot(point[1] - point[0], (*contactI)->tangent)))
+                      //(point[1] - point[0]).getMagnitude() < 0.01)
                   {
                     // Add the current point for the persistence
                     (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
@@ -134,8 +139,10 @@ namespace Spring2D
                 (*contactI)->body[0]->transformWorld(&point[0]);
                 (*contactI)->body[1]->transformWorld(&point[1]);
                 // TODO: define a constant for persistence distance
-                if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
-                    (point[1] - point[0]).getMagnitude() < 0.01)
+                if (dot(point[1] - point[0], (*contactI)->normal) > -0.01 &&
+                    s2fabs(dot(point[1] - point[0], (*contactI)->normal)) * 10 >
+                    s2fabs(dot(point[1] - point[0], (*contactI)->tangent)))
+                    //(point[1] - point[0]).getMagnitude() < 0.01)
                 {
                   (*contactI)->nContacts = 2;
                 }
@@ -150,8 +157,10 @@ namespace Spring2D
                 (*contactI)->body[0]->transformWorld(&point[0]);
                 (*contactI)->body[1]->transformWorld(&point[1]);
                 // TODO: define a constant for persistence distance
-                if (dot(point[1] - point[0], (*contactI)->normal) > 0 ||
-                    (point[0] - point[1]).getMagnitude() < 0.01)
+                if (dot(point[1] - point[0], (*contactI)->normal) > -0.01 &&
+                    s2fabs(dot(point[1] - point[0], (*contactI)->normal)) * 10 >
+                    s2fabs(dot(point[1] - point[0], (*contactI)->tangent)))
+                    //(point[0] - point[1]).getMagnitude() < 0.01)
                 {
                   if ((*contactI)->nContacts == 2) // (V, V)
                   {
@@ -164,13 +173,30 @@ namespace Spring2D
                     (*contactI)->body[1]->transformWorld(&tpoint[1]);
                     midPoint[0] = (tpoint[0] + tpoint[1]) * 0.5;
 
+                    std::cerr << "point0[0]     = " << tpoint[0] << "\n";
+                    std::cerr << "point0[1]     = " << tpoint[1] << "\n";
+                    std::cerr << "penetration0  = " << (tpoint[1] - tpoint[0]).getMagnitude() << "\n";
+
+
                     tpoint[0] = (*contactY)->persistencePoint[1][0];
                     (*contactI)->body[0]->transformWorld(&tpoint[0]);
                     tpoint[1] = (*contactY)->persistencePoint[1][1];
                     (*contactI)->body[1]->transformWorld(&tpoint[1]);
                     midPoint[1] = (tpoint[0] + tpoint[1]) * 0.5;
 
+                    std::cerr << "point1[0]     = " << tpoint[0] << "\n";
+                    std::cerr << "point1[1]     = " << tpoint[1] << "\n";
+                    std::cerr << "penetration1  = " << (tpoint[1] - tpoint[0]).getMagnitude() << "\n";
+
+
                     midPoint[2] = ((*contactI)->point[0] + (*contactI)->point[1]) * 0.5;
+
+                    std::cerr << "point2[0]     = " << (*contactI)->point[0] << "\n";
+                    std::cerr << "point2[1]     = " << (*contactI)->point[1] << "\n";
+                    std::cerr << "penetration2  = " << ((*contactI)->point[1] -(*contactI)->point[0]).getMagnitude() << "\n";
+
+
+
 
                     // Keep the two furthest points
                     if (dot(midPoint[0], (*contactI)->tangent) >
@@ -181,12 +207,14 @@ namespace Spring2D
                       {
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                        std::cerr << "(2, 1)\n";
                       }
                       else if (dot(midPoint[2], (*contactI)->tangent) <=
                           dot(midPoint[1], (*contactI)->tangent))   // (0, 1, 2)
                       {
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                        std::cerr << "(0, 2)\n";
                       }
                       else                                          // (0, 2, 1)
                       {
@@ -194,6 +222,7 @@ namespace Spring2D
                         (*contactI)->persistencePoint[0][1] = (*contactY)->persistencePoint[0][1];
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                        std::cerr << "(0, 1)\n";
                       }
                     }
                     else // (1 > 0)
@@ -203,12 +232,14 @@ namespace Spring2D
                       {
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[0][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[0][1];
+                        std::cerr << "(2, 0)\n";
                       }
                       else if (dot(midPoint[2], (*contactI)->tangent) <=
                           dot(midPoint[0], (*contactI)->tangent))   // (1, 0, 2)
                       {
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                        std::cerr << "(1, 2)\n";
                       }
                       else                                          // (1, 2, 0)
                       {
@@ -216,6 +247,7 @@ namespace Spring2D
                         (*contactI)->persistencePoint[0][1] = (*contactY)->persistencePoint[0][1];
                         (*contactI)->persistencePoint[1][0] = (*contactY)->persistencePoint[1][0];
                         (*contactI)->persistencePoint[1][1] = (*contactY)->persistencePoint[1][1];
+                        std::cerr << "(1, 0)\n";
                       }
 
                     }
@@ -285,6 +317,10 @@ namespace Spring2D
       // Calculate the tangent
       (*contactI)->tangent = (*contactI)->normal.getPerpendicularCopy();
 
+      std::cerr << "nI = " << (*contactI)->normal << "\n";
+      std::cerr << "point[0]     = " << (*contactI)->point[0] << "\n";
+      std::cerr << "point[1]     = " << (*contactI)->point[1] << "\n";
+      std::cerr << "penetration  = " << ((*contactI)->point[1] - (*contactI)->point[0]).getMagnitude() << "\n";
 
       // Calculate the relative points
       (*contactI)->relativeContactPoint[0] = (*contactI)->point[0] -
@@ -448,7 +484,7 @@ namespace Spring2D
     // b = before, a = after
     // e = -(v1a - v2a) / (v1b - v2b)
     contact->restitution = 0.2;
-    contact->friction = 0.9;
+    contact->friction = 0.5;
     Vector2 n = contact->normal;
 
     Vector2 Rap = contact->relativeContactPoint[0];
@@ -488,19 +524,27 @@ namespace Spring2D
     Ib = contact->body[1]->getMomentOfInertia();
 
 
+    // Remove velocity caused by only acceleration (gravity)
+    Real aV =
+      dot(contact->body[0]->getVelocityFromAcceleration(), contact->normal);
+
+    if (contact->body[1]->isDynamic())
+    {
+      aV -=
+        dot(contact->body[1]->getVelocityFromAcceleration(), contact->normal);
+    }
+
     // Calculate the normal impulse
-    // TODO: remove velocity caused by only acceleration (gravity)
     Real Jnorm =
-      -(1 + e) * cV /
+      -(1 + e) * (cV - aV) /
       (
        contact->linearInertia[0] +
        contact->angularInertia[0]
       );
     if (contact->body[1]->isDynamic())
     {
-      // TODO: remove velocity caused by only acceleration (gravity)
       Jnorm =
-        -(1 + e) * cV /
+        -(1 + e) * (cV - aV) /
         (
          contact->linearInertia[0] +
          contact->linearInertia[1] +
@@ -530,6 +574,7 @@ namespace Spring2D
     }
 
     // Calculate the tangent impulse
+    // TODO: remove velocity caused by only acceleration (gravity)
     Real Jtang =
       -sV /
       (
@@ -538,6 +583,7 @@ namespace Spring2D
       );
     if (contact->body[1]->isDynamic())
     {
+      // TODO: remove velocity caused by only acceleration (gravity)
       Jtang =
         -sV /
         (
