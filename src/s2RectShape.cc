@@ -24,7 +24,7 @@ namespace Spring2D
     // TODO: check if directionX & directionY are normalized
     Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
     Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
-    Vector2 point = -halfSize_;
+    Vector2 point = -extent_;
     aabb_.halfSize_.x = s2fabs(dot(point, directionX));
     aabb_.halfSize_.y = s2fabs(dot(point, directionY));
 
@@ -69,29 +69,6 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // Calculate the moment of inertia
-  // (m * (w^2 + h^2)) / 12
-  // TODO: make inline
-  Real RectShape::calculateMomentOfInertia () const
-  {
-    return area_ * density_ *
-      (s2sqr(2 * halfSize_.x) + s2sqr(2 * halfSize_.y)) / 12;
-  }
-
-
-
-  // ---------------------------------------------------------------------------
-  // Return any vertex as the initial support point
-  // TODO: make inline
-  Vector2 RectShape::getSupportPoint0 () const
-  {
-    return body_->getPosition() +
-      body_->getOrientationMatrix() * Vector2(-halfSize_.x, -halfSize_.y);
-  }
-
-
-
-  // ---------------------------------------------------------------------------
   // Return the furthest point along the given direction
   Vector2 RectShape::getSupportPoint (const Vector2& DIRECTION) const
   {
@@ -100,10 +77,10 @@ namespace Spring2D
       DIRECTION;
 
     Vector2 points[4];
-    points[0] = Vector2(-halfSize_.x, -halfSize_.y);
-    points[1] = Vector2( halfSize_.x, -halfSize_.y);
-    points[2] = Vector2( halfSize_.x,  halfSize_.y);
-    points[3] = Vector2(-halfSize_.x,  halfSize_.y);
+    points[0] = Vector2(-extent_.x, -extent_.y);
+    points[1] = Vector2( extent_.x, -extent_.y);
+    points[2] = Vector2( extent_.x,  extent_.y);
+    points[3] = Vector2(-extent_.x,  extent_.y);
 
     int index = 0;
     Real projection   = dot(points[0], direction);

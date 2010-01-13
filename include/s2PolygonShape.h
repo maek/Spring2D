@@ -16,12 +16,21 @@ namespace Spring2D
     public:
 
       // Constructor
-      PolygonShape (const int N_VERTICES, Vector2* VERTICES,
+      PolygonShape (const int N_VERTICES, const Vector2* VERTICES,
           const Real DENSITY = 1)
         : nVertices_(N_VERTICES)
       {
-        assert(N_VERTICES >= 3);
-        assert(DENSITY > 0);
+        if (N_VERTICES < 3)
+        {
+          valid_ = false;
+          return;
+        }
+
+        if (DENSITY <= 0)
+        {
+          valid_ = false;
+          return;
+        }
 
         // TODO: add the convexity test
 
@@ -32,6 +41,7 @@ namespace Spring2D
         }
 
         density_ = DENSITY;
+
         area_ =
           VERTICES[N_VERTICES - 1].x * VERTICES[0].y -
           VERTICES[0].x * VERTICES[N_VERTICES - 1].y;
@@ -42,6 +52,14 @@ namespace Spring2D
             VERTICES[i + 1].x * VERTICES[i].y;
         }
         area_ /= 2;
+
+        valid_ = true;
+      }
+
+      // Desstructor
+      ~PolygonShape ()
+      {
+        delete vertices_;
       }
 
 
@@ -52,7 +70,7 @@ namespace Spring2D
       }
 
       // Get the vertices
-      Vector2* getVertices() const
+      const Vector2* getVertices() const
       {
         return vertices_;
       }
@@ -69,9 +87,16 @@ namespace Spring2D
 
       void updateAABB ();
 
+
       Real calculateMomentOfInertia () const;
 
-      Vector2 getSupportPoint0 () const;
+
+      // Return any vertex as the initial support point
+      Vector2 getSupportPoint0 () const
+      {
+        return body_->getOrientationMatrix() * vertices_[0] +
+          body_->getPosition();
+      }
 
       Vector2 getSupportPoint (const Vector2&) const;
 

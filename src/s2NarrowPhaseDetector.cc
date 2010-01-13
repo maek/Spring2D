@@ -40,47 +40,17 @@ namespace Spring2D
                   (*contactI));
               break;
 
-            case Shape::POLYGON :   // CIRCLE - POLYGON
-              collision = testCirclePolygon(
-                  static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
-                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
-                  (*contactI));
-              break;
-
             case Shape::RECT :      // CIRCLE - RECT
               collision = testCircleRect(
                   static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
                   static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
-          }
-          break;
 
-
-        case Shape::POLYGON :
-          switch ((*contactI)->body[1]->getShape()->getType())
-          {
-            case Shape::CIRCLE :    // POLYGON - CIRCLE
-              tbody                 = (*contactI)->body[0];
-              (*contactI)->body[0]  = (*contactI)->body[1];
-              (*contactI)->body[1]  = tbody;
+            case Shape::POLYGON :   // CIRCLE - POLYGON
               collision = testCirclePolygon(
                   static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
                   static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
-                  (*contactI));
-              break;
-
-            case Shape::POLYGON :   // POLYGON - POLYGON
-              collision = testPolygonPolygon(
-                  (*contactI)->body[0]->getShape(),
-                  (*contactI)->body[1]->getShape(),
-                  (*contactI));
-              break;
-
-            case Shape::RECT :      // POLYGON - RECT
-              collision = testPolygonPolygon(
-                  (*contactI)->body[0]->getShape(),
-                  (*contactI)->body[1]->getShape(),
                   (*contactI));
               break;
           }
@@ -100,23 +70,52 @@ namespace Spring2D
                   (*contactI));
               break;
 
-            case Shape::POLYGON :   // RECT - POLYGON
-              collision = testPolygonPolygon(
-                  (*contactI)->body[0]->getShape(),
-                  (*contactI)->body[1]->getShape(),
-                  (*contactI));
-              break;
-
             case Shape::RECT :      // RECT - RECT
               collision = testPolygonPolygon(
                   static_cast<RectShape*>((*contactI)->body[0]->getShape()),
                   static_cast<RectShape*>((*contactI)->body[1]->getShape()),
                   (*contactI));
               break;
+
+            case Shape::POLYGON :   // RECT - POLYGON
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
+              break;
+          }
+          break;
+
+
+        case Shape::POLYGON :
+          switch ((*contactI)->body[1]->getShape()->getType())
+          {
+            case Shape::CIRCLE :    // POLYGON - CIRCLE
+              tbody                 = (*contactI)->body[0];
+              (*contactI)->body[0]  = (*contactI)->body[1];
+              (*contactI)->body[1]  = tbody;
+              collision = testCirclePolygon(
+                  static_cast<CircleShape*>((*contactI)->body[0]->getShape()),
+                  static_cast<PolygonShape*>((*contactI)->body[1]->getShape()),
+                  (*contactI));
+              break;
+
+            case Shape::RECT :      // POLYGON - RECT
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
+              break;
+
+            case Shape::POLYGON :   // POLYGON - POLYGON
+              collision = testPolygonPolygon(
+                  (*contactI)->body[0]->getShape(),
+                  (*contactI)->body[1]->getShape(),
+                  (*contactI));
+              break;
           }
           break;
       }
-
 
 
       if (collision == false)
@@ -185,7 +184,7 @@ namespace Spring2D
     Real radius       = CIRCLE->getRadius();
 
     Vector2 centerR   = RECT->getBody()->getPosition();
-    Vector2 halfSize  = RECT->getHalfSize();
+    Vector2 extent    = RECT->getExtent();
 
     // TODO: OPTIMIZATION -> early out (separation axis -> p. 285) needed ???
 
@@ -195,22 +194,22 @@ namespace Spring2D
     RECT->getBody()->transformLocal(&pointRect);
 
     // Clamp it to the not oriented rect
-    if (pointRect.x < -halfSize.x)
+    if (pointRect.x < -extent.x)
     {
-      pointRect.x = -halfSize.x;
+      pointRect.x = -extent.x;
     }
-    if (pointRect.y < -halfSize.y)
+    if (pointRect.y < -extent.y)
     {
-      pointRect.y = -halfSize.y;
+      pointRect.y = -extent.y;
     }
 
-    if (pointRect.x > halfSize.x)
+    if (pointRect.x > extent.x)
     {
-      pointRect.x = halfSize.x;
+      pointRect.x = extent.x;
     }
-    if (pointRect.y > halfSize.y)
+    if (pointRect.y > extent.y)
     {
-      pointRect.y = halfSize.y;
+      pointRect.y = extent.y;
     }
 
 
@@ -279,309 +278,6 @@ namespace Spring2D
       }
     }
     return false;
-  }
-
-
-
-  // ---------------------------------------------------------------------------
-  // Check a rect against another one
-  bool NarrowPhaseDetector::testRectRect (
-      RectShape* RECT1, RectShape* RECT2, Contact* contact)
-  {
-    Vector2 halfSize1(RECT1->getHalfSize());
-    Vector2 halfSize2(RECT2->getHalfSize());
-
-    Vector2 points1A[4];
-    Vector2 points1B[4];
-    Vector2 points2A[4];
-    Vector2 points2B[4];
-
-    points1A[0] = Vector2(-halfSize1.x, -halfSize1.y);
-    points1A[1] = Vector2( halfSize1.x, -halfSize1.y);
-    points1A[2] = Vector2( halfSize1.x,  halfSize1.y);
-    points1A[3] = Vector2(-halfSize1.x,  halfSize1.y);
-
-    points2B[0] = Vector2(-halfSize2.x, -halfSize2.y);
-    points2B[1] = Vector2( halfSize2.x, -halfSize2.y);
-    points2B[2] = Vector2( halfSize2.x,  halfSize2.y);
-    points2B[3] = Vector2(-halfSize2.x,  halfSize2.y);
-
-
-    // Transform B into local coordinates of A
-    for (int i = 0; i < 4; ++i)
-    {
-      points2A[i] = points2B[i];
-      RECT2->getBody()->transformWorld(&points2A[i]);
-      RECT1->getBody()->transformLocal(&points2A[i]);
-    }
-
-    // Test for collisions
-    if (
-        (points2A[0].x < points1A[0].x &&
-         points2A[1].x < points1A[0].x &&
-         points2A[2].x < points1A[0].x &&
-         points2A[3].x < points1A[0].x) ||
-        (points2A[0].x > points1A[2].x &&
-         points2A[1].x > points1A[2].x &&
-         points2A[2].x > points1A[2].x &&
-         points2A[3].x > points1A[2].x) ||
-        (points2A[0].y < points1A[0].y &&
-         points2A[1].y < points1A[0].y &&
-         points2A[2].y < points1A[0].y &&
-         points2A[3].y < points1A[0].y) ||
-        (points2A[0].y > points1A[2].y &&
-         points2A[1].y > points1A[2].y &&
-         points2A[2].y > points1A[2].y &&
-         points2A[3].y > points1A[2].y)
-       )
-    {
-      return false;
-    }
-
-
-
-    // Transform A into local coordinates of B
-    for (int i = 0; i < 4; ++i)
-    {
-      points1B[i] = points1A[i];
-      RECT1->getBody()->transformWorld(&points1B[i]);
-      RECT2->getBody()->transformLocal(&points1B[i]);
-    }
-
-    // Test for collisions
-    if (
-        (points1B[0].x < points2B[0].x &&
-         points1B[1].x < points2B[0].x &&
-         points1B[2].x < points2B[0].x &&
-         points1B[3].x < points2B[0].x) ||
-        (points1B[0].x > points2B[2].x &&
-         points1B[1].x > points2B[2].x &&
-         points1B[2].x > points2B[2].x &&
-         points1B[3].x > points2B[2].x) ||
-        (points1B[0].y < points2B[0].y &&
-         points1B[1].y < points2B[0].y &&
-         points1B[2].y < points2B[0].y &&
-         points1B[3].y < points2B[0].y) ||
-        (points1B[0].y > points2B[2].y &&
-         points1B[1].y > points2B[2].y &&
-         points1B[2].y > points2B[2].y &&
-         points1B[3].y > points2B[2].y)
-       )
-    {
-      return false;
-    }
-
-
-    // We have a collision so find the collision points
-    enum {LEFT, RIGHT } sideX;
-    enum {DOWN, UP} sideY;
-
-    Vector2 pointA[2];
-    Real pA = 0;
-    Real dX = 0;
-    Real dY = 0;
-
-
-    Vector2 center2A = RECT2->getBody()->getPosition();
-    RECT1->getBody()->transformLocal(&center2A);
-
-    // Test for collisions in A
-    for (int i = 0; i < 4; ++i)
-    {
-      // Check if the vertex is internal
-      if (points2A[i].x > points1A[0].x &&
-          points2A[i].x < points1A[2].x &&
-          points2A[i].y > points1A[0].y &&
-          points2A[i].y < points1A[2].y)
-      {
-        // Find the separating distance
-        // (skip points aligned with center)
-        if (center2A.x - points2A[i].x > 0) // left side point
-        {
-          dX = points1A[2].x - points2A[i].x;
-          sideX = LEFT;
-        }
-        if (center2A.x - points2A[i].x < 0) // right side point
-        {
-          dX = points2A[i].x - points1A[0].x;
-          sideX = RIGHT;
-        }
-
-        if (center2A.y - points2A[i].y > 0) // down side point
-        {
-          dY = points1A[2].y - points2A[i].y;
-          sideY = DOWN;
-        }
-        if (center2A.y - points2A[i].y < 0) // up side point
-        {
-          dY = points2A[i].y - points1A[0].y;
-          sideY = UP;
-        }
-
-
-        // Check if this distance is the best until now
-        if (dX <= dY)
-        {
-          if (dX > pA && sideX == LEFT)
-          {
-            pointA[0].x = points1A[2].x;
-            pointA[0].y = points2A[i].y;
-            pointA[1].x = points2A[i].x;
-            pointA[1].y = points2A[i].y;
-            pA = dX;
-          }
-          if (dX > pA && sideX == RIGHT)
-          {
-            pointA[0].x = points1A[0].x;
-            pointA[0].y = points2A[i].y;
-            pointA[1].x = points2A[i].x;
-            pointA[1].y = points2A[i].y;
-            pA = dX;
-          }
-        }
-        else // dY < dX
-        {
-          if (dY > pA && sideY == DOWN)
-          {
-            pointA[0].x = points2A[i].x;
-            pointA[0].y = points1A[2].y;
-            pointA[1].x = points2A[i].x;
-            pointA[1].y = points2A[i].y;
-            pA = dY;
-          }
-          if (dY > pA && sideY == UP)
-          {
-            pointA[0].x = points2A[i].x;
-            pointA[0].y = points1A[0].y;
-            pointA[1].x = points2A[i].x;
-            pointA[1].y = points2A[i].y;
-            pA = dY;
-          }
-        }
-      }
-
-    }
-
-
-    Vector2 pointB[2];
-    Real pB = 0;
-    dX = 0;
-    dY = 0;
-
-    Vector2 center1B = RECT1->getBody()->getPosition();
-    RECT2->getBody()->transformLocal(&center1B);
-
-    // Test for collisions in B
-    for (int i = 0; i < 4; ++i)
-    {
-      // Check if the vertex is internal
-      if (points1B[i].x > points2B[0].x &&
-          points1B[i].x < points2B[2].x &&
-          points1B[i].y > points2B[0].y &&
-          points1B[i].y < points2B[2].y)
-      {
-        // Find the separating distance
-        // (skip points aligned with center)
-        if (center1B.x - points1B[i].x > 0) // left side point
-        {
-          dX = points2B[2].x - points1B[i].x;
-          sideX = LEFT;
-        }
-        if (center1B.x - points1B[i].x < 0) // right side point
-        {
-          dX = points1B[i].x - points2B[0].x;
-          sideX = RIGHT;
-        }
-
-        if (center1B.y - points1B[i].y > 0) // down side point
-        {
-          dY = points2B[2].y - points1B[i].y;
-          sideY = DOWN;
-        }
-        if (center1B.y - points1B[i].y < 0) // up side point
-        {
-          dY = points1B[i].y - points2B[0].y;
-          sideY = UP;
-        }
-
-
-        // Check if this distance is the best until now
-        if (dX < dY)
-        {
-          if (dX > pB && sideX == LEFT)
-          {
-            pointB[0].x = points1B[i].x;
-            pointB[0].y = points1B[i].y;
-            pointB[1].x = points2B[2].x;
-            pointB[1].y = points1B[i].y;
-            pB = dX;
-          }
-          if (dX > pB && sideX == RIGHT)
-          {
-            pointB[0].x = points1B[i].x;
-            pointB[0].y = points1B[i].y;
-            pointB[1].x = points2B[0].x;
-            pointB[1].y = points1B[i].y;
-            pB = dX;
-          }
-        }
-        else // dY <= dX
-        {
-          if (dY > pB && sideY == DOWN)
-          {
-            pointB[0].x = points1B[i].x;
-            pointB[0].y = points1B[i].y;
-            pointB[1].x = points1B[i].x;
-            pointB[1].y = points2B[2].y;
-            pB = dY;
-          }
-          if (dY > pB && sideY == UP)
-          {
-            pointB[0].x = points1B[i].x;
-            pointB[0].y = points1B[i].y;
-            pointB[1].x = points1B[i].x;
-            pointB[1].y = points2B[0].y;
-            pB = dY;
-          }
-        }
-      }
-
-    }
-
-
-    // TODO: check edges
-    if (pA == 0 && pB == 0)
-    {
-      std::cerr << "Huston, we have a problem!!!\n";
-      return false;
-    }
-
-
-    if ((pA < pB && pA != 0) || pB == 0)
-    {
-      RECT1->getBody()->transformWorld(&pointA[0]);
-      RECT1->getBody()->transformWorld(&pointA[1]);
-      contact->penetrationDepth = pA;
-      contact->point[0] = pointA[0];
-      contact->point[1] = pointA[1];
-    }
-    if ((pB < pA && pB != 0) || pA == 0)
-    {
-      RECT2->getBody()->transformWorld(&pointB[0]);
-      RECT2->getBody()->transformWorld(&pointB[1]);
-      contact->penetrationDepth = pB;
-      contact->point[0] = pointB[0];
-      contact->point[1] = pointB[1];
-    }
-
-
-    // Robustness check
-    if (contact->penetrationDepth <= EPSILON_ABS)
-    {
-      return false;
-    }
-
-    return true;
   }
 
 
@@ -691,6 +387,8 @@ namespace Spring2D
 
       if (dot(v.getNormalizedCopy(), w) > mu)
       {
+        // TODO: return an approssimate penetration depth
+        error = false;
         break;
       }
 
@@ -792,10 +490,14 @@ namespace Spring2D
       edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
 
+    std::cerr << contact->penetrationDepth << "\n";
 
     // Skip collision if EPA fails
     if (error)
     {
+      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
+      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
+      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
       contact->penetrationDepth = 0;
     }
 
@@ -821,7 +523,7 @@ namespace Spring2D
   {
     if (size == 1) // single point (1 vertex)
     {
-      bCoordinates[0] = 1.0;
+      bCoordinates[0] = 1;
       return vertices[0];
     }
 
@@ -838,7 +540,7 @@ namespace Spring2D
       {
         // Remove B & return A
         size--;
-        bCoordinates[0] = 1.0;
+        bCoordinates[0] = 1;
         // TODO: this should never happen
         assert(false);
         return A;
@@ -853,13 +555,13 @@ namespace Spring2D
         supportPointsA[0] = supportPointsA[1];
         supportPointsB[0] = supportPointsB[1];
         size--;
-        bCoordinates[0] = 1.0;
+        bCoordinates[0] = 1;
         return B;
       }
       // O is on AB
       // Return the projection on AB
       Real v = numerator / denominator;
-      bCoordinates[0] = 1.0 - v;
+      bCoordinates[0] = 1 - v;
       bCoordinates[1] = v;
       return (A + v * AB);
 
@@ -881,13 +583,13 @@ namespace Spring2D
         supportPointsA[0] = supportPointsA[1];
         supportPointsB[0] = supportPointsB[1];
         size--;
-        bCoordinates[0] = 1.0;
+        bCoordinates[0] = 1;
         return B;
       }
 
       // O is on AB
       lambda /= dot(AB, AB);
-      bCoordinates[0] = 1.0 - lambda;
+      bCoordinates[0] = 1 - lambda;
       bCoordinates[1] = lambda;
       return (A + lambda * AB);
 #endif
@@ -921,7 +623,7 @@ namespace Spring2D
         supportPointsA[0] = supportPointsA[2];
         supportPointsB[0] = supportPointsB[2];
         size -= 2;
-        bCoordinates[0] = 1.0;
+        bCoordinates[0] = 1;
         return C;
       }
 
@@ -940,7 +642,7 @@ namespace Spring2D
 
       // Check if O is in edge region of BC
       Real va = n * cross(B, C);
-      if (va <= 0 && unum >= 0 && udenom >= 0 && (unum + udenom) > 0.0f)
+      if (va <= 0 && unum >= 0 && udenom >= 0 && (unum + udenom) > 0)
       {
         // Remove A & return the projection on BC
         // TODO: OPTIMIZATION -> switch A <> C
@@ -955,7 +657,7 @@ namespace Spring2D
         supportPointsB[0] = supportPointsB[2];
         size--;
         Real lambda = unum / (unum + udenom);
-        bCoordinates[0] = 1.0 - lambda;
+        bCoordinates[0] = 1 - lambda;
         bCoordinates[1] = lambda;
         return (B + lambda * BC);
       }
@@ -971,7 +673,7 @@ namespace Spring2D
         supportPointsB[1] = supportPointsB[2];
         size--;
         Real lambda = tnum / (tnum + tdenom);
-        bCoordinates[0] = 1.0 - lambda;
+        bCoordinates[0] = 1 - lambda;
         bCoordinates[1] = lambda;
         return (A + lambda * AC);
       }

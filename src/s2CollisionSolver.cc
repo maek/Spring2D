@@ -325,7 +325,7 @@ namespace Spring2D
       // Calculate the relative points
       (*contactI)->relativeContactPoint[0] = (*contactI)->point[0] -
         (*contactI)->body[0]->getPosition();
-      if ((*contactI)->body[1]->isDynamic())
+      if ((*contactI)->body[1]->isStatic() == false)
       {
         (*contactI)->relativeContactPoint[1] = (*contactI)->point[1] -
           (*contactI)->body[1]->getPosition();
@@ -335,7 +335,7 @@ namespace Spring2D
         (*contactI)->body[0]->getVelocity() +
         (*contactI)->body[0]->getRotation() *
         (*contactI)->relativeContactPoint[0].getPerpendicularCopy();
-      if ((*contactI)->body[1]->isDynamic())
+      if ((*contactI)->body[1]->isStatic() == false)
       {
         velocity -=
           (*contactI)->body[1]->getVelocity() +
@@ -351,25 +351,25 @@ namespace Spring2D
 
 
       // Calculate the linear inertia
-      (*contactI)->linearInertia[0] = (1.0 / (*contactI)->body[0]->getMass());
-      if ((*contactI)->body[1]->isDynamic())
+      (*contactI)->linearInertia[0] = (*contactI)->body[0]->getInverseMass();
+      if ((*contactI)->body[1]->isStatic() == false)
       {
-        (*contactI)->linearInertia[1] = (1.0 / (*contactI)->body[1]->getMass());
+        (*contactI)->linearInertia[1] = (*contactI)->body[1]->getInverseMass();
       }
 
       // Calculate the angular inertia
       Real tcross = cross(
           (*contactI)->relativeContactPoint[0],
           (*contactI)->normal);
-      (*contactI)->angularInertia[0] = tcross * tcross /
-        (*contactI)->body[0]->getMomentOfInertia();
-      if ((*contactI)->body[1]->isDynamic())
+      (*contactI)->angularInertia[0] = tcross * tcross *
+        (*contactI)->body[0]->getInverseMomentOfInertia();
+      if ((*contactI)->body[1]->isStatic() == false)
       {
         tcross = cross(
             (*contactI)->relativeContactPoint[1],
             (*contactI)->normal);
-        (*contactI)->angularInertia[1] = tcross * tcross /
-          (*contactI)->body[1]->getMomentOfInertia();
+        (*contactI)->angularInertia[1] = tcross * tcross *
+          (*contactI)->body[1]->getInverseMomentOfInertia();
       }
     }
 
@@ -393,7 +393,7 @@ namespace Spring2D
 
     Real tI     = lIa + aIa;
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       Rbp = contact->relativeContactPoint[1];
 
@@ -404,14 +404,14 @@ namespace Spring2D
     }
 
 
-    Real itI  = (1.0 / tI);
+    Real itI  = (1 / tI);
 
     Real lMa =  p * lIa * itI;
     Real lMb;
     Real aMa =  p * aIa * itI;
     Real aMb;
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       lMb = -p * lIb * itI;
       aMb = -p * aIb * itI;
@@ -435,7 +435,7 @@ namespace Spring2D
       lMa = tM - aMa;
     }
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       aLb = angularLimitConstant * Rbp.getMagnitude();
 
@@ -455,19 +455,19 @@ namespace Spring2D
     Vector2 pb1;
     contact->body[0]->setPosition(pa1 + lMa * n);
 
-    Complex oa(contact->body[0]->getOrientation());
+    Complex oa = contact->body[0]->getOrientation();
     Complex ob;
 
     oa.rotate(s2copysign(1, cross(Rap, n)) * aMa / Rap.getMagnitude());
     contact->body[0]->setOrientation(oa);
 
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       pb1 = contact->body[1]->getPosition();
       contact->body[1]->setPosition(pb1 + lMb * n);
 
-      ob = Complex(contact->body[1]->getOrientation());
+      ob = contact->body[1]->getOrientation();
 
       ob.rotate(s2copysign(1, cross(Rbp, n)) * aMb / Rbp.getMagnitude());
       contact->body[1]->setOrientation(ob);
@@ -484,7 +484,7 @@ namespace Spring2D
     // b = before, a = after
     // e = -(v1a - v2a) / (v1b - v2b)
     contact->restitution = 0.2;
-    contact->friction = 0.5;
+    contact->friction = 0.1;
     Vector2 n = contact->normal;
 
     Vector2 Rap = contact->relativeContactPoint[0];
@@ -496,7 +496,7 @@ namespace Spring2D
     Real Wb1;
 
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       Rbp = contact->relativeContactPoint[1];
       Vb1 = contact->body[1]->getVelocity();
@@ -514,21 +514,24 @@ namespace Spring2D
 
 
     Real e = contact->restitution;
-    Real Ma = contact->body[0]->getMass();
-    Real Mb;
-    Real Ia = contact->body[0]->getMomentOfInertia();
-    Real Ib;
+    Real iMa = contact->body[0]->getInverseMass();
+    Real iMb;
+    Real iIa = contact->body[0]->getInverseMomentOfInertia();
+    Real iIb;
 
 
-    Mb = contact->body[1]->getMass();
-    Ib = contact->body[1]->getMomentOfInertia();
+    if (contact->body[1]->isStatic() == false)
+    {
+      iMb = contact->body[1]->getInverseMass();
+      iIb = contact->body[1]->getInverseMomentOfInertia();
+    }
 
 
     // Remove velocity caused by only acceleration (gravity)
     Real aV =
       dot(contact->body[0]->getVelocityFromAcceleration(), contact->normal);
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       aV -=
         dot(contact->body[1]->getVelocityFromAcceleration(), contact->normal);
@@ -541,7 +544,7 @@ namespace Spring2D
        contact->linearInertia[0] +
        contact->angularInertia[0]
       );
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       Jnorm =
         -(1 + e) * (cV - aV) /
@@ -562,15 +565,15 @@ namespace Spring2D
     Real tcross = cross(
         contact->relativeContactPoint[0],
         contact->tangent);
-    angularInertia[0] = tcross * tcross /
-      contact->body[0]->getMomentOfInertia();
-    if (contact->body[1]->isDynamic())
+    angularInertia[0] = tcross * tcross *
+      contact->body[0]->getInverseMomentOfInertia();
+    if (contact->body[1]->isStatic() == false)
     {
       tcross = cross(
           contact->relativeContactPoint[1],
           contact->tangent);
-      angularInertia[1] = tcross * tcross /
-        contact->body[1]->getMomentOfInertia();
+      angularInertia[1] = tcross * tcross *
+        contact->body[1]->getInverseMomentOfInertia();
     }
 
     // Calculate the tangent impulse
@@ -581,7 +584,7 @@ namespace Spring2D
        contact->linearInertia[0] +
        angularInertia[0]
       );
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       // TODO: remove velocity caused by only acceleration (gravity)
       Jtang =
@@ -605,18 +608,18 @@ namespace Spring2D
 
 
     // Apply the impulse (velocity)
-    contact->body[0]->setVelocity(Va1 + J * (1.0 / Ma));
+    contact->body[0]->setVelocity(Va1 + J * iMa);
 
     // Apply the impulse (rotation)
-    contact->body[0]->setRotation(Wa1 + cross(Rap, J) * (1.0 / Ia));
+    contact->body[0]->setRotation(Wa1 + cross(Rap, J) * iIa);
 
 
-    if (contact->body[1]->isDynamic())
+    if (contact->body[1]->isStatic() == false)
     {
       // Apply the impulse (velocity)
-      contact->body[1]->setVelocity(Vb1 - J * (1.0 / Mb));
+      contact->body[1]->setVelocity(Vb1 - J * iMb);
       // Apply the impulse (rotation)
-      contact->body[1]->setRotation(Wb1 - cross(Rbp, J) * (1.0 / Ib));
+      contact->body[1]->setRotation(Wb1 - cross(Rbp, J) * iIb);
     }
 
   }

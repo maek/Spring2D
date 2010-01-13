@@ -6,8 +6,8 @@
 #include "s2Body.h"
 #include "s2Shape.h"
 #include "s2CircleShape.h"
-#include "s2PolygonShape.h"
 #include "s2RectShape.h"
+#include "s2PolygonShape.h"
 #include "s2Contact.h"
 
 
@@ -26,13 +26,11 @@ namespace Spring2D
 
       bool testCircleCircle (CircleShape*, CircleShape*, Contact*);
 
-      bool testCirclePolygon (CircleShape*, PolygonShape*, Contact*);
-
       bool testCircleRect (CircleShape*, RectShape*, Contact*);
 
-      bool testPolygonPolygon (Shape*, Shape*, Contact*);
+      bool testCirclePolygon (CircleShape*, PolygonShape*, Contact*);
 
-      bool testRectRect (RectShape*, RectShape*, Contact*);
+      bool testPolygonPolygon (Shape*, Shape*, Contact*);
 
 
       Vector2 GJK (Simplex&, const Shape*, const Shape*) const;

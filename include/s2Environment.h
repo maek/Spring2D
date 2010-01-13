@@ -30,10 +30,15 @@ namespace Spring2D
         delete torqueRegister_;
       }
 
+
       Body* createBody (
-          const Vector2& POSITION = Vector2::ZERO,
-          const Vector2& VELOCITY = Vector2::ZERO,
-          const Real ORIENTATION = 0);
+          Shape* SHAPE,
+          const bool STATIC,
+          const Vector2& POSITION,
+          const Vector2& VELOCITY     = Vector2::ZERO,
+          const Vector2& ACCELERATION = Vector2::ZERO,
+          const Complex& ORIENTATION  = Complex::ZERO,
+          const Real ROTATION         = 0);
 
       void destroyBody (Body*);
 

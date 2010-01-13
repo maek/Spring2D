@@ -6,10 +6,31 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Create a new body in the environment
   Body* Environment::createBody (
-      const Vector2& POSITION, const Vector2& VELOCITY, const Real ORIENTATION)
+      Shape* SHAPE,
+      const bool STATIC,
+      const Vector2& POSITION,
+      const Vector2& VELOCITY,
+      const Vector2& ACCELERATION,
+      const Complex& ORIENTATION,
+      const Real ROTATION)
   {
-    Body *body = new Body(POSITION, VELOCITY, Complex(ORIENTATION));
+    // Check if the shape is valid
+    if (SHAPE->isValid() == false)
+    {
+      return 0;
+    }
+
+    Body *body = new Body(
+        SHAPE,
+        STATIC,
+        POSITION,
+        VELOCITY,
+        ACCELERATION,
+        ORIENTATION,
+        ROTATION);
+
     bodyList_.push_back(body);
+
     return body;
   }
 

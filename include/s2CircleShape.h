@@ -19,20 +19,24 @@ namespace Spring2D
       CircleShape (const Real RADIUS, const Real DENSITY = 1)
         : radius_(RADIUS)
       {
-        assert(RADIUS > 0);
-        assert(DENSITY > 0);
+        if (RADIUS <= 0)
+        {
+          valid_ = false;
+          return;
+        }
 
-        density_ = DENSITY;
-        area_ = M_PI * RADIUS * RADIUS;
+        if (DENSITY <= 0)
+        {
+          valid_ = false;
+          return;
+        }
+
+        density_  = DENSITY;
+        area_     = M_PI * RADIUS * RADIUS;
+
+        valid_ = true;
       }
 
-
-      // Set the radius
-      void setRadius (const Real RADIUS)
-      {
-        assert(RADIUS > 0);
-        radius_ = RADIUS;
-      }
 
       // Get the radius
       Real getRadius () const
@@ -48,15 +52,36 @@ namespace Spring2D
       }
 
 
-      void buildAABB (Vector2*);
+      // Build the associated AABB
+      void buildAABB (Vector2* CENTER)
+      {
+        aabb_.center_   = CENTER;
+        aabb_.halfSize_ = Vector2(radius_, radius_);
+      }
 
-      void updateAABB ();
+      // Update the associated AABB
+      void updateAABB () { }
 
-      Real calculateMomentOfInertia () const;
 
-      Vector2 getSupportPoint0 () const;
+      // Calculate the moment of inertia
+      // m * r^2 / 2
+      Real calculateMomentOfInertia () const
+      {
+        return area_ * density_ * radius_ * radius_ / 2;
+      }
 
-      Vector2 getSupportPoint (const Vector2&) const;
+
+      // Return the center of the circle (see GJK optimization)
+      Vector2 getSupportPoint0 () const
+      {
+        return body_->getPosition();
+      }
+
+      // Return the center of the circle (see GJK optimization)
+      Vector2 getSupportPoint (const Vector2& DIRECTION) const
+      {
+        return body_->getPosition();
+      }
 
 
     private:

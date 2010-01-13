@@ -16,35 +16,39 @@ namespace Spring2D
     public:
 
       // Constructor
-      RectShape (const Vector2& HALF_SIZE, const Real DENSITY = 1)
-        : halfSize_(HALF_SIZE)
+      RectShape (const Vector2& EXTENT, const Real DENSITY = 1)
+        : extent_(EXTENT)
       {
-        assert(HALF_SIZE.x > 0 && HALF_SIZE.y > 0);
-        assert(DENSITY > 0);
+        if (EXTENT.x <= 0 || EXTENT.y <= 0)
+        {
+          valid_ = false;
+          return;
+        }
 
-        density_ = DENSITY;
-        area_ = 4 * HALF_SIZE.x * HALF_SIZE.y;
+        if (DENSITY <= 0)
+        {
+          valid_ = false;
+          return;
+        }
+
+        density_  = DENSITY;
+        area_     = 4 * EXTENT.x * EXTENT.y;
+
+        valid_ = true;
       }
 
 
-      // Set the half size
-      void setHalfSize (const Vector2& HALF_SIZE)
+      // Get the extent
+      Vector2 getExtent () const
       {
-        assert(HALF_SIZE.x > 0 && HALF_SIZE.y > 0);
-        halfSize_ = HALF_SIZE;
-      }
-
-      // Get the half size
-      Vector2 getHalfSize () const
-      {
-        return halfSize_;
+        return extent_;
       }
 
 
       // Get the shape type
       ShapeType getType () const
       {
-        return RECT;
+        return Shape::RECT;
       }
 
 
@@ -52,17 +56,29 @@ namespace Spring2D
 
       void updateAABB ();
 
-      Real calculateMomentOfInertia () const;
 
-      Vector2 getSupportPoint0 () const;
+      // Calculate the moment of inertia
+      // (m * (w^2 + h^2)) / 12
+      Real calculateMomentOfInertia () const
+      {
+        return area_ * density_ *
+          (s2sqr(2 * extent_.x) + s2sqr(2 * extent_.y)) / 12;
+      }
+
+
+      // Return any vertex as the initial support point
+      Vector2 getSupportPoint0 () const
+      {
+        return body_->getOrientationMatrix() * extent_ + body_->getPosition();
+      }
+
 
       Vector2 getSupportPoint (const Vector2&) const;
 
 
     private:
 
-      // TODO: change name -> extent
-      Vector2   halfSize_;
+      Vector2 extent_;
 
   };
 

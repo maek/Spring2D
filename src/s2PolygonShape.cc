@@ -73,39 +73,7 @@ namespace Spring2D
 
     momentOfInertia *= density_ / 12;
 
-#if 0
-    // Calculate the centroid
-    Real t =
-      vertices_[nVertices_ - 1].x * vertices_[0].y -
-      vertices_[0].x * vertices_[nVertices_ - 1].y;
-    Vector2 centroid(
-        (vertices_[nVertices_ - 1].x + vertices_[0].x) * t,
-        (vertices_[nVertices_ - 1].y + vertices_[0].y) * t);
-    for (int i = 0; i < nVertices_ - 1; ++i)
-    {
-      t =
-        vertices_[i].x * vertices_[i + 1].y -
-        vertices_[i + 1].x * vertices_[i].y;
-      centroid.x += (vertices_[i].x + vertices_[i + 1].x) * t;
-      centroid.y += (vertices_[i].y + vertices_[i + 1].y) * t;
-    }
-    centroid *= 1 / (6 * area_);
-
-    momentOfInertia += area_ * density_ * -centroid.getSquaredMagnitude();
-#endif
-
     return momentOfInertia;
-  }
-
-
-
-  // ---------------------------------------------------------------------------
-  // Return any vertex as the initial support point
-  // TODO: make inline
-  Vector2 PolygonShape::getSupportPoint0 () const
-  {
-    return body_->getPosition() +
-      body_->getOrientationMatrix() * vertices_[0];
   }
 
 

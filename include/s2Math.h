@@ -243,6 +243,15 @@ namespace Spring2D
 
     public:
 
+      // Canonical orientations
+      static const Complex ZERO;
+      static const Complex PI_4;
+      static const Complex PI_2;
+      static const Complex PI;
+
+
+    public:
+
       // Constructor
       explicit Complex (const Real R, const Real I) : r(R), i(I) { }
 

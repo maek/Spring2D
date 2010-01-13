@@ -14,9 +14,10 @@ namespace Spring2D
   {
     public:
 
+      // TODO: does it need ???
       friend class Body;
 
-      enum ShapeType {CIRCLE, POLYGON, RECT};
+      enum ShapeType {CIRCLE, RECT, POLYGON};
 
 
     public:
@@ -25,29 +26,51 @@ namespace Spring2D
       virtual ~Shape () { }
 
 
+      virtual ShapeType getType () const = 0;
+
       // Return a pointer to the body
       Body* getBody () const
       {
         return body_;
       }
 
-      // Return the halfSize of the AABB
-      AABB* getAABB ()
+
+      // Return a pointer to the AABB
+      const AABB* getAABB () const
       {
         return &aabb_;
       }
 
+      virtual void buildAABB (Vector2*) = 0;
+
+      virtual void updateAABB () = 0;
+
+
+      // Set the density of the shape
+      bool setDensity (const Real DENSITY)
+      {
+        if (DENSITY <= 0)
+        {
+          return false;
+        }
+
+        density_ = DENSITY;
+        return true;
+      }
+
       // Return the density of the shape
-      Real getDensity ()
+      Real getDensity () const
       {
         return density_;
       }
 
+
       // Return the area of the shape
-      Real getArea ()
+      Real getArea () const
       {
         return area_;
       }
+
 
       // Calculate the mass of the shape
       Real calculateMass () const
@@ -55,29 +78,32 @@ namespace Spring2D
         return area_ * density_;
       }
 
-
-      virtual ShapeType getType () const = 0;
-
-      virtual void buildAABB (Vector2*) = 0;
-
-      virtual void updateAABB () = 0;
-
       virtual Real calculateMomentOfInertia () const = 0;
+
 
       virtual Vector2 getSupportPoint0 () const = 0;
 
       virtual Vector2 getSupportPoint (const Vector2&) const = 0;
 
 
+      // Check if the shape is valid
+      bool isValid () const
+      {
+        return valid_;
+      }
+
+
     protected:
 
-      Body*     body_;
+      Body*   body_;
 
-      AABB      aabb_;
+      AABB    aabb_;
 
-      Real      density_;
+      Real    area_;
 
-      Real      area_;
+      Real    density_;
+
+      bool    valid_;
 
   };
 

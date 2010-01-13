@@ -16,28 +16,48 @@ namespace Spring2D
 
       // Constructor
       Body (
+          Shape* SHAPE,
+          const bool STATIC = false,
           const Vector2& POSITION = Vector2::ZERO,
           const Vector2& VELOCITY = Vector2::ZERO,
-          const Complex& ORIENTATION = Complex(1, 0),
-          const Real ROTATION = 0,
-          const Real MASS = 1,
-          const Real MOMENT_OF_INERTIA = 1,
-          const bool STATIC = false)
-        : position_(POSITION), velocity_(VELOCITY),
+          const Vector2& ACCELERATION = Vector2::ZERO,
+          const Complex& ORIENTATION = Complex::ZERO,
+          const Real ROTATION = 0)
+        : static_(STATIC),
+        position_(POSITION), velocity_(VELOCITY), acceleration_(ACCELERATION),
         orientation_(ORIENTATION), rotation_(ROTATION),
-        mass_(MASS), momentOfInertia_(MOMENT_OF_INERTIA), static_(STATIC)
-    { }
+        drag_(0), elasticity_(1), friction_(0)
+      {
+        // Check if the shape is valid
+        assert(SHAPE->isValid());
+
+        shape_ = SHAPE;
+        shape_->body_ = this;
+        shape_->buildAABB(&position_);
+        iMass_            = (1 / shape_->calculateMass());
+        iMomentOfInertia_ = (1 / shape_->calculateMomentOfInertia());
+      }
+
+
+      // Get the shape
+      Shape* getShape () const
+      {
+        return shape_;
+      }
+
+
+      // Is the body static ?
+      bool isStatic () const
+      {
+        return static_;
+      }
 
 
       // Set the body position
-      void setPosition (const Vector2& POSITION)
+      bool setPosition (const Vector2& POSITION)
       {
         position_ = POSITION;
-      }
-      void setPosition (const Real X, const Real Y)
-      {
-        position_.x = X;
-        position_.y = Y;
+        return true;
       }
 
       // Get the body position
@@ -46,15 +66,12 @@ namespace Spring2D
         return position_;
       }
 
+
       // Set the body velocity
-      void setVelocity (const Vector2& VELOCITY)
+      bool setVelocity (const Vector2& VELOCITY)
       {
         velocity_ = VELOCITY;
-      }
-      void setVelocity (const Real X, const Real Y)
-      {
-        velocity_.x = X;
-        velocity_.y = Y;
+        return true;
       }
 
       // Get the body velocity
@@ -63,11 +80,20 @@ namespace Spring2D
         return velocity_;
       }
 
+
+      // Set the body acceleration
+      bool setAcceleration (const Vector2& ACCELERATION)
+      {
+        acceleration_ = ACCELERATION;
+        return true;
+      }
+
       // Get the body acceleration
       Vector2 getAcceleration () const
       {
         return acceleration_;
       }
+
 
       // Get the body velocity caused only from acceleration
       Vector2 getVelocityFromAcceleration () const
@@ -77,23 +103,19 @@ namespace Spring2D
 
 
       // Set the body orientation
-      void setOrientation (const Complex& ORIENTATION)
+      bool setOrientation (const Complex& ORIENTATION)
       {
         orientation_ = ORIENTATION;
-      }
-      void setOrientation (const Real ANGLE)
-      {
-        orientation_.r = s2cos(ANGLE);
-        orientation_.i = s2sin(ANGLE);
+        return true;
       }
 
-      // Get the body orientation (in radians)
-      Real getOrientation () const
+      // Get the body orientation
+      Complex getOrientation () const
       {
-        return s2atan2(orientation_.i, orientation_.r);
+        return orientation_;
       }
 
-      // Get the body orientation (in radians)
+      // Get the body orientation (the matrix)
       Matrix2x2 getOrientationMatrix () const
       {
         return Matrix2x2(orientation_);
@@ -101,9 +123,10 @@ namespace Spring2D
 
 
       // Set the body rotation
-      void setRotation (const Real ROTATION)
+      bool setRotation (const Real ROTATION)
       {
         rotation_ = ROTATION;
+        return true;
       }
 
       // Get the body rotation
@@ -113,101 +136,126 @@ namespace Spring2D
       }
 
 
+      // Set the body density
+      bool setDensity (const Real DENSITY)
+      {
+        if (shape_->setDensity(DENSITY) == false)
+        {
+          return false;
+        }
+
+        iMass_            = 1 / shape_->calculateMass();
+        iMomentOfInertia_ = 1 / shape_->calculateMomentOfInertia();
+        return true;
+      }
+
+      // Get the body density
+      Real getDensity () const
+      {
+        return shape_->getDensity();
+      }
+
+
       // Get the body mass
       Real getMass () const
       {
-        return mass_;
+        return (1 / iMass_);
+      }
+
+      // Get the body inverse mass
+      Real getInverseMass () const
+      {
+        return iMass_;
       }
 
       // Get the body moment of inertia
       Real getMomentOfInertia () const
       {
-        return momentOfInertia_;
+        return (1 / iMomentOfInertia_);
+      }
+
+      // Get the body inverse moment of inertia
+      Real getInverseMomentOfInertia () const
+      {
+        return iMomentOfInertia_;
       }
 
 
-      // Set the shape
-      void setShape (Shape* SHAPE)
+      // Set the body drag
+      bool setDrag (const Real DRAG)
       {
-        shape_ = SHAPE;
-        shape_->body_ = this;
-        shape_->buildAABB(&position_);
-        mass_ = shape_->calculateMass();
-        momentOfInertia_ = shape_->calculateMomentOfInertia();
+        drag_ = DRAG;
+        return true;
       }
 
-      // Get the shape
-      Shape* getShape () const
+      // Get the body drag
+      Real getDrag () const
       {
-        return shape_;
+        return drag_;
       }
 
 
-      // Make the body static
-      void makeStatic ()
+      // Set the body elasticity
+      bool setElasticity (const Real ELASTICITY)
       {
-        static_ = true;
+        elasticity_ = ELASTICITY;
+        return true;
       }
 
-      // Is the body static ?
-      bool isStatic () const
+      // Get the body elasticity
+      Real getElasticity () const
       {
-        return static_;
+        return elasticity_;
       }
 
 
-      // Make the body dynamic
-      void makeDynamic ()
+      // Set the body friction
+      bool setFriction (const Real FRICTION)
       {
-        static_ = false;
+        friction_ = FRICTION;
+        return true;
       }
 
-      // Is the body dynamic ?
-      bool isDynamic () const
+      // Get the body friction
+      Real getFriction () const
       {
-        return !static_;
+        return friction_;
       }
 
 
       // Transform the point in local coordinates
       void transformLocal (Vector2* point) const
       {
-        // TODO: OPTIMIZATION -> in one step with Matrix2x3
-        *point -= position_;
-        *point = getOrientationMatrix().getInverse() * *point;
+        *point = getOrientationMatrix().getInverse() * ((*point) - position_);
       }
 
       // Transform the point from body to world coordinates
       void transformWorld (Vector2* point)
       {
-        *point = getOrientationMatrix() * *point;
-        *point += position_;
+        *point = getOrientationMatrix() * (*point) + position_;
       }
 
 
-      // Apply a force
+      // Add the given force to the net force
       void applyForce (const Vector2& FORCE)
       {
         netForce_ += FORCE;
       }
 
-      // Apply a force (WORLD) to a point (BODY)
+      // Apply a force (WORLD) to a point (LOCAL)
       void applyForceAtPoint (const Vector2& FORCE, const Vector2& POINT)
       {
         // TODO: check for external point (NULL force)
 
-        // Apply the force to the netForce
+        // Add the given force to the net force
         netForce_ += FORCE;
 
-        // Rotate the point
-        Vector2 worldPoint = Matrix2x2(orientation_) * POINT;
-        // Apply the torque as point CROSS force
-        // TODO: check the cross order
-        netTorque_ += cross(worldPoint, FORCE);
+        // Add the calculate torque to the net torque
+        netTorque_ += cross(Matrix2x2(orientation_) * POINT, FORCE);
       }
 
 
-      // Add a torque
+      // Add the given torque to the net torque
       void applyTorque (const Real TORQUE)
       {
         netTorque_ += TORQUE;
@@ -218,6 +266,12 @@ namespace Spring2D
 
 
     private:
+
+      Shape*      shape_;
+
+
+      bool        static_;
+
 
       Vector2     position_;
 
@@ -233,20 +287,21 @@ namespace Spring2D
       Real        rotation_;
 
 
-      Real        mass_;
+      Real        iMass_;
 
-      Real        momentOfInertia_;
+      Real        iMomentOfInertia_;
+
+
+      Real        drag_;
+
+      Real        elasticity_;
+
+      Real        friction_;
 
 
       Vector2     netForce_;
 
       Real        netTorque_;
-
-
-      Shape*      shape_;
-
-
-      bool        static_;
 
   };
 
