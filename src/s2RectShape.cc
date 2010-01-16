@@ -20,7 +20,6 @@ namespace Spring2D
   {
     // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
     //                       (only if rotating)
-    // TODO: make not inline
     // TODO: check if directionX & directionY are normalized
     Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
     Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;

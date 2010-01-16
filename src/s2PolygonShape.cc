@@ -140,4 +140,89 @@ namespace Spring2D
   }
 
 
+
+  // ---------------------------------------------------------------------------
+  // Return the furthest point along the given direction
+  bool PolygonShape::convexityTest (
+      const int N_VERTICES, const Vector2* VERTICES) const
+  {
+    int counterX  = 0;
+    int counterY  = 0;
+
+    // First edge
+    Vector2 previousEdge  = VERTICES[0] - VERTICES[N_VERTICES - 1];
+    Vector2 currentEdge   = VERTICES[1] - VERTICES[0];
+
+    if (cross(previousEdge, currentEdge) < 0)
+    {
+      return false;
+    }
+
+    if ((previousEdge.x >= 0 && currentEdge.x <  0) ||
+        (previousEdge.x <  0 && currentEdge.x >= 0))
+      ++counterX;
+    if ((previousEdge.y >= 0 && currentEdge.y <  0) ||
+        (previousEdge.y <  0 && currentEdge.y >= 0))
+      ++counterY;
+
+
+    // Central edges
+    for (int i = 1; i < N_VERTICES - 1; ++i)
+    {
+      previousEdge = currentEdge;
+      currentEdge = VERTICES[i + 1] - VERTICES[i];
+
+      if (cross(previousEdge, currentEdge) < 0)
+      {
+        return false;
+      }
+
+      if ((previousEdge.x >= 0 && currentEdge.x <  0) ||
+          (previousEdge.x <  0 && currentEdge.x >= 0))
+      {
+        ++counterX;
+      }
+      if ((previousEdge.y >= 0 && currentEdge.y <  0) ||
+          (previousEdge.y <  0 && currentEdge.y >= 0))
+      {
+        ++counterY;
+      }
+
+      if (counterX > 2 || counterY > 2)
+      {
+        return false;
+      }
+    }
+
+
+    // Last edge
+    previousEdge = currentEdge;
+    currentEdge = VERTICES[0] - VERTICES[N_VERTICES - 1];
+
+    if (cross(previousEdge, currentEdge) < 0)
+    {
+      return false;
+    }
+
+    if ((previousEdge.x >= 0 && currentEdge.x <  0) ||
+        (previousEdge.x <  0 && currentEdge.x >= 0))
+    {
+      ++counterX;
+    }
+    if ((previousEdge.y >= 0 && currentEdge.y <  0) ||
+        (previousEdge.y <  0 && currentEdge.y >= 0))
+    {
+      ++counterY;
+    }
+
+    if (counterX > 2 || counterY > 2)
+    {
+      return false;
+    }
+
+
+    return true;
+  }
+
+
 }

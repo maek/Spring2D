@@ -32,7 +32,13 @@ namespace Spring2D
           return;
         }
 
-        // TODO: add the convexity test
+        // Convexity test
+        if (convexityTest(N_VERTICES, VERTICES) == false)
+        {
+          valid_ = false;
+          return;
+        }
+
 
         vertices_ = new Vector2[N_VERTICES];
         for (int i = 0; i < N_VERTICES; ++i)
@@ -53,8 +59,16 @@ namespace Spring2D
         }
         area_ /= 2;
 
+        // Counter-clockwise test
+        if (area_ <= 0)
+        {
+          valid_ = false;
+          return;
+        }
+
         valid_ = true;
       }
+
 
       // Desstructor
       ~PolygonShape ()
@@ -106,6 +120,11 @@ namespace Spring2D
       int       nVertices_;
 
       Vector2*  vertices_;
+
+
+    private:
+
+      bool convexityTest (const int, const Vector2*) const;
 
   };
 
