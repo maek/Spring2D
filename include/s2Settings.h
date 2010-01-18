@@ -78,6 +78,7 @@ namespace Spring2D
   class Force;
   class ForceRegister;
   class GenericForce;
+  class GenericTorque;
   class Matrix2x2;
   class NarrowPhaseDetector;
   class PolygonShape;
@@ -85,7 +86,6 @@ namespace Spring2D
   class Shape;
   class Simplex;
   class Torque;
-  class TorqueMotor;
   class TorqueRegister;
   class UGrid;
   class Vector2;

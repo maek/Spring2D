@@ -10,7 +10,7 @@ namespace Spring2D
     // Compute the net forces
     environment_->handleForces();
     // Compute the net torques
-    environment_->computeTorques();
+    environment_->handleTorques();
 
     // Update positions & velocities
     environment_->integrateBodies();

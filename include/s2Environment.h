@@ -75,10 +75,28 @@ namespace Spring2D
       }
 
 
-      // Compute the net torque
-      void computeTorques ()
+      // Apply the given torque to the given body
+      bool registerTorqueToBody (Torque* TORQUE, Body* BODY) const
       {
-        torqueRegister_->computeTorques();
+        return torqueRegister_->applyTorqueToBody(TORQUE, BODY);
+      }
+
+      // Remove the given torque from the application to the given body
+      bool unregisterTorqueFromBody (Torque* TORQUE, Body* BODY) const
+      {
+        return torqueRegister_->removeTorqueFromBody(TORQUE, BODY);
+      }
+
+      // Remove a torque from the register
+      bool unregisterTorque (Torque* TORQUE) const
+      {
+        return torqueRegister_->removeTorque(TORQUE);
+      }
+
+      // Compute the net torque
+      void handleTorques () const
+      {
+        torqueRegister_->calculateNetTorques();
       }
 
 
