@@ -577,7 +577,6 @@ namespace Spring2D
     }
 
     // Calculate the tangent impulse
-    // TODO: remove velocity caused by only acceleration (gravity)
     Real Jtang =
       -sV /
       (
@@ -586,7 +585,6 @@ namespace Spring2D
       );
     if (contact->body[1]->isStatic() == false)
     {
-      // TODO: remove velocity caused by only acceleration (gravity)
       Jtang =
         -sV /
         (

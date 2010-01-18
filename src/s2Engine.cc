@@ -8,7 +8,7 @@ namespace Spring2D
   void Engine::runStep()
   {
     // Compute the net forces
-    environment_->computeForces();
+    environment_->handleForces();
     // Compute the net torques
     environment_->computeTorques();
 

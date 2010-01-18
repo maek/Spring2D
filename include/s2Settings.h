@@ -76,8 +76,8 @@ namespace Spring2D
   class Engine;
   class Environment;
   class Force;
-  class ForceGravity;
   class ForceRegister;
+  class GenericForce;
   class Matrix2x2;
   class NarrowPhaseDetector;
   class PolygonShape;

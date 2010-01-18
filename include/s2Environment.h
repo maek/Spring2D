@@ -50,11 +50,30 @@ namespace Spring2D
       }
 
 
-      // Compute the net force
-      void computeForces ()
+      // Apply the given force to the given body
+      bool registerForceToBody (Force* FORCE, Body* BODY) const
       {
-        forceRegister_->computeForces();
+        return forceRegister_->applyForceToBody(FORCE, BODY);
       }
+
+      // Remove the given force from the application to the given body
+      bool unregisterForceFromBody (Force* FORCE, Body* BODY) const
+      {
+        return forceRegister_->removeForceFromBody(FORCE, BODY);
+      }
+
+      // Remove a force from the register
+      bool unregisterForce (Force* FORCE) const
+      {
+        return forceRegister_->removeForce(FORCE);
+      }
+
+      // Compute the net force
+      void handleForces () const
+      {
+        forceRegister_->calculateNetForces();
+      }
+
 
       // Compute the net torque
       void computeTorques ()
@@ -66,17 +85,6 @@ namespace Spring2D
       void integrateBodies ();
 
 
-      // Get a pointer to the force register
-      ForceRegister* getForceRegister () const
-      {
-        return forceRegister_;
-      }
-
-      // Get a pointer to the torque register
-      TorqueRegister* getTorqueRegister () const
-      {
-        return torqueRegister_;
-      }
 
 
     private:
