@@ -31,8 +31,10 @@ namespace Spring2D
           return;
         }
 
-        density_  = DENSITY;
         area_     = M_PI * RADIUS * RADIUS;
+        density_  = DENSITY;
+        iMass_    = 1 / (area_ * density_);
+        updateInverseMomentOfInertia();
 
         valid_ = true;
       }
@@ -65,9 +67,10 @@ namespace Spring2D
 
       // Calculate the moment of inertia
       // m * r^2 / 2
-      Real calculateMomentOfInertia () const
+      void updateInverseMomentOfInertia ()
       {
-        return area_ * density_ * radius_ * radius_ / 2;
+        iMomentOfInertia_ = 2 /
+          (area_ * density_ * radius_ * radius_);
       }
 
 

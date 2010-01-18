@@ -46,6 +46,13 @@ namespace Spring2D
       virtual void updateAABB () = 0;
 
 
+      // Return the area of the shape
+      Real getArea () const
+      {
+        return area_;
+      }
+
+
       // Set the density of the shape
       bool setDensity (const Real DENSITY)
       {
@@ -54,7 +61,10 @@ namespace Spring2D
           return false;
         }
 
-        density_ = DENSITY;
+        density_  = DENSITY;
+        iMass_    = 1 / (area_ * density_);
+        updateInverseMomentOfInertia();
+
         return true;
       }
 
@@ -64,21 +74,32 @@ namespace Spring2D
         return density_;
       }
 
-
-      // Return the area of the shape
-      Real getArea () const
+      // Return the mass of the shape
+      Real getMass () const
       {
-        return area_;
+        return (1 / iMass_);
+      }
+
+      // Return the density of the shape
+      Real getInverseMass () const
+      {
+        return iMass_;
+      }
+
+      // Return the moment of inertia of the shape
+      Real getMomentOfInertia () const
+      {
+        return (1 / iMomentOfInertia_);
+      }
+
+      // Return the moment of inertia of the shape
+      Real getInverseMomentOfInertia () const
+      {
+        return iMomentOfInertia_;
       }
 
 
-      // Calculate the mass of the shape
-      Real calculateMass () const
-      {
-        return area_ * density_;
-      }
-
-      virtual Real calculateMomentOfInertia () const = 0;
+      virtual void updateInverseMomentOfInertia () = 0;
 
 
       virtual Vector2 getSupportPoint0 () const = 0;
@@ -97,11 +118,19 @@ namespace Spring2D
 
       Body*   body_;
 
+
       AABB    aabb_;
+
 
       Real    area_;
 
+
       Real    density_;
+
+      Real    iMass_;
+
+      Real    iMomentOfInertia_;
+
 
       bool    valid_;
 

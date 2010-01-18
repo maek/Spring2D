@@ -52,7 +52,7 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Calculate the moment of inertia
   // D / 12 * sum [ ||Pn+1 x Pn|| * (Pn+1^2 + Pn+1 . Pn + Pn^2) ]
-  Real PolygonShape::calculateMomentOfInertia () const
+  void PolygonShape::updateInverseMomentOfInertia ()
   {
     // Calculate the moment of inertia about the centroid
     Real momentOfInertia =
@@ -72,8 +72,7 @@ namespace Spring2D
     }
 
     momentOfInertia *= density_ / 12;
-
-    return momentOfInertia;
+    iMomentOfInertia_ = 1 / momentOfInertia;
   }
 
 

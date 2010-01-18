@@ -46,8 +46,7 @@ namespace Spring2D
           vertices_[i] = VERTICES[i];
         }
 
-        density_ = DENSITY;
-
+        // Calculate the area
         area_ =
           VERTICES[N_VERTICES - 1].x * VERTICES[0].y -
           VERTICES[0].x * VERTICES[N_VERTICES - 1].y;
@@ -65,6 +64,10 @@ namespace Spring2D
           valid_ = false;
           return;
         }
+
+        density_  = DENSITY;
+        iMass_    = 1 / (area_ * density_);
+        updateInverseMomentOfInertia();
 
         valid_ = true;
       }
@@ -102,7 +105,7 @@ namespace Spring2D
       void updateAABB ();
 
 
-      Real calculateMomentOfInertia () const;
+      void updateInverseMomentOfInertia ();
 
 
       // Return any vertex as the initial support point

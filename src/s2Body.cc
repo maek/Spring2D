@@ -11,16 +11,15 @@ namespace Spring2D
     if (static_)
       return;
 
-    // Calculate the acceleration
-    Vector2 acceleration = acceleration_;
-    acceleration += netForce_  * iMass_;
-    velocityFromAcceleration_ = acceleration * TIME_STEP;
+    // Calculate the velocity from acceleration
+    velocityFromAcceleration_ =
+      (acceleration_ + netForce_ * shape_->iMass_) * TIME_STEP;
 
     // Update the velocity
     velocity_ += velocityFromAcceleration_;
 
     // Update the rotation
-    rotation_ += netTorque_ * iMomentOfInertia_ * TIME_STEP;
+    rotation_ += netTorque_ * shape_->iMomentOfInertia_ * TIME_STEP;
 
     // Update the position
     position_ += (velocity_ * TIME_STEP);
@@ -33,6 +32,7 @@ namespace Spring2D
     shape_->updateAABB();
 
     // Normalize the orientation
+    // TODO: only 1 time every second
     orientation_.normalize();
 
     // Clear the accumulators

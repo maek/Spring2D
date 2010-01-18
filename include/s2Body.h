@@ -28,14 +28,15 @@ namespace Spring2D
         orientation_(ORIENTATION), rotation_(ROTATION),
         drag_(0), elasticity_(1), friction_(0)
       {
-        // Check if the shape is valid
-        assert(SHAPE->isValid());
-
         shape_ = SHAPE;
         shape_->body_ = this;
         shape_->buildAABB(&position_);
-        iMass_            = (1 / shape_->calculateMass());
-        iMomentOfInertia_ = (1 / shape_->calculateMomentOfInertia());
+      }
+
+      // Destructor
+      ~Body ()
+      {
+        delete shape_;
       }
 
 
@@ -105,6 +106,11 @@ namespace Spring2D
       // Set the body orientation
       bool setOrientation (const Complex& ORIENTATION)
       {
+        if (ORIENTATION.getMagnitude() != 1)
+        {
+          return false;
+        }
+
         orientation_ = ORIENTATION;
         return true;
       }
@@ -144,8 +150,6 @@ namespace Spring2D
           return false;
         }
 
-        iMass_            = 1 / shape_->calculateMass();
-        iMomentOfInertia_ = 1 / shape_->calculateMomentOfInertia();
         return true;
       }
 
@@ -159,31 +163,36 @@ namespace Spring2D
       // Get the body mass
       Real getMass () const
       {
-        return (1 / iMass_);
+        return shape_->getMass();
       }
 
       // Get the body inverse mass
       Real getInverseMass () const
       {
-        return iMass_;
+        return shape_->getInverseMass();
       }
 
       // Get the body moment of inertia
       Real getMomentOfInertia () const
       {
-        return (1 / iMomentOfInertia_);
+        return shape_->getMomentOfInertia();
       }
 
       // Get the body inverse moment of inertia
       Real getInverseMomentOfInertia () const
       {
-        return iMomentOfInertia_;
+        return shape_->getInverseMomentOfInertia();
       }
 
 
       // Set the body drag
       bool setDrag (const Real DRAG)
       {
+        if (DRAG < 0)
+        {
+          return false;
+        }
+
         drag_ = DRAG;
         return true;
       }
@@ -198,6 +207,11 @@ namespace Spring2D
       // Set the body elasticity
       bool setElasticity (const Real ELASTICITY)
       {
+        if (ELASTICITY < 0 || 1 < ELASTICITY)
+        {
+          return false;
+        }
+
         elasticity_ = ELASTICITY;
         return true;
       }
@@ -212,6 +226,11 @@ namespace Spring2D
       // Set the body friction
       bool setFriction (const Real FRICTION)
       {
+        if (FRICTION < 0)
+        {
+          return false;
+        }
+
         friction_ = FRICTION;
         return true;
       }
@@ -285,11 +304,6 @@ namespace Spring2D
       Complex     orientation_;
 
       Real        rotation_;
-
-
-      Real        iMass_;
-
-      Real        iMomentOfInertia_;
 
 
       Real        drag_;
