@@ -2,6 +2,7 @@
 #define __TORQUE_REGISTER_H__
 
 #include "s2Settings.h"
+#include "s2Body.h"
 
 
 namespace Spring2D
@@ -12,91 +13,23 @@ namespace Spring2D
   {
     public:
 
-      virtual void apply (Body*) const = 0;
-
-  };
+      virtual ~Torque () { }
 
 
+      virtual void apply () const = 0;
 
 
+      virtual bool addBody (Body*) { return false; }
 
-  // ---------------------------------------------------------------------------
-  // The entry for the torque register
-  class TorqueEntry
-  {
-    public:
-
-      // Constructor
-      TorqueEntry (Torque* TORQUE) : torque_(TORQUE) { }
-
-      // Destructor
-      ~TorqueEntry()
-      {
-        bodyList_.clear();
-        delete torque_;
-      }
-
-
-      // Check if this entry has the given torque
-      bool hasTorque (Torque* TORQUE) const
-      {
-        if (torque_ == TORQUE)
-        {
-          return true;
-        }
-
-        return false;
-      }
-
-
-      // Add a body to the list of body to apply the torque
-      bool addBody (Body* BODY)
-      {
-        bodyList_.push_back(BODY);
-        return true;
-      }
-
-      // Remove a body from the list of body to apply the torque
-      bool removeBody (Body* BODY)
-      {
-        for (BodyList::iterator bodyListI = bodyList_.begin();
-            bodyListI != bodyList_.end(); ++bodyListI)
-        {
-          if ((*bodyListI) == BODY)
-          {
-            bodyList_.erase(bodyListI);
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-
-      // Apply the force to all register body
-      void applyTorque ()
-      {
-        for (BodyList::iterator bodyListI = bodyList_.begin();
-            bodyListI != bodyList_.end(); ++bodyListI)
-        {
-          torque_->apply((*bodyListI));
-        }
-      }
-
-
-    private:
-
-      Torque* torque_;
-
-      BodyList bodyList_;
+      virtual bool removeBody (Body*) { return false; }
 
   };
 
 
 
   // ---------------------------------------------------------------------------
-  // The force entry list
-  typedef std::list<TorqueEntry*> TorqueEntryList;
+  // The torque list
+  typedef std::list<Torque*> TorqueList;
 
 
 
@@ -108,76 +41,65 @@ namespace Spring2D
   {
     public:
 
-      // Apply the given torque to the given body
-      bool applyTorqueToBody (Torque* TORQUE, Body* BODY)
+      // Destructor
+      ~TorqueRegister ()
       {
-        // Check if the torque exists
-        for (TorqueEntryList::iterator torqueEntryListI = torqueEntryList_.begin();
-            torqueEntryListI != torqueEntryList_.end(); ++torqueEntryListI)
+        torqueList_.clear();
+      }
+
+
+      // Register the given torque
+      bool registerTorque (Torque* TORQUE)
+      {
+        for (TorqueList::iterator torqueListI = torqueList_.begin();
+            torqueListI != torqueList_.end(); ++torqueListI)
         {
           // If the torque is already in the register
-          if ((*torqueEntryListI)->hasTorque(TORQUE))
+          if ((*torqueListI) == TORQUE)
           {
-            (*torqueEntryListI)->addBody(BODY);
-            return true;
+            return false;
           }
         }
 
-        // If the torque is a new torque
-        torqueEntryList_.push_back(new TorqueEntry(TORQUE));
-        torqueEntryList_.back()->addBody(BODY);
+        // If the torque is a new one
+        torqueList_.push_back(TORQUE);
         return true;
       }
 
-      // Remove the given torque from the application to the given body
-      bool removeTorqueFromBody (Torque* TORQUE, Body* BODY)
+
+      // Unregister the given torque
+      bool unregisterTorque (Torque* TORQUE)
       {
-        // Check if the torque exists
-        for (TorqueEntryList::iterator torqueEntryListI = torqueEntryList_.begin();
-            torqueEntryListI != torqueEntryList_.end(); ++torqueEntryListI)
+        for (TorqueList::iterator torqueListI = torqueList_.begin();
+            torqueListI != torqueList_.end(); ++torqueListI)
         {
-          if ((*torqueEntryListI)->hasTorque(TORQUE))
+          // If the torque is in the register
+          if ((*torqueListI) == TORQUE)
           {
-            return (*torqueEntryListI)->removeBody(BODY);
-          }
-        }
-
-        return false;
-      }
-
-
-      // Remove a torque from the register
-      bool removeTorque (Torque* TORQUE)
-      {
-        // Check if the torque exists
-        for (TorqueEntryList::iterator torqueEntryListI = torqueEntryList_.begin();
-            torqueEntryListI != torqueEntryList_.end(); ++torqueEntryListI)
-        {
-          if ((*torqueEntryListI)->hasTorque(TORQUE))
-          {
-            torqueEntryList_.erase(torqueEntryListI);
+            torqueList_.erase(torqueListI);
             return true;
           }
         }
 
+        // If the torque is not in the register
         return false;
       }
 
 
       // Compute the net torque for all body
-      void calculateNetTorques ()
+      void calculateNetTorques () const
       {
-        for (TorqueEntryList::iterator torqueEntryListI = torqueEntryList_.begin();
-            torqueEntryListI != torqueEntryList_.end(); ++torqueEntryListI)
+        for (TorqueList::const_iterator torqueListI = torqueList_.begin();
+            torqueListI != torqueList_.end(); ++torqueListI)
         {
-          (*torqueEntryListI)->applyTorque();
+          (*torqueListI)->apply();
         }
       }
 
 
     private:
 
-      TorqueEntryList torqueEntryList_;
+      TorqueList torqueList_;
 
   };
 

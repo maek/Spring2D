@@ -14,16 +14,24 @@ namespace Spring2D
   {
     public:
 
-      Body* body[2];
+      Body*     body[2];
+
+      Vector2   point[2];
 
 
     public:
 
       // Constructor
-      SpringEnds (Body* BODY1, Body* BODY2)
+      SpringEnds (
+          Body* BODY1,
+          Body* BODY2,
+          const Vector2& POINT1,
+          const Vector2& POINT2)
       {
-        body[0] = BODY1;
-        body[1] = BODY2;
+        body[0]   = BODY1;
+        body[1]   = BODY2;
+        point[0]  = POINT1;
+        point[1]  = POINT2;
       }
 
 
@@ -84,19 +92,25 @@ namespace Spring2D
       }
 
 
-      // Add the given body
-      bool addBody (Body* BODY1, Body* BODY2)
+      // Add the given body (with points)
+      bool addBody (
+          Body* BODY1,
+          Body* BODY2,
+          const Vector2& POINT1 = Vector2::ZERO,
+          const Vector2& POINT2 = Vector2::ZERO)
       {
         for (SpringList::iterator springListI = springList_.begin();
             springListI != springList_.end(); ++springListI)
         {
+          // If the couple is already in the spring list
           if ((*springListI)->hasBodies(BODY1, BODY2))
           {
             return false;
           }
         }
 
-        springList_.push_back(new SpringEnds(BODY1, BODY2));
+        // If the couple is a new one
+        springList_.push_back(new SpringEnds(BODY1, BODY2, POINT1, POINT2));
         return true;
       }
 
@@ -107,6 +121,7 @@ namespace Spring2D
         for (SpringList::iterator springListI = springList_.begin();
             springListI != springList_.end(); ++springListI)
         {
+          // If the couple is in the spring list
           if ((*springListI)->hasBodies(BODY1, BODY2))
           {
             springList_.erase(springListI);
@@ -114,6 +129,7 @@ namespace Spring2D
           }
         }
 
+        // If the couple is not in the spring list
         return false;
       }
 
@@ -136,17 +152,20 @@ namespace Spring2D
             continue;
           }
 
+          // Calculate the spring force
           force = stiffness_ * (distance.getMagnitude() - length_) *
             distance.getNormalizedCopy();
 
+          // Apply it
           if ((*springListI)->body[0]->isStatic() == false)
           {
-            (*springListI)->body[0]->addForce(force);
+            (*springListI)->body[0]->addForceAtPoint(force,
+                (*springListI)->point[0]);
           }
-
           if ((*springListI)->body[1]->isStatic() == false)
           {
-            (*springListI)->body[1]->addForce(-force);
+            (*springListI)->body[1]->addForceAtPoint(-force,
+                (*springListI)->point[1]);
           }
 
         }

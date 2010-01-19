@@ -25,17 +25,19 @@ namespace Spring2D
 
 
       // Add the given body
-      bool addBody (Body* BODY)
+      bool addBody (Body* BODY, const Vector2& POINT = Vector2::ZERO)
       {
         for (BodyList::iterator bodyListI = bodyList_.begin();
             bodyListI != bodyList_.end(); ++bodyListI)
         {
+          // If the is already in the body list
           if ((*bodyListI) == BODY)
           {
             return false;
           }
         }
 
+        // If it is a new body
         bodyList_.push_back(BODY);
         return true;
       }
@@ -47,6 +49,7 @@ namespace Spring2D
         for (BodyList::iterator bodyListI = bodyList_.begin();
             bodyListI != bodyList_.end(); ++bodyListI)
         {
+          // If the body is in the body list
           if ((*bodyListI) == BODY)
           {
             bodyList_.erase(bodyListI);
@@ -54,6 +57,7 @@ namespace Spring2D
           }
         }
 
+        // If the body is not in the body list
         return false;
       }
 
@@ -64,6 +68,7 @@ namespace Spring2D
         for (BodyList::const_iterator bodyListI = bodyList_.begin();
             bodyListI != bodyList_.end(); ++bodyListI)
         {
+          // Skip static body
           if ((*bodyListI)->isStatic())
           {
             continue;
@@ -77,7 +82,6 @@ namespace Spring2D
     private:
 
       Vector2 force_;
-
 
       BodyList bodyList_;
 

@@ -164,8 +164,8 @@ namespace Spring2D
     if (squaredDistance < (radiusSum * radiusSum))
     {
       contact->penetrationDepth = radiusSum - s2sqrt(squaredDistance);
-      contact->point[0] = center2 - midLine.getNormalizedCopy() * radius2;
-      contact->point[1] = center1 + midLine.getNormalizedCopy() * radius1;
+      contact->point[0] = center1 + midLine.getNormalizedCopy() * radius1;
+      contact->point[1] = center2 - midLine.getNormalizedCopy() * radius2;
 
       return true;
     }

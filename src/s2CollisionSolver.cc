@@ -484,7 +484,7 @@ namespace Spring2D
     // b = before, a = after
     // e = -(v1a - v2a) / (v1b - v2b)
     contact->restitution = 0.2;
-    contact->friction = 0.1;
+    contact->friction = 0.5;
     Vector2 n = contact->normal;
 
     Vector2 Rap = contact->relativeContactPoint[0];

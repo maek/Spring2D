@@ -19,12 +19,15 @@ namespace Spring2D
       virtual void apply () const = 0;
 
 
-      virtual bool addBody (Body*) { return false; }
+      virtual bool addBody (Body*,
+          const Vector2& = Vector2::ZERO) { return false; }
 
       virtual bool removeBody (Body*) { return false; }
 
 
-      virtual bool addBody (Body*, Body*) { return false; }
+      virtual bool addBody (Body*, Body*,
+          const Vector2& = Vector2::ZERO,
+          const Vector2& = Vector2::ZERO) { return false; }
 
       virtual bool removeBody (Body*, Body*) { return false; }
 
@@ -66,7 +69,7 @@ namespace Spring2D
           }
         }
 
-        // If the force is a new force
+        // If the force is a new one
         forceList_.push_back(FORCE);
         return true;
       }
@@ -86,7 +89,7 @@ namespace Spring2D
           }
         }
 
-        // If the force doesn't exist
+        // If the force is not in the register
         return false;
       }
 
