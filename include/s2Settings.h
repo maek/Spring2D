@@ -85,6 +85,7 @@ namespace Spring2D
   class RectShape;
   class Shape;
   class Simplex;
+  class SpringForce;
   class Torque;
   class TorqueRegister;
   class UGrid;

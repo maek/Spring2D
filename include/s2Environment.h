@@ -50,22 +50,16 @@ namespace Spring2D
       }
 
 
-      // Apply the given force to the given body
-      bool registerForceToBody (Force* FORCE, Body* BODY) const
+      // Register the given force
+      bool registerForce (Force* FORCE) const
       {
-        return forceRegister_->applyForceToBody(FORCE, BODY);
+        return forceRegister_->registerForce(FORCE);
       }
 
-      // Remove the given force from the application to the given body
-      bool unregisterForceFromBody (Force* FORCE, Body* BODY) const
-      {
-        return forceRegister_->removeForceFromBody(FORCE, BODY);
-      }
-
-      // Remove a force from the register
+      // Unregister the given force
       bool unregisterForce (Force* FORCE) const
       {
-        return forceRegister_->removeForce(FORCE);
+        return forceRegister_->unregisterForce(FORCE);
       }
 
       // Compute the net force

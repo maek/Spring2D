@@ -18,11 +18,12 @@ namespace Spring2D
     // Update the velocity
     velocity_ += velocityFromAcceleration_;
 
-    // Update the rotation
-    rotation_ += netTorque_ * shape_->iMomentOfInertia_ * TIME_STEP;
-
     // Update the position
     position_ += (velocity_ * TIME_STEP);
+
+
+    // Update the rotation
+    rotation_ += netTorque_ * shape_->iMomentOfInertia_ * TIME_STEP;
 
     // Update the orientation
     orientation_.rotate(rotation_ * TIME_STEP);

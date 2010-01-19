@@ -26,7 +26,7 @@ namespace Spring2D
           return;
         }
 
-        BODY->applyTorque(torque_);
+        BODY->addTorque(torque_);
       }
 
 

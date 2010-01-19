@@ -13,91 +13,28 @@ namespace Spring2D
   {
     public:
 
-      virtual void apply (Body*) const = 0;
-
-  };
+      virtual ~Force () { }
 
 
+      virtual void apply () const = 0;
 
 
+      virtual bool addBody (Body*) { return false; }
 
-  // ---------------------------------------------------------------------------
-  // The entry for the force register
-  class ForceEntry
-  {
-    public:
-
-      // Constructor
-      ForceEntry (Force* FORCE) : force_(FORCE) { }
-
-      // Destructor
-      ~ForceEntry ()
-      {
-        bodyList_.clear();
-        delete force_;
-      }
+      virtual bool removeBody (Body*) { return false; }
 
 
-      // Check if this entry has the given force
-      bool hasForce (Force* FORCE) const
-      {
-        if (force_ == FORCE)
-        {
-          return true;
-        }
+      virtual bool addBody (Body*, Body*) { return false; }
 
-        return false;
-      }
-
-
-      // Add a body to the list of body to apply the force
-      bool addBody (Body* BODY)
-      {
-        bodyList_.push_back(BODY);
-        return true;
-      }
-
-      // Remove a body from the list of body to apply the force
-      bool removeBody (Body* BODY)
-      {
-        for (BodyList::iterator bodyListI = bodyList_.begin();
-            bodyListI != bodyList_.end(); ++bodyListI)
-        {
-          if ((*bodyListI) == BODY)
-          {
-            bodyList_.erase(bodyListI);
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-
-      // Apply the force to all register body
-      void applyForce ()
-      {
-        for (BodyList::iterator bodyListI = bodyList_.begin();
-            bodyListI != bodyList_.end(); ++bodyListI)
-        {
-          force_->apply((*bodyListI));
-        }
-      }
-
-
-    private:
-
-      Force* force_;
-
-      BodyList bodyList_;
+      virtual bool removeBody (Body*, Body*) { return false; }
 
   };
 
 
 
   // ---------------------------------------------------------------------------
-  // The force entry list
-  typedef std::list<ForceEntry*> ForceEntryList;
+  // The force list
+  typedef std::list<Force*> ForceList;
 
 
 
@@ -109,76 +46,65 @@ namespace Spring2D
   {
     public:
 
-      // Apply the given force to the given body
-      bool applyForceToBody (Force* FORCE, Body* BODY)
+      // Destructor
+      ~ForceRegister ()
       {
-        // Check if the force exists
-        for (ForceEntryList::iterator forceEntryListI = forceEntryList_.begin();
-            forceEntryListI != forceEntryList_.end(); ++forceEntryListI)
+        forceList_.clear();
+      }
+
+
+      // Register the given force
+      bool registerForce (Force* FORCE)
+      {
+        for (ForceList::iterator forceListI = forceList_.begin();
+            forceListI != forceList_.end(); ++forceListI)
         {
           // If the force is already in the register
-          if ((*forceEntryListI)->hasForce(FORCE))
+          if ((*forceListI) == FORCE)
           {
-            (*forceEntryListI)->addBody(BODY);
-            return true;
+            return false;
           }
         }
 
         // If the force is a new force
-        forceEntryList_.push_back(new ForceEntry(FORCE));
-        forceEntryList_.back()->addBody(BODY);
+        forceList_.push_back(FORCE);
         return true;
       }
 
-      // Remove the given force from the application to the given body
-      bool removeForceFromBody (Force* FORCE, Body* BODY)
+
+      // Unregister the given force
+      bool unregisterForce (Force* FORCE)
       {
-        // Check if the force exists
-        for (ForceEntryList::iterator forceEntryListI = forceEntryList_.begin();
-            forceEntryListI != forceEntryList_.end(); ++forceEntryListI)
+        for (ForceList::iterator forceListI = forceList_.begin();
+            forceListI != forceList_.end(); ++forceListI)
         {
-          if ((*forceEntryListI)->hasForce(FORCE))
+          // If the force is in the register
+          if ((*forceListI) == FORCE)
           {
-            return (*forceEntryListI)->removeBody(BODY);
-          }
-        }
-
-        return false;
-      }
-
-
-      // Remove a force from the register
-      bool removeForce (Force* FORCE)
-      {
-        // Check if the force exists
-        for (ForceEntryList::iterator forceEntryListI = forceEntryList_.begin();
-            forceEntryListI != forceEntryList_.end(); ++forceEntryListI)
-        {
-          if ((*forceEntryListI)->hasForce(FORCE))
-          {
-            forceEntryList_.erase(forceEntryListI);
+            forceList_.erase(forceListI);
             return true;
           }
         }
 
+        // If the force doesn't exist
         return false;
       }
 
 
       // Compute the net force for all body
-      void calculateNetForces ()
+      void calculateNetForces () const
       {
-        for (ForceEntryList::iterator forceEntryListI = forceEntryList_.begin();
-            forceEntryListI != forceEntryList_.end(); ++forceEntryListI)
+        for (ForceList::const_iterator forceListI = forceList_.begin();
+            forceListI != forceList_.end(); ++forceListI)
         {
-          (*forceEntryListI)->applyForce();
+          (*forceListI)->apply();
         }
       }
 
 
     private:
 
-      ForceEntryList forceEntryList_;
+      ForceList forceList_;
 
   };
 

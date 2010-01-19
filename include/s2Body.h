@@ -256,13 +256,13 @@ namespace Spring2D
 
 
       // Add the given force to the net force
-      void applyForce (const Vector2& FORCE)
+      void addForce (const Vector2& FORCE)
       {
         netForce_ += FORCE;
       }
 
       // Apply a force (WORLD) to a point (LOCAL)
-      void applyForceAtPoint (const Vector2& FORCE, const Vector2& POINT)
+      void addForceAtPoint (const Vector2& FORCE, const Vector2& POINT)
       {
         // TODO: check for external point (NULL force)
 
@@ -275,7 +275,7 @@ namespace Spring2D
 
 
       // Add the given torque to the net torque
-      void applyTorque (const Real TORQUE)
+      void addTorque (const Real TORQUE)
       {
         netTorque_ += TORQUE;
       }
