@@ -15,13 +15,7 @@ namespace Spring2D
 
       virtual ~Torque () { }
 
-
       virtual void apply () const = 0;
-
-
-      virtual bool addBody (Body*) { return false; }
-
-      virtual bool removeBody (Body*) { return false; }
 
   };
 

@@ -25,7 +25,7 @@ namespace Spring2D
 
 
       // Add the given body
-      bool addBody (Body* BODY, const Vector2& POINT = Vector2::ZERO)
+      bool addBody (Body* BODY)
       {
         for (BodyList::iterator bodyListI = bodyList_.begin();
             bodyListI != bodyList_.end(); ++bodyListI)

@@ -18,8 +18,6 @@ namespace Spring2D
 
       int       nContacts;
 
-      Vector2   persistencePoint[2][2];
-
 
       Vector2   point[2];
 

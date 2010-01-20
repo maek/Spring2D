@@ -93,7 +93,7 @@ namespace Spring2D
 
 
       // Add the given body (with points)
-      bool addBody (
+      bool addEndBodies (
           Body* BODY1,
           Body* BODY2,
           const Vector2& POINT1 = Vector2::ZERO,
@@ -116,7 +116,7 @@ namespace Spring2D
 
 
       // Remove the given body
-      bool removeBody (Body* BODY1, Body* BODY2)
+      bool removeEndBodies (Body* BODY1, Body* BODY2)
       {
         for (SpringList::iterator springListI = springList_.begin();
             springListI != springList_.end(); ++springListI)

@@ -15,21 +15,7 @@ namespace Spring2D
 
       virtual ~Force () { }
 
-
       virtual void apply () const = 0;
-
-
-      virtual bool addBody (Body*,
-          const Vector2& = Vector2::ZERO) { return false; }
-
-      virtual bool removeBody (Body*) { return false; }
-
-
-      virtual bool addBody (Body*, Body*,
-          const Vector2& = Vector2::ZERO,
-          const Vector2& = Vector2::ZERO) { return false; }
-
-      virtual bool removeBody (Body*, Body*) { return false; }
 
   };
 
