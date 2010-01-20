@@ -61,7 +61,7 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // The spring force
-  class SpringForce : public Force
+  class SpringForce : public DynamicEntry
   {
     public:
 

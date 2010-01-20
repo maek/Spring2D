@@ -73,10 +73,10 @@ namespace Spring2D
   class CollisionSolver;
   class Complex;
   class Contact;
+  class DynamicEntry;
+  class DynamicsRegister;
   class Engine;
   class Environment;
-  class Force;
-  class ForceRegister;
   class GenericForce;
   class GenericTorque;
   class Matrix2x2;
@@ -86,8 +86,6 @@ namespace Spring2D
   class Shape;
   class Simplex;
   class SpringForce;
-  class Torque;
-  class TorqueRegister;
   class UGrid;
   class Vector2;
 

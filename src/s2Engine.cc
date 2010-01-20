@@ -7,10 +7,8 @@ namespace Spring2D
   // Run a complete physics step
   void Engine::runStep()
   {
-    // Compute the net forces
-    environment_->handleForces();
-    // Compute the net torques
-    environment_->handleTorques();
+    // Compute the net forces & net torques
+    environment_->handleDynamics();
 
     // Update positions & velocities
     environment_->integrateBodies();

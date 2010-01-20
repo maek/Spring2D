@@ -10,7 +10,7 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // A generic torque
-  class GenericTorque : public Torque
+  class GenericTorque : public DynamicEntry
   {
     public:
 

@@ -10,7 +10,7 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // A generic force
-  class GenericForce : public Force
+  class GenericForce : public DynamicEntry
   {
     public:
 

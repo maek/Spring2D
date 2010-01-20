@@ -4,8 +4,7 @@
 #include "s2Settings.h"
 #include "s2Math.h"
 #include "s2Body.h"
-#include "s2ForceRegister.h"
-#include "s2TorqueRegister.h"
+#include "s2DynamicsRegister.h"
 
 
 namespace Spring2D
@@ -19,15 +18,13 @@ namespace Spring2D
       // Constructor
       Environment (const Real TIME_STEP) : timeStep_(TIME_STEP)
       {
-        forceRegister_  = new ForceRegister();
-        torqueRegister_ = new TorqueRegister();
+        dynamicsRegister_  = new DynamicsRegister ();
       }
 
       // Destructor
       ~Environment ()
       {
-        delete forceRegister_;
-        delete torqueRegister_;
+        delete dynamicsRegister_;
       }
 
 
@@ -50,41 +47,22 @@ namespace Spring2D
       }
 
 
-      // Register the given force
-      bool registerForce (Force* FORCE) const
+      // Register the given dynamic
+      bool registerDynamic (DynamicEntry* DYNAMIC) const
       {
-        return forceRegister_->registerForce(FORCE);
+        return dynamicsRegister_->registerDynamic(DYNAMIC);
       }
 
-      // Unregister the given force
-      bool unregisterForce (Force* FORCE) const
+      // Unregister the given dynamic
+      bool unregisterDynamic (DynamicEntry* DYNAMIC) const
       {
-        return forceRegister_->unregisterForce(FORCE);
+        return dynamicsRegister_->unregisterDynamic(DYNAMIC);
       }
 
-      // Compute the net force
-      void handleForces () const
+      // Compute the net dynamics
+      void handleDynamics () const
       {
-        forceRegister_->calculateNetForces();
-      }
-
-
-      // Register the given torque
-      bool registerTorque (Torque* TORQUE) const
-      {
-        return torqueRegister_->registerTorque(TORQUE);
-      }
-
-      // Unregister the given torque
-      bool unregisterTorque (Torque* TORQUE) const
-      {
-        return torqueRegister_->unregisterTorque(TORQUE);
-      }
-
-      // Compute the net torque
-      void handleTorques () const
-      {
-        torqueRegister_->calculateNetTorques();
+        dynamicsRegister_->calculateNetDynamics();
       }
 
 
@@ -95,14 +73,12 @@ namespace Spring2D
 
     private:
 
-      Real              timeStep_;
+      Real                timeStep_;
 
 
-      BodyList          bodyList_;
+      BodyList            bodyList_;
 
-      ForceRegister*    forceRegister_;
-
-      TorqueRegister*   torqueRegister_;
+      DynamicsRegister*   dynamicsRegister_;
   };
 
 
