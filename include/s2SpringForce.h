@@ -67,22 +67,23 @@ namespace Spring2D
 
       // Constructor
       SpringForce (
-          const Real LENGTH,
+          const Real REST_LENGTH,
           const Real STIFFNESS = 1,
-          const Real DAMP = 1,
+          const Real DAMP = 0,
           const bool BUNGEE = false)
-        : length_(LENGTH), stiffness_(STIFFNESS), damp_(DAMP), bungee_(BUNGEE)
+        : restLength_(REST_LENGTH), stiffness_(STIFFNESS), damp_(DAMP),
+          bungee_(BUNGEE)
       {
-        assert(LENGTH >= 0);
+        assert(REST_LENGTH >= 0);
         assert(STIFFNESS >= 0);
-        assert(DAMP >= 0);
+        assert(0 <= DAMP && DAMP <= 1);
       }
 
 
-      // Return the length of the spring
-      Real getLength ()
+      // Return the rest length of the spring
+      Real getRestLength ()
       {
-        return length_;
+        return restLength_;
       }
 
       // Check if it is a bungee
@@ -147,25 +148,49 @@ namespace Spring2D
                      (*springListI)->body[0]->getPosition();
 
           // Skip the bungee compression phase
-          if (bungee_ && distance.getMagnitude() <= length_)
+          if (bungee_ && distance.getMagnitude() <= restLength_)
           {
             continue;
           }
 
           // Calculate the spring force
-          force = stiffness_ * (distance.getMagnitude() - length_) *
+          force = stiffness_ * (distance.getMagnitude() - restLength_) *
             distance.getNormalizedCopy();
 
-          // Apply it
+
+
+          // Apply it to the first body
           if ((*springListI)->body[0]->isStatic() == false)
           {
-            (*springListI)->body[0]->addForceAtPoint(force,
-                (*springListI)->point[0]);
+            // Damp decreases force (accelerating)
+            if (dot((*springListI)->body[0]->getVelocity(), force) >= 0)
+            {
+              (*springListI)->body[0]->addForceAtPoint(force * (1 - damp_),
+                  (*springListI)->point[0]);
+            }
+            // Damp increases force (decelerating)
+            else
+            {
+              (*springListI)->body[0]->addForceAtPoint(force * (1 + damp_),
+                  (*springListI)->point[0]);
+            }
           }
+
+          // Apply it to the second body
           if ((*springListI)->body[1]->isStatic() == false)
           {
-            (*springListI)->body[1]->addForceAtPoint(-force,
-                (*springListI)->point[1]);
+            // Damp decreases force (accelerating)
+            if (dot((*springListI)->body[1]->getVelocity(), -force) >= 0)
+            {
+              (*springListI)->body[1]->addForceAtPoint(-force * (1 - damp_),
+                  (*springListI)->point[1]);
+            }
+            // Damp increases force (decelerating)
+            else
+            {
+              (*springListI)->body[1]->addForceAtPoint(-force * (1 + damp_),
+                  (*springListI)->point[1]);
+            }
           }
 
         }
@@ -182,7 +207,7 @@ namespace Spring2D
 
     private:
 
-      Real length_;
+      Real restLength_;
 
       Real stiffness_;
 
