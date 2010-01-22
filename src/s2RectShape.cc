@@ -106,8 +106,7 @@ namespace Spring2D
     }
 
 
-    body_->transformWorld(&points[index]);
-    return points[index];
+    return body_->transformWorld(points[index]);
   }
 
 

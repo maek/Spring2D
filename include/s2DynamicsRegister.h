@@ -45,17 +45,6 @@ namespace Spring2D
       // Register the given force/torque
       bool registerDynamic (DynamicEntry* DYNAMIC)
       {
-        for (DynamicsList::iterator dynamicsListI = dynamicsList_.begin();
-            dynamicsListI != dynamicsList_.end(); ++dynamicsListI)
-        {
-          // If the force/torque is already in the register
-          if ((*dynamicsListI) == DYNAMIC)
-          {
-            return false;
-          }
-        }
-
-        // If the force/torque is a new one
         dynamicsList_.push_back(DYNAMIC);
         return true;
       }
@@ -67,7 +56,7 @@ namespace Spring2D
         for (DynamicsList::iterator dynamicsListI = dynamicsList_.begin();
             dynamicsListI != dynamicsList_.end(); ++dynamicsListI)
         {
-          // If the force/dynamics is in the register
+          // If the dynamic is in the register
           if ((*dynamicsListI) == DYNAMIC)
           {
             dynamicsList_.erase(dynamicsListI);
@@ -75,7 +64,7 @@ namespace Spring2D
           }
         }
 
-        // If the force/dynamics is not in the register
+        // If the dynamic is not in the register
         return false;
       }
 

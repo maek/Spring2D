@@ -5,6 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2DynamicsRegister.h"
+#include "s2ConstraintsRegister.h"
 #include "s2SpringForce.h"
 
 
@@ -17,16 +18,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      Environment (const Real TIME_STEP) : timeStep_(TIME_STEP)
-      {
-        dynamicsRegister_  = new DynamicsRegister ();
-      }
-
-      // Destructor
-      ~Environment ()
-      {
-        delete dynamicsRegister_;
-      }
+      Environment (const Real TIME_STEP) : timeStep_(TIME_STEP) { }
 
 
       Body* createBody (
@@ -47,23 +39,29 @@ namespace Spring2D
         return bodyList_;
       }
 
+      // Return a pointer to the constraint list
+      ConstraintsList* getConstraints ()
+      {
+        return constraintsRegister_.getConstraints();
+      }
+
 
       // Register the given dynamic
-      bool registerDynamic (DynamicEntry* DYNAMIC) const
+      bool registerDynamic (DynamicEntry* DYNAMIC)
       {
-        return dynamicsRegister_->registerDynamic(DYNAMIC);
+        return dynamicsRegister_.registerDynamic(DYNAMIC);
       }
 
       // Unregister the given dynamic
-      bool unregisterDynamic (DynamicEntry* DYNAMIC) const
+      bool unregisterDynamic (DynamicEntry* DYNAMIC)
       {
-        return dynamicsRegister_->unregisterDynamic(DYNAMIC);
+        return dynamicsRegister_.unregisterDynamic(DYNAMIC);
       }
 
       // Compute the net dynamics
       void handleDynamics () const
       {
-        dynamicsRegister_->calculateNetDynamics();
+        dynamicsRegister_.calculateNetDynamics();
       }
 
 
@@ -76,37 +74,58 @@ namespace Spring2D
           const Real REST_LENGTH,
           const Real STIFFNESS = 1,
           const Real DAMP = 0,
-          const bool BUNGEE = false) const
+          const bool BUNGEE = false)
       {
         SpringForce* springForce = new SpringForce(
             BODY1, POINT1, BODY2, POINT2, REST_LENGTH, STIFFNESS, DAMP, BUNGEE);
-        dynamicsRegister_->registerDynamic(
+        dynamicsRegister_.registerDynamic(
             static_cast<DynamicEntry*>(springForce));
         return springForce;
       }
 
       // Destroy the given spring
-      bool destroySpring (SpringForce* SPRING_FORCE) const
+      bool destroySpring (SpringForce* SPRING_FORCE)
       {
-        return dynamicsRegister_->unregisterDynamic(
+        return dynamicsRegister_.unregisterDynamic(
             static_cast<DynamicEntry*>(SPRING_FORCE));
       }
 
+
+      // Create a constraint
+      Constraint* createConstraint (
+          Body* BODY1,
+          const Vector2& POINT1,
+          Body* BODY2,
+          const Vector2& POINT2,
+          const Real LENGTH,
+          const bool CABLE = false)
+      {
+        Constraint* constraint = new Constraint(
+            BODY1, POINT1, BODY2, POINT2, LENGTH, CABLE);
+        constraintsRegister_.registerConstraint(constraint);
+        return constraint;
+      }
+
+      // Destroy the given constraint
+      bool destroyConstraint (Constraint* CONSTRAINT)
+      {
+        return constraintsRegister_.unregisterConstraint(CONSTRAINT);
+      }
 
 
       void integrateBodies ();
 
 
-
-
     private:
 
-      Real                timeStep_;
+      Real                  timeStep_;
 
 
-      BodyList            bodyList_;
+      BodyList              bodyList_;
 
-      DynamicsRegister*   dynamicsRegister_;
+      DynamicsRegister      dynamicsRegister_;
+
+      ConstraintsRegister   constraintsRegister_;
   };
 
 

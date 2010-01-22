@@ -14,10 +14,16 @@ namespace Spring2D
     environment_->integrateBodies();
 
 
-    // Find collision
+    // Find violated constraints
+    collisionDetector_.checkConstraints(environment_->getConstraints());
+
+    // Solve violated constraints
+    collisionSolver_.solveConstraints(collisionDetector_.getConstraintsContacts());
+
+    // Find collisions
     collisionDetector_.findCollisions(environment_->getBodyList());
 
-    // Solve collision
+    // Solve collisions
     collisionSolver_.solveCollisions(collisionDetector_.getContacts());
 
 

@@ -45,6 +45,46 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
+  // Solve violated constraints
+  void CollisionSolver::solveConstraints (ContactList* contacts)
+  {
+    // Early out
+    if (contacts->empty())
+    {
+      return;
+    }
+
+    // Preprocess contacts
+    preprocessConstraintsContacts(contacts);
+
+
+    // Sort in penetration depth decreasing order
+    contacts->sort(interpenetrationCompare);
+
+    // Solve interpenetration
+    // TODO: update & sort again
+    //       extract from the main list, sort in a new list & merge
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
+    {
+      solveInterpenetration(*contactI);
+    }
+
+    // Sort in closing velocity decreasing order
+    contacts->sort(velocityCompare);
+
+    // Solve velocities
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
+    {
+      solveVelocity(*contactI);
+    }
+
+  }
+
+
+
+  // ---------------------------------------------------------------------------
   // Preprocess the Contact list
   void CollisionSolver::preprocessContacts ( ContactList* contacts)
   {
@@ -63,6 +103,17 @@ namespace Spring2D
 
       // Calculate the tangent
       (*contactI)->tangent = (*contactI)->normal.getPerpendicularCopy();
+
+
+      // Calculate the restitution coefficient
+      (*contactI)->restitution =
+        ((*contactI)->body[0]->getElasticity() +
+         (*contactI)->body[1]->getElasticity()) * 0.5;
+
+      // Calculate the friction coefficient
+      (*contactI)->friction =
+        ((*contactI)->body[0]->getFriction() +
+         (*contactI)->body[1]->getFriction()) * 0.5;
 
 
       // Calculate the relative points
@@ -91,6 +142,89 @@ namespace Spring2D
 
       // Calculate the sliding velocity
       (*contactI)->slidingVelocity = dot(velocity, (*contactI)->tangent);
+
+
+      // Calculate the linear inertia
+      (*contactI)->linearInertia[0] = (*contactI)->body[0]->getInverseMass();
+      if ((*contactI)->body[1]->isStatic() == false)
+      {
+        (*contactI)->linearInertia[1] = (*contactI)->body[1]->getInverseMass();
+      }
+
+      // Calculate the angular inertia
+      Real tcross = cross(
+          (*contactI)->relativeContactPoint[0],
+          (*contactI)->normal);
+      (*contactI)->angularInertia[0] = tcross * tcross *
+        (*contactI)->body[0]->getInverseMomentOfInertia();
+      if ((*contactI)->body[1]->isStatic() == false)
+      {
+        tcross = cross(
+            (*contactI)->relativeContactPoint[1],
+            (*contactI)->normal);
+        (*contactI)->angularInertia[1] = tcross * tcross *
+          (*contactI)->body[1]->getInverseMomentOfInertia();
+      }
+    }
+
+  }
+
+
+
+  // ---------------------------------------------------------------------------
+  // Preprocess the constraints contacts list
+  void CollisionSolver::preprocessConstraintsContacts (ContactList* contacts)
+  {
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
+    {
+      // Swap if needed
+      if ((*contactI)->body[0]->isStatic())
+      {
+        (*contactI)->swap();
+      }
+
+      // Calculate the normal
+      (*contactI)->normal = ((*contactI)->point[1] - (*contactI)->point[0]);
+      (*contactI)->normal.normalize();
+
+      // Calculate the tangent
+      (*contactI)->tangent = (*contactI)->normal.getPerpendicularCopy();
+
+
+      // Calculate the restitution coefficient
+      (*contactI)->restitution = 0;
+
+      // Calculate the friction coefficient
+      (*contactI)->friction = 0;
+
+
+      // Calculate the relative points
+      (*contactI)->relativeContactPoint[0] = (*contactI)->point[0] -
+        (*contactI)->body[0]->getPosition();
+      if ((*contactI)->body[1]->isStatic() == false)
+      {
+        (*contactI)->relativeContactPoint[1] = (*contactI)->point[1] -
+          (*contactI)->body[1]->getPosition();
+      }
+
+      Vector2 velocity =
+        (*contactI)->body[0]->getVelocity() +
+        (*contactI)->body[0]->getRotation() *
+        (*contactI)->relativeContactPoint[0].getPerpendicularCopy();
+      if ((*contactI)->body[1]->isStatic() == false)
+      {
+        velocity -=
+          (*contactI)->body[1]->getVelocity() +
+          (*contactI)->body[1]->getRotation() *
+          (*contactI)->relativeContactPoint[1].getPerpendicularCopy();
+      }
+
+      // Calculate the closing velocity
+      (*contactI)->closingVelocity = dot(velocity, (*contactI)->normal);
+
+      // Calculate the sliding velocity
+      (*contactI)->slidingVelocity = 0;
 
 
       // Calculate the linear inertia
@@ -223,13 +357,6 @@ namespace Spring2D
   // Solve velocities
   void CollisionSolver::solveVelocity (Contact* contact)
   {
-    // Restitution
-    // b = before, a = after
-    // e = -(v1a - v2a) / (v1b - v2b)
-    contact->restitution = 0.2;
-    contact->friction = 0.5;
-    Vector2 n = contact->normal;
-
     Vector2 Rap = contact->relativeContactPoint[0];
     Vector2 Rbp;
 

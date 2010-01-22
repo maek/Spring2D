@@ -247,11 +247,19 @@ namespace Spring2D
       {
         *point = getOrientationMatrix().getInverse() * ((*point) - position_);
       }
+      Vector2 transformLocal (Vector2 point) const
+      {
+        return getOrientationMatrix().getInverse() * (point - position_);
+      }
 
       // Transform the point from body to world coordinates
       void transformWorld (Vector2* point)
       {
         *point = getOrientationMatrix() * (*point) + position_;
+      }
+      Vector2 transformWorld (Vector2 point)
+      {
+        return getOrientationMatrix() * point + position_;
       }
 
 

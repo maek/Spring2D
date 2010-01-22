@@ -82,8 +82,8 @@ namespace Spring2D
   Vector2 PolygonShape::getSupportPoint (const Vector2& DIRECTION) const
   {
     // Transform the direction in the local coordinates
-    Vector2 direction = body_->getOrientationMatrix().getInverse() *
-      DIRECTION;
+    Vector2 direction =
+      body_->getOrientationMatrix().getInverse() * DIRECTION;
 
     Vector2 pointCW   = vertices_[0];
     Vector2 pointCCW  = vertices_[0];
@@ -127,14 +127,12 @@ namespace Spring2D
     if (dot(pointCCW, direction) > projection)
     {
       // Transform the point in the world coordinates
-      body_->transformWorld(&pointCCW);
-      return pointCCW;
+      return body_->transformWorld(pointCCW);
     }
     else
     {
       // Transform the point in the world coordinates
-      body_->transformWorld(&pointCW);
-      return pointCW;
+      return body_->transformWorld(pointCW);
     }
   }
 

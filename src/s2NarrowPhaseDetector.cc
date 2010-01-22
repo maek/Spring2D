@@ -129,7 +129,6 @@ namespace Spring2D
       }
       else
       {
-        (*contactI)->nContacts = 1;
         ++contactI;
         continue;
       }
@@ -190,8 +189,7 @@ namespace Spring2D
 
     // Transform the point in the local coordinates of the rect
     // TODO: OPTIMIZATION -> using projection axis (p. 133)
-    Vector2 pointRect = centerC;
-    RECT->getBody()->transformLocal(&pointRect);
+    Vector2 pointRect = RECT->getBody()->transformLocal(centerC);
 
     // Clamp it to the not oriented rect
     if (pointRect.x < -extent.x)

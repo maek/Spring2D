@@ -72,6 +72,8 @@ namespace Spring2D
   class CollisionDetector;
   class CollisionSolver;
   class Complex;
+  class Constraint;
+  class ConstraintsRegister;
   class Contact;
   class DynamicEntry;
   class DynamicsRegister;

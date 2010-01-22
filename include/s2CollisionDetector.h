@@ -7,6 +7,7 @@
 #include "s2Body.h"
 #include "s2BroadPhaseDetector.h"
 #include "s2NarrowPhaseDetector.h"
+#include "s2ConstraintsRegister.h"
 
 
 namespace Spring2D
@@ -34,11 +35,19 @@ namespace Spring2D
 
       void findCollisions (const BodyList&);
 
+      void checkConstraints (ConstraintsList*);
+
 
       // Return a pointer to the contact list
       ContactList* getContacts ()
       {
         return &contactList_;
+      }
+
+      // Return a pointer to the constraints contacts list
+      ContactList* getConstraintsContacts ()
+      {
+        return &constraintsContactsList_;
       }
 
 
@@ -50,6 +59,8 @@ namespace Spring2D
 
 
       ContactList           contactList_;
+
+      ContactList           constraintsContactsList_;
 
   };
 

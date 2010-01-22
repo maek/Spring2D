@@ -17,10 +17,15 @@ namespace Spring2D
 
       void solveCollisions (ContactList*);
 
+      void solveConstraints (ContactList*);
+
 
     private:
 
       void preprocessContacts (ContactList*);
+
+      void preprocessConstraintsContacts (ContactList*);
+
 
       void solveInterpenetration (Contact*);
 

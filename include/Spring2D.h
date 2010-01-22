@@ -10,6 +10,7 @@
 #include "s2CircleShape.h"
 #include "s2CollisionDetector.h"
 #include "s2CollisionSolver.h"
+#include "s2ConstraintsRegister.h"
 #include "s2Contact.h"
 #include "s2DynamicsRegister.h"
 #include "s2Engine.h"

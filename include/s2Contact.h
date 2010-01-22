@@ -16,8 +16,6 @@ namespace Spring2D
 
       Body*     body[2];
 
-      int       nContacts;
-
 
       Vector2   point[2];
 
@@ -45,7 +43,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      Contact (Body* BODY1, Body* BODY2) : nContacts(0)
+      Contact (Body* BODY1, Body* BODY2)
       {
         body[0] = BODY1;
         body[1] = BODY2;
