@@ -15,12 +15,12 @@ namespace Spring2D
   {
     public:
 
-      void solveCollisions (ContactList*, ContactList*);
+      void solveCollisions (ContactList*);
 
 
     private:
 
-      void preprocessContacts (ContactList*, ContactList*);
+      void preprocessContacts (ContactList*);
 
       void solveInterpenetration (Contact*);
 

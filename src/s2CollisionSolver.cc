@@ -5,39 +5,37 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // Solve collisions
-  void CollisionSolver::solveCollisions (
-      ContactList* frontContacts,
-      ContactList* backContacts)
+  void CollisionSolver::solveCollisions (ContactList* contacts)
   {
     // Early out
-    if (frontContacts->empty())
+    if (contacts->empty())
     {
       return;
     }
 
     // Preprocess contacts
-    preprocessContacts(frontContacts, backContacts);
+    preprocessContacts(contacts);
 
 
     // Sort in penetration depth decreasing order
-    frontContacts->sort(interpenetrationCompare);
+    contacts->sort(interpenetrationCompare);
 
     // Solve interpenetration
     // TODO: update & sort again
     //       extract from the main list, sort in a new list & merge
-    for (ContactList::iterator contactI = frontContacts->begin();
-        contactI != frontContacts->end(); ++contactI)
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
     {
       solveInterpenetration(*contactI);
     }
 
 
     // Sort in closing velocity decreasing order
-    frontContacts->sort(velocityCompare);
+    contacts->sort(velocityCompare);
 
     // Solve velocities
-    for (ContactList::iterator contactI = frontContacts->begin();
-        contactI != frontContacts->end(); ++contactI)
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
     {
       solveVelocity(*contactI);
     }
@@ -48,12 +46,10 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // Preprocess the Contact list
-  void CollisionSolver::preprocessContacts (
-      ContactList* frontContacts,
-      ContactList* backContacts)
+  void CollisionSolver::preprocessContacts ( ContactList* contacts)
   {
-    for (ContactList::iterator contactI = frontContacts->begin();
-        contactI != frontContacts->end(); ++contactI)
+    for (ContactList::iterator contactI = contacts->begin();
+        contactI != contacts->end(); ++contactI)
     {
       // Swap if needed
       if ((*contactI)->body[0]->isStatic())

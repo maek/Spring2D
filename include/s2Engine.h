@@ -47,7 +47,7 @@ namespace Spring2D
       // TODO: TESTING
       ContactList* getContacts ()
       {
-        return collisionDetector_.getFrontContacts();
+        return collisionDetector_.getContacts();
       }
 
 
