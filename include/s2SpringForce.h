@@ -9,57 +9,6 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // The endpoints data
-  class SpringEnds
-  {
-    public:
-
-      Body*     body[2];
-
-      Vector2   point[2];
-
-
-    public:
-
-      // Constructor
-      SpringEnds (
-          Body* BODY1,
-          Body* BODY2,
-          const Vector2& POINT1,
-          const Vector2& POINT2)
-      {
-        body[0]   = BODY1;
-        body[1]   = BODY2;
-        point[0]  = POINT1;
-        point[1]  = POINT2;
-      }
-
-
-      // Check if this is the given spring
-      bool hasBodies (Body* BODY1, Body* BODY2)
-      {
-        if ((BODY1 == body[0] && BODY2 == body[1]) ||
-            (BODY1 == body[1] && BODY2 == body[0]))
-        {
-          return true;
-        }
-
-        return false;
-      }
-
-  };
-
-
-
-  // ---------------------------------------------------------------------------
-  // The spring couple of body list
-  typedef std::list<SpringEnds*> SpringList;
-
-
-
-
-
-  // ---------------------------------------------------------------------------
   // The spring force
   class SpringForce : public DynamicEntry
   {
@@ -67,16 +16,25 @@ namespace Spring2D
 
       // Constructor
       SpringForce (
+          Body* BODY1,
+          const Vector2& POINT1,
+          Body* BODY2,
+          const Vector2& POINT2,
           const Real REST_LENGTH,
-          const Real STIFFNESS = 1,
-          const Real DAMP = 0,
-          const bool BUNGEE = false)
+          const Real STIFFNESS,
+          const Real DAMP,
+          const bool BUNGEE)
         : restLength_(REST_LENGTH), stiffness_(STIFFNESS), damp_(DAMP),
           bungee_(BUNGEE)
       {
         assert(REST_LENGTH >= 0);
         assert(STIFFNESS >= 0);
         assert(0 <= DAMP && DAMP <= 1);
+
+        body_[0]  = BODY1;
+        body_[1]  = BODY2;
+        point_[0] = POINT1;
+        point_[1] = POINT2;
       }
 
 
@@ -93,131 +51,82 @@ namespace Spring2D
       }
 
 
-      // Add the given body (with points)
-      bool addEndBodies (
-          Body* BODY1,
-          Body* BODY2,
-          const Vector2& POINT1 = Vector2::ZERO,
-          const Vector2& POINT2 = Vector2::ZERO)
-      {
-        for (SpringList::iterator springListI = springList_.begin();
-            springListI != springList_.end(); ++springListI)
-        {
-          // If the couple is already in the spring list
-          if ((*springListI)->hasBodies(BODY1, BODY2))
-          {
-            return false;
-          }
-        }
-
-        // If the couple is a new one
-        springList_.push_back(new SpringEnds(BODY1, BODY2, POINT1, POINT2));
-        return true;
-      }
-
-
-      // Remove the given body
-      bool removeEndBodies (Body* BODY1, Body* BODY2)
-      {
-        for (SpringList::iterator springListI = springList_.begin();
-            springListI != springList_.end(); ++springListI)
-        {
-          // If the couple is in the spring list
-          if ((*springListI)->hasBodies(BODY1, BODY2))
-          {
-            springList_.erase(springListI);
-            return true;
-          }
-        }
-
-        // If the couple is not in the spring list
-        return false;
-      }
-
-
       // Apply the force
       void apply () const
       {
-        Vector2 force;
-        Vector2 distance;
+        Vector2 distance = body_[1]->getPosition() - body_[0]->getPosition();
 
-        for (SpringList::const_iterator springListI = springList_.begin();
-            springListI != springList_.end(); ++springListI)
+        // Skip the bungee compression phase
+        if (bungee_ && distance.getMagnitude() <= restLength_)
         {
-          distance = (*springListI)->body[1]->getPosition() -
-                     (*springListI)->body[0]->getPosition();
+          return;
+        }
 
-          // Skip the bungee compression phase
-          if (bungee_ && distance.getMagnitude() <= restLength_)
+        // Calculate the spring force
+        Vector2 force = stiffness_ * (distance.getMagnitude() - restLength_) *
+          distance.getNormalizedCopy();
+
+
+        // Apply it to the first body
+        if (body_[0]->isStatic() == false)
+        {
+          // Damp decreases force (accelerating)
+          if (dot(body_[0]->getVelocity(), force) >= 0)
           {
-            continue;
+            body_[0]->addForceAtPoint(force * (1 - damp_), point_[0]);
           }
-
-          // Calculate the spring force
-          force = stiffness_ * (distance.getMagnitude() - restLength_) *
-            distance.getNormalizedCopy();
-
-
-
-          // Apply it to the first body
-          if ((*springListI)->body[0]->isStatic() == false)
+          // Damp increases force (decelerating)
+          else
           {
-            // Damp decreases force (accelerating)
-            if (dot((*springListI)->body[0]->getVelocity(), force) >= 0)
-            {
-              (*springListI)->body[0]->addForceAtPoint(force * (1 - damp_),
-                  (*springListI)->point[0]);
-            }
-            // Damp increases force (decelerating)
-            else
-            {
-              (*springListI)->body[0]->addForceAtPoint(force * (1 + damp_),
-                  (*springListI)->point[0]);
-            }
+            body_[0]->addForceAtPoint(force * (1 + damp_), point_[0]);
           }
+        }
 
-          // Apply it to the second body
-          if ((*springListI)->body[1]->isStatic() == false)
+        // Apply it to the second body
+        if (body_[1]->isStatic() == false)
+        {
+          // Damp decreases force (accelerating)
+          if (dot(body_[1]->getVelocity(), -force) >= 0)
           {
-            // Damp decreases force (accelerating)
-            if (dot((*springListI)->body[1]->getVelocity(), -force) >= 0)
-            {
-              (*springListI)->body[1]->addForceAtPoint(-force * (1 - damp_),
-                  (*springListI)->point[1]);
-            }
-            // Damp increases force (decelerating)
-            else
-            {
-              (*springListI)->body[1]->addForceAtPoint(-force * (1 + damp_),
-                  (*springListI)->point[1]);
-            }
+            body_[1]->addForceAtPoint(-force * (1 - damp_), point_[1]);
           }
-
+          // Damp increases force (decelerating)
+          else
+          {
+            body_[1]->addForceAtPoint(-force * (1 + damp_), point_[1]);
+          }
         }
 
       }
 
 
       // TODO: remove or make const
-      SpringList* getSpringList ()
+      const Body** getBody () const
       {
-        return &springList_;
+        return const_cast<const Body**>(body_);
+      }
+      // TODO: remove or make const
+      const Vector2* getPoint () const
+      {
+        return point_;
       }
 
 
     private:
 
-      Real restLength_;
+      Body*     body_[2];
 
-      Real stiffness_;
-
-      Real damp_;
+      Vector2   point_[2];
 
 
-      bool bungee_;
+      Real      restLength_;
+
+      Real      stiffness_;
+
+      Real      damp_;
 
 
-      SpringList springList_;
+      bool      bungee_;
 
   };
 

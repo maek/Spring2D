@@ -5,6 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2DynamicsRegister.h"
+#include "s2SpringForce.h"
 
 
 namespace Spring2D
@@ -64,6 +65,33 @@ namespace Spring2D
       {
         dynamicsRegister_->calculateNetDynamics();
       }
+
+
+      // Create a spring
+      SpringForce* createSpring (
+          Body* BODY1,
+          const Vector2& POINT1,
+          Body* BODY2,
+          const Vector2& POINT2,
+          const Real REST_LENGTH,
+          const Real STIFFNESS = 1,
+          const Real DAMP = 0,
+          const bool BUNGEE = false) const
+      {
+        SpringForce* springForce = new SpringForce(
+            BODY1, POINT1, BODY2, POINT2, REST_LENGTH, STIFFNESS, DAMP, BUNGEE);
+        dynamicsRegister_->registerDynamic(
+            static_cast<DynamicEntry*>(springForce));
+        return springForce;
+      }
+
+      // Destroy the given spring
+      bool destroySpring (SpringForce* SPRING_FORCE) const
+      {
+        return dynamicsRegister_->unregisterDynamic(
+            static_cast<DynamicEntry*>(SPRING_FORCE));
+      }
+
 
 
       void integrateBodies ();
