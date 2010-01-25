@@ -18,7 +18,7 @@ namespace Spring2D
     public:
 
       // Constructor
-      Environment (const Real TIME_STEP) : timeStep_(TIME_STEP) { }
+      Environment (const Real TIMESTEP) : timestep_(TIMESTEP) { }
 
 
       Body* createBody (
@@ -118,7 +118,7 @@ namespace Spring2D
 
     private:
 
-      Real                  timeStep_;
+      Real                  timestep_;
 
 
       BodyList              bodyList_;

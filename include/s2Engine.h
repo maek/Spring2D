@@ -16,9 +16,9 @@ namespace Spring2D
     public:
 
       // Constructor
-      Engine (const Real TIME_STEP) : timeStep_(TIME_STEP), stepCounter_(0)
+      Engine (const Real TIMESTEP) : timestep_(TIMESTEP), stepCounter_(0)
       {
-        environment_    = new Environment(TIME_STEP);
+        environment_    = new Environment(TIMESTEP);
       }
 
       // Destructor
@@ -37,7 +37,7 @@ namespace Spring2D
       // Return the current physical time
       Real getCurrentTime ()
       {
-        return stepCounter_ * timeStep_;
+        return stepCounter_ * timestep_;
       }
 
 
@@ -53,7 +53,7 @@ namespace Spring2D
 
     private:
 
-      Real                timeStep_;
+      Real                timestep_;
 
       int                 stepCounter_;
 

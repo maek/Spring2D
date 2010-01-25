@@ -28,6 +28,7 @@ namespace Spring2D
   const double EPSILON_REL_2  = 0.000001;
 
   #define s2sqrt(x)             sqrt(x)
+  #define s2pow(x, y)           pow(x, y)
   #define s2hypot(x, y)         hypot(x, y)
   #define s2sin(x)              sin(x)
   #define s2cos(x)              cos(x)
@@ -46,6 +47,7 @@ namespace Spring2D
   const float EPSILON_REL_2   = 0.0001f;
 
   #define s2sqrt(x)             sqrtf(x)
+  #define s2pow(x, y)           powf(x, y)
   #define s2hypot(x, y)         hypotf(x, y)
   #define s2sin(x)              sinf(x)
   #define s2cos(x)              cosf(x)

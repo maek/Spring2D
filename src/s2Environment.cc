@@ -21,6 +21,7 @@ namespace Spring2D
     }
 
     Body *body = new Body(
+        timestep_,
         SHAPE,
         STATIC,
         POSITION,
@@ -52,7 +53,7 @@ namespace Spring2D
         ++bodyI)
     {
       // Integrate
-      (*bodyI)->integrate(timeStep_);
+      (*bodyI)->integrate();
     }
   }
 

@@ -16,6 +16,7 @@ namespace Spring2D
 
       // Constructor
       Body (
+          const Real TIMESTEP,
           Shape* SHAPE,
           const bool STATIC = false,
           const Vector2& POSITION = Vector2::ZERO,
@@ -23,10 +24,10 @@ namespace Spring2D
           const Vector2& ACCELERATION = Vector2::ZERO,
           const Complex& ORIENTATION = Complex::ZERO,
           const Real ROTATION = 0)
-        : static_(STATIC),
+        : timestep_(TIMESTEP), static_(STATIC),
         position_(POSITION), velocity_(VELOCITY), acceleration_(ACCELERATION),
         orientation_(ORIENTATION), rotation_(ROTATION),
-        drag_(0), elasticity_(1), friction_(0)
+        iDrag_(1), elasticity_(1), friction_(0)
       {
         shape_ = SHAPE;
         shape_->body_ = this;
@@ -188,19 +189,19 @@ namespace Spring2D
       // Set the body drag
       bool setDrag (const Real DRAG)
       {
-        if (DRAG < 0)
+        if (DRAG < 0 || 1 < DRAG)
         {
           return false;
         }
 
-        drag_ = DRAG;
+        iDrag_ = 1 - DRAG;
         return true;
       }
 
       // Get the body drag
       Real getDrag () const
       {
-        return drag_;
+        return (1 - iDrag_);
       }
 
 
@@ -289,10 +290,13 @@ namespace Spring2D
       }
 
 
-      void integrate (const Real);
+      void integrate ();
 
 
     private:
+
+      Real        timestep_;
+
 
       Shape*      shape_;
 
@@ -314,7 +318,7 @@ namespace Spring2D
       Real        rotation_;
 
 
-      Real        drag_;
+      Real        iDrag_;
 
       Real        elasticity_;
 

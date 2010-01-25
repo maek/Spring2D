@@ -6,27 +6,28 @@ namespace Spring2D
   // ---------------------------------------------------------------------------
   // Compute the new position & update velocity
   // (EULER)
-  void Body::integrate (const Real TIME_STEP)
+  void Body::integrate ()
   {
     if (static_)
       return;
 
     // Calculate the velocity from acceleration
     velocityFromAcceleration_ =
-      (acceleration_ + netForce_ * shape_->iMass_) * TIME_STEP;
-
-    // Update the velocity
-    velocity_ += velocityFromAcceleration_;
+      (acceleration_ + netForce_ * shape_->iMass_) * timestep_;
 
     // Update the position
-    position_ += (velocity_ * TIME_STEP);
+    position_ += (velocity_ * timestep_);
 
+    // Update the velocity
+    velocity_ = iDrag_ * velocity_ + velocityFromAcceleration_;
 
-    // Update the rotation
-    rotation_ += netTorque_ * shape_->iMomentOfInertia_ * TIME_STEP;
 
     // Update the orientation
-    orientation_.rotate(rotation_ * TIME_STEP);
+    orientation_.rotate(rotation_ * timestep_);
+
+    // Update the rotation
+    rotation_ = iDrag_ * rotation_ +
+      netTorque_ * shape_->iMomentOfInertia_ * timestep_;
 
 
     // Update the AABB

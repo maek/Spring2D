@@ -488,8 +488,6 @@ namespace Spring2D
       edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
 
-    std::cerr << contact->penetrationDepth << "\n";
-
     // Skip collision if EPA fails
     if (error)
     {
