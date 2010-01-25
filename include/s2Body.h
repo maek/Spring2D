@@ -31,7 +31,7 @@ namespace Spring2D
       {
         shape_ = SHAPE;
         shape_->body_ = this;
-        shape_->buildAABB(&position_);
+        shape_->updateAABB();
       }
 
       // Destructor

@@ -41,8 +41,6 @@ namespace Spring2D
         return &aabb_;
       }
 
-      virtual void buildAABB (Vector2*) = 0;
-
       virtual void updateAABB () = 0;
 
 

@@ -4,64 +4,31 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Build the associated AABB
-  // TODO: check for correctness
-  void RectShape::buildAABB (Vector2* CENTER)
-  {
-    aabb_.center_ = CENTER;
-    updateAABB();
-  }
-
-
-
-  // ---------------------------------------------------------------------------
   // Update the associated AABB
   void RectShape::updateAABB ()
   {
-    // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
-    //                       (only if rotating)
-    // TODO: check if directionX & directionY are normalized
-    Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
-    Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
-    Vector2 point = -extent_;
-    aabb_.halfSize_.x = s2fabs(dot(point, directionX));
-    aabb_.halfSize_.y = s2fabs(dot(point, directionY));
+    Vector2 point0 = body_->transformWorld(-extent_);
+    Vector2 point1 = body_->transformWorld(Vector2( extent_.x, -extent_.y));
+    Vector2 point2 = body_->transformWorld(extent_);
+    Vector2 point3 = body_->transformWorld(Vector2(-extent_.x,  extent_.y));
 
-    point.x = -point.x;
-    Real tx = s2fabs(dot(point, directionX));
-    Real ty = s2fabs(dot(point, directionY));
-    if (tx > aabb_.halfSize_.x)
-    {
-      aabb_.halfSize_.x = tx;
-    }
-    if (ty > aabb_.halfSize_.y)
-    {
-      aabb_.halfSize_.y = ty;
-    }
+    aabb_.min = point0;
+    aabb_.max = point0;
 
-    point.y = -point.y;
-    tx = s2fabs(dot(point, directionX));
-    ty = s2fabs(dot(point, directionY));
-    if (tx > aabb_.halfSize_.x)
-    {
-      aabb_.halfSize_.x = tx;
-    }
-    if (ty > aabb_.halfSize_.y)
-    {
-      aabb_.halfSize_.y = ty;
-    }
+    if (point1.x < aabb_.min.x) aabb_.min.x = point1.x;
+    if (point1.x > aabb_.max.x) aabb_.max.x = point1.x;
+    if (point1.y < aabb_.min.y) aabb_.min.y = point1.y;
+    if (point1.y > aabb_.max.y) aabb_.max.y = point1.y;
 
-    point.x = -point.x;
-    tx = s2fabs(dot(point, directionX));
-    ty = s2fabs(dot(point, directionY));
-    if (tx > aabb_.halfSize_.x)
-    {
-      aabb_.halfSize_.x = tx;
-    }
-    if (ty > aabb_.halfSize_.y)
-    {
-      aabb_.halfSize_.y = ty;
-    }
+    if (point2.x < aabb_.min.x) aabb_.min.x = point2.x;
+    if (point2.x > aabb_.max.x) aabb_.max.x = point2.x;
+    if (point2.y < aabb_.min.y) aabb_.min.y = point2.y;
+    if (point2.y > aabb_.max.y) aabb_.max.y = point2.y;
+
+    if (point3.x < aabb_.min.x) aabb_.min.x = point3.x;
+    if (point3.x > aabb_.max.x) aabb_.max.x = point3.x;
+    if (point3.y < aabb_.min.y) aabb_.min.y = point3.y;
+    if (point3.y > aabb_.max.y) aabb_.max.y = point3.y;
 
   }
 

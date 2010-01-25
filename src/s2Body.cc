@@ -31,6 +31,7 @@ namespace Spring2D
 
 
     // Update the AABB
+    // TODO: here ???
     shape_->updateAABB();
 
     // Normalize the orientation

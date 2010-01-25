@@ -5,17 +5,14 @@ namespace Spring2D
 {
   // ---------------------------------------------------------------------------
   // Check two AABBs for collision
-  // TODO: OPTIMIZATION -> int instead of Real (faster & lighter)
-  bool checkAABB (AABB* aabb1, AABB* aabb2)
+  bool testAABBAABB (AABB* aabb1, AABB* aabb2)
   {
     // Test X before Y because it can be more discriminatory
-    if (s2fabs(aabb1->center_->x - aabb2->center_->x) >
-        (aabb1->halfSize_.x + aabb2->halfSize_.x))
+    if (aabb1->max.x < aabb2->min.x || aabb1->min.x > aabb2->max.x)
     {
       return false;
     }
-    if (s2fabs(aabb1->center_->y - aabb2->center_->y) >
-        (aabb1->halfSize_.y + aabb2->halfSize_.y))
+    if (aabb1->max.y < aabb2->min.y || aabb1->min.y > aabb2->max.y)
     {
       return false;
     }

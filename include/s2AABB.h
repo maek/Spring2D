@@ -13,14 +13,14 @@ namespace Spring2D
   {
     public:
 
-      Vector2  *center_;
-      Vector2   halfSize_;
+      Vector2 min;
+      Vector2 max;
 
   };
 
 
 
-  bool checkAABB (AABB*, AABB*);
+  bool testAABBAABB (AABB*, AABB*);
 
 
 }

@@ -54,8 +54,6 @@ namespace Spring2D
       }
 
 
-      void buildAABB (Vector2*);
-
       void updateAABB ();
 
 

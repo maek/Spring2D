@@ -54,15 +54,13 @@ namespace Spring2D
       }
 
 
-      // Build the associated AABB
-      void buildAABB (Vector2* CENTER)
-      {
-        aabb_.center_   = CENTER;
-        aabb_.halfSize_ = Vector2(radius_, radius_);
-      }
-
       // Update the associated AABB
-      void updateAABB () { }
+      void updateAABB ()
+      {
+        Vector2 extent(radius_, radius_);
+        aabb_.min = body_->getPosition() - extent;
+        aabb_.max = body_->getPosition() + extent;
+      }
 
 
       // Calculate the moment of inertia

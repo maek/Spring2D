@@ -4,46 +4,48 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Build the associated AABB
-  // TODO: check for correctness
-  void PolygonShape::buildAABB (Vector2* CENTER)
-  {
-    aabb_.center_ = CENTER;
-    updateAABB();
-  }
-
-
-
-  // ---------------------------------------------------------------------------
   // Update the associated AABB
   void PolygonShape::updateAABB ()
   {
-    Real tx;
-    Real ty;
-    // TODO: OPTIMIZATION -> check if is necessary to re-build the AABB
-    //                       (only if rotating)
-    // TODO: check if directionX & directionY are normalized
-    Vector2 directionX = body_->getOrientationMatrix() * Vector2::X;
-    Vector2 directionY = body_->getOrientationMatrix() * Vector2::Y;
+    Vector2 min;
+    Vector2 max;
+    Real    projection;
 
-    aabb_.halfSize_.x = s2fabs(dot(vertices_[0], directionX));
-    aabb_.halfSize_.y = s2fabs(dot(vertices_[0], directionY));
+    Vector2 directionX =
+      body_->getOrientationMatrix().getInverse() * Vector2::X;
+    Vector2 directionY =
+      body_->getOrientationMatrix().getInverse() * Vector2::Y;
+
+    min.x = max.x = dot(vertices_[0], directionX);
+    min.y = max.y = dot(vertices_[0], directionY);
 
     for (int i = 1; i < nVertices_; ++i)
     {
-      tx = s2fabs(dot(vertices_[i], directionX));
-      ty = s2fabs(dot(vertices_[i], directionY));
+      projection = dot(vertices_[i], directionX);
 
-      if (tx > aabb_.halfSize_.x)
+      if (projection < min.x)
       {
-        aabb_.halfSize_.x = tx;
+        min.x = projection;
       }
-      if (ty > aabb_.halfSize_.y)
+      if (projection > max.x)
       {
-        aabb_.halfSize_.y = ty;
+        max.x = projection;
       }
 
+      projection = dot(vertices_[i], directionY);
+
+      if (projection < min.y)
+      {
+        min.y = projection;
+      }
+      if (projection > max.y)
+      {
+        max.y = projection;
+      }
     }
+
+    aabb_.min = body_->getPosition() + min;
+    aabb_.max = body_->getPosition() + max;
 
   }
 
