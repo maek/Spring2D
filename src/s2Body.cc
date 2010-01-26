@@ -30,10 +30,6 @@ namespace Spring2D
       netTorque_ * shape_->iMomentOfInertia_ * timestep_;
 
 
-    // Update the AABB
-    // TODO: here ???
-    shape_->updateAABB();
-
     // Normalize the orientation
     // TODO: only 1 time every second
     orientation_.normalize();

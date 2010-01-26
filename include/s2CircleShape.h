@@ -33,7 +33,7 @@ namespace Spring2D
 
         area_     = M_PI * RADIUS * RADIUS;
         density_  = DENSITY;
-        iMass_    = 1 / (area_ * density_);
+        iMass_    = 1. / (area_ * density_);
         updateInverseMomentOfInertia();
 
         valid_ = true;
@@ -67,7 +67,7 @@ namespace Spring2D
       // m * r^2 / 2
       void updateInverseMomentOfInertia ()
       {
-        iMomentOfInertia_ = 2 /
+        iMomentOfInertia_ = 2. /
           (area_ * density_ * radius_ * radius_);
       }
 

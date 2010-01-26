@@ -60,7 +60,7 @@ namespace Spring2D
         }
 
         density_  = DENSITY;
-        iMass_    = 1 / (area_ * density_);
+        iMass_    = 1. / (area_ * density_);
         updateInverseMomentOfInertia();
 
         return true;
@@ -75,7 +75,7 @@ namespace Spring2D
       // Return the mass of the shape
       Real getMass () const
       {
-        return (1 / iMass_);
+        return (1. / iMass_);
       }
 
       // Return the density of the shape
@@ -87,7 +87,7 @@ namespace Spring2D
       // Return the moment of inertia of the shape
       Real getMomentOfInertia () const
       {
-        return (1 / iMomentOfInertia_);
+        return (1. / iMomentOfInertia_);
       }
 
       // Return the moment of inertia of the shape

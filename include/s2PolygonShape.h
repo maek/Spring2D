@@ -56,7 +56,7 @@ namespace Spring2D
             VERTICES[i].x * VERTICES[i + 1].y -
             VERTICES[i + 1].x * VERTICES[i].y;
         }
-        area_ /= 2;
+        area_ /= 2.;
 
         // Counter-clockwise test
         if (area_ <= 0)
@@ -66,7 +66,7 @@ namespace Spring2D
         }
 
         density_  = DENSITY;
-        iMass_    = 1 / (area_ * density_);
+        iMass_    = 1. / (area_ * density_);
         updateInverseMomentOfInertia();
 
         valid_ = true;

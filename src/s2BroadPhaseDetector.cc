@@ -13,9 +13,9 @@ namespace Spring2D
     {
       BodyList::const_iterator otherBodyI = bodyI;
       ++otherBodyI;
+      // Insert all pairs
       for (; otherBodyI != bodyList.end(); ++otherBodyI)
       {
-        // Insert all pairs
         contactList->push_back(new Contact((*bodyI), (*otherBodyI)));
       }
     }

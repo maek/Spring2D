@@ -11,8 +11,8 @@ OBJECTS = s2Engine.o\
 					s2PolygonShape.o\
 					s2Body.o\
 					s2Environment.o\
-					s2AABB.o\
 					s2BroadPhaseDetector.o\
+					s2Grid.o\
 					s2NarrowPhaseDetector.o\
 					s2CollisionDetector.o\
 					s2CollisionSolver.o
@@ -67,14 +67,14 @@ $(OBJDIR)/s2Environment.o:							$(SRCDIR)/s2Environment.cc\
 																				$(INCDIR)/s2Body.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJDIR)/s2AABB.o:											$(SRCDIR)/s2AABB.cc\
-																				$(INCDIR)/s2AABB.h\
+$(OBJDIR)/s2BroadPhaseDetector.o:				$(SRCDIR)/s2BroadPhaseDetector.cc\
+																				$(INCDIR)/s2BroadPhaseDetector.h\
 																				$(INCDIR)/s2Settings.h\
 																				$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-$(OBJDIR)/s2BroadPhaseDetector.o:				$(SRCDIR)/s2BroadPhaseDetector.cc\
-																				$(INCDIR)/s2BroadPhaseDetector.h\
+$(OBJDIR)/s2Grid.o:											$(SRCDIR)/s2Grid.cc\
+																				$(INCDIR)/s2Grid.h\
 																				$(INCDIR)/s2Settings.h\
 																				$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

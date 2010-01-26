@@ -6,6 +6,7 @@
 #include "s2Contact.h"
 #include "s2Body.h"
 #include "s2BroadPhaseDetector.h"
+#include "s2Grid.h"
 #include "s2NarrowPhaseDetector.h"
 #include "s2ConstraintsRegister.h"
 
@@ -21,7 +22,8 @@ namespace Spring2D
       // Constructor
       CollisionDetector ()
       {
-        broadPhaseDetector_   = new BroadPhaseDetector();
+        //broadPhaseDetector_   = new BroadPhaseDetector();
+        broadPhaseDetector_   = new Grid(100, 10, 10);
         narrowPhaseDetector_  = new NarrowPhaseDetector();
       }
 
@@ -48,6 +50,12 @@ namespace Spring2D
       ContactList* getConstraintsContacts ()
       {
         return &constraintsContactsList_;
+      }
+
+      // TODO: TESTING
+      Grid* getGrid ()
+      {
+        return static_cast<Grid*>(broadPhaseDetector_);
       }
 
 

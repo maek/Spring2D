@@ -11,7 +11,7 @@ namespace Spring2D
 
   // Canonical orientations
   const Complex Complex::ZERO(1, 0);
-  const Complex Complex::PI_4(s2sqrt(2) / 2, s2sqrt(2) / 2);
+  const Complex Complex::PI_4(s2sqrt(2) / 2., s2sqrt(2) / 2.);
   const Complex Complex::PI_2(0, 1);
   const Complex Complex::PI(-1, 0);
 

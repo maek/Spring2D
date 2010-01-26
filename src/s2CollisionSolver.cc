@@ -281,7 +281,7 @@ namespace Spring2D
     }
 
 
-    Real itI  = (1 / tI);
+    Real itI  = (1. / tI);
 
     Real lMa =  p * lIa * itI;
     Real lMb;
@@ -335,7 +335,7 @@ namespace Spring2D
     Complex oa = contact->body[0]->getOrientation();
     Complex ob;
 
-    oa.rotate(s2copysign(1, cross(Rap, n)) * aMa / Rap.getMagnitude());
+    oa.rotate(s2copysign(1., cross(Rap, n)) * aMa / Rap.getMagnitude());
     contact->body[0]->setOrientation(oa);
 
 
@@ -346,7 +346,7 @@ namespace Spring2D
 
       ob = contact->body[1]->getOrientation();
 
-      ob.rotate(s2copysign(1, cross(Rbp, n)) * aMb / Rbp.getMagnitude());
+      ob.rotate(s2copysign(1., cross(Rbp, n)) * aMb / Rbp.getMagnitude());
       contact->body[1]->setOrientation(ob);
     }
   }

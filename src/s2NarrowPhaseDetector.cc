@@ -677,7 +677,7 @@ namespace Spring2D
 
       // O is inside the triangle
       Real denom = va + vb + vc;
-      denom = 1 / denom;
+      denom = 1. / denom;
 
       Real u = va * denom;
       Real v = vb * denom;

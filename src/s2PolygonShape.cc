@@ -73,8 +73,8 @@ namespace Spring2D
             );
     }
 
-    momentOfInertia *= density_ / 12;
-    iMomentOfInertia_ = 1 / momentOfInertia;
+    momentOfInertia *= density_ / 12.;
+    iMomentOfInertia_ = 1. / momentOfInertia;
   }
 
 

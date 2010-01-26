@@ -50,6 +50,12 @@ namespace Spring2D
         return collisionDetector_.getContacts();
       }
 
+      // TODO: TESTING
+      Grid* getGrid ()
+      {
+        return collisionDetector_.getGrid();
+      }
+
 
     private:
 

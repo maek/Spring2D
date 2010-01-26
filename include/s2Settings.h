@@ -35,6 +35,7 @@ namespace Spring2D
   #define s2atan2(x, y)         atan2(x, y)
   #define s2copysign(x, y)      copysign(x, y)
   #define s2fabs(x)             fabs(x)
+  #define s2floor(x)            floor(x)
 
 #else
 
@@ -54,6 +55,7 @@ namespace Spring2D
   #define s2atan2(x, y)         atan2f(x, y)
   #define s2copysign(x, y)      copysignf(x, y)
   #define s2fabs(x)             fabsf(x)
+  #define s2floor(x)            floorf(x)
 
 #endif
 
@@ -83,6 +85,7 @@ namespace Spring2D
   class Environment;
   class GenericForce;
   class GenericTorque;
+  class Grid;
   class Matrix2x2;
   class NarrowPhaseDetector;
   class PolygonShape;
@@ -90,7 +93,6 @@ namespace Spring2D
   class Shape;
   class Simplex;
   class SpringForce;
-  class UGrid;
   class Vector2;
 
 }
