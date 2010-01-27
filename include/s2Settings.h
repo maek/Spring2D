@@ -4,7 +4,8 @@
 // Include all the external headers
 #include <iostream>
 #include <list>
-#include <queue>
+#include <vector>
+#include <algorithm>
 #include <cmath>
 #include <cfloat>
 #include <cassert>
@@ -90,6 +91,7 @@ namespace Spring2D
   class NarrowPhaseDetector;
   class PolygonShape;
   class RectShape;
+  class SAP;
   class Shape;
   class Simplex;
   class SpringForce;

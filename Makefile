@@ -13,6 +13,7 @@ OBJECTS = s2Engine.o\
 					s2Environment.o\
 					s2BroadPhaseDetector.o\
 					s2Grid.o\
+					s2SAP.o\
 					s2NarrowPhaseDetector.o\
 					s2CollisionDetector.o\
 					s2CollisionSolver.o
@@ -75,6 +76,12 @@ $(OBJDIR)/s2BroadPhaseDetector.o:				$(SRCDIR)/s2BroadPhaseDetector.cc\
 
 $(OBJDIR)/s2Grid.o:											$(SRCDIR)/s2Grid.cc\
 																				$(INCDIR)/s2Grid.h\
+																				$(INCDIR)/s2Settings.h\
+																				$(INCDIR)/s2Math.h
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/s2SAP.o:											$(SRCDIR)/s2SAP.cc\
+																				$(INCDIR)/s2SAP.h\
 																				$(INCDIR)/s2Settings.h\
 																				$(INCDIR)/s2Math.h
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

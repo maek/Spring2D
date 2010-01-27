@@ -7,6 +7,7 @@
 #include "s2Body.h"
 #include "s2BroadPhaseDetector.h"
 #include "s2Grid.h"
+#include "s2SAP.h"
 #include "s2NarrowPhaseDetector.h"
 #include "s2ConstraintsRegister.h"
 
@@ -22,8 +23,9 @@ namespace Spring2D
       // Constructor
       CollisionDetector ()
       {
-        //broadPhaseDetector_   = new BroadPhaseDetector();
-        broadPhaseDetector_   = new Grid(100, 10, 10);
+        broadPhaseDetector_   = new BroadPhaseDetector();
+        //broadPhaseDetector_   = new Grid(100, 10, 10);
+        //broadPhaseDetector_   = new SAP();
         narrowPhaseDetector_  = new NarrowPhaseDetector();
       }
 

@@ -334,8 +334,26 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // The body list
+  // The body list type
   typedef std::list<Body*> BodyList;
+
+
+
+  // ---------------------------------------------------------------------------
+  // The const body list type
+  typedef std::list<const Body*> ConstBodyList;
+
+
+
+  // ---------------------------------------------------------------------------
+  // The body vector type
+  typedef std::vector<Body*> BodyVector;
+
+
+
+  // ---------------------------------------------------------------------------
+  // The const body vector type
+  typedef std::vector<const Body*> ConstBodyVector;
 
 
 }
