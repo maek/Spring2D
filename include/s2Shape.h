@@ -3,7 +3,7 @@
 
 #include "s2Settings.h"
 #include "s2Body.h"
-#include "s2AABB.h"
+#include "s2AABR.h"
 
 
 namespace Spring2D
@@ -35,13 +35,13 @@ namespace Spring2D
       }
 
 
-      // Return a pointer to the AABB
-      const AABB* getAABB () const
+      // Return a pointer to the AABR
+      const AABR* getAABR () const
       {
-        return &aabb_;
+        return &aabr_;
       }
 
-      virtual void updateAABB () = 0;
+      virtual void updateAABR () = 0;
 
 
       // Return the area of the shape
@@ -117,7 +117,7 @@ namespace Spring2D
       Body*   body_;
 
 
-      AABB    aabb_;
+      AABR    aabr_;
 
 
       Real    area_;

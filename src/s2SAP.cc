@@ -7,11 +7,11 @@ namespace Spring2D
   // Test for coarse collisions using the Sweep And Prune method
   void SAP::findCollisions (const BodyList& bodyList, ContactList* contactList)
   {
-    // Update all AABB
+    // Update all AABR
     for (BodyList::const_iterator bodyI = bodyList.begin();
         bodyI != bodyList.end(); ++bodyI)
     {
-      (*bodyI)->getShape()->updateAABB();
+      (*bodyI)->getShape()->updateAABR();
     }
 
 
@@ -19,7 +19,7 @@ namespace Spring2D
     // TODO: better test
     if (xAxis_.size() != bodyList.size())
     {
-      const AABB*   aabb;
+      const AABR*   aabr;
       Element*      element;
 
       // Clear the x axis list
@@ -38,9 +38,9 @@ namespace Spring2D
       for (BodyList::const_iterator bodyI = bodyList.begin();
           bodyI != bodyList.end(); ++bodyI)
       {
-        aabb = (*bodyI)->getShape()->getAABB();
+        aabr = (*bodyI)->getShape()->getAABR();
         element = new Element(*bodyI,
-            &aabb->min.x, &aabb->max.x, &aabb->min.y, &aabb->max.y);
+            &aabr->min.x, &aabr->max.x, &aabr->min.y, &aabr->max.y);
 
         xAxis_.push_back(element);
         yAxis_.push_back(element);

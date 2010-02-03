@@ -4,7 +4,7 @@
 // Include all header files of the library (for the applications)
 // TOOD: remove the implementation interfaces
 #include "s2Settings.h"
-#include "s2AABB.h"
+#include "s2AABR.h"
 #include "s2Body.h"
 #include "s2BroadPhaseDetector.h"
 #include "s2CircleShape.h"

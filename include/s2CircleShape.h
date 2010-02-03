@@ -54,12 +54,12 @@ namespace Spring2D
       }
 
 
-      // Update the associated AABB
-      void updateAABB ()
+      // Update the associated AABR
+      void updateAABR ()
       {
         Vector2 extent(radius_, radius_);
-        aabb_.min = body_->getPosition() - extent;
-        aabb_.max = body_->getPosition() + extent;
+        aabr_.min = body_->getPosition() - extent;
+        aabr_.max = body_->getPosition() + extent;
       }
 
 

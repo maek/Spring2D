@@ -70,7 +70,7 @@ namespace Spring2D
 
 
   // Class declarations (to decrease dependencies)
-  class AABB;
+  class AABR;
   class Body;
   class BroadPhaseDetector;
   class CircleShape;

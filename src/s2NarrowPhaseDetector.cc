@@ -145,15 +145,16 @@ namespace Spring2D
       CircleShape* CIRCLE1, CircleShape* CIRCLE2, Contact* contact)
   {
     Vector2 center1 = CIRCLE1->getBody()->getPosition();
-    Real radius1    = CIRCLE1->getRadius();
     Vector2 center2 = CIRCLE2->getBody()->getPosition();
-    Real radius2    = CIRCLE2->getRadius();
 
     // Early out if the two circle is concentric (NO normal possible)
     if (center1 == center2)
     {
       return false;
     }
+
+    Real radius1 = CIRCLE1->getRadius();
+    Real radius2 = CIRCLE2->getRadius();
 
     Vector2 midLine = center2 - center1;
     Real squaredDistance = midLine.getSquaredMagnitude();
@@ -185,46 +186,106 @@ namespace Spring2D
     Vector2 centerR   = RECT->getBody()->getPosition();
     Vector2 extent    = RECT->getExtent();
 
-    // TODO: OPTIMIZATION -> early out (separation axis -> p. 285) needed ???
-
     // Transform the point in the local coordinates of the rect
-    // TODO: OPTIMIZATION -> using projection axis (p. 133)
-    Vector2 pointRect = RECT->getBody()->transformLocal(centerC);
+    Vector2 centerCinR  = RECT->getBody()->transformLocal(centerC);
+    Vector2 pointRect   = RECT->getBody()->transformLocal(centerC);
 
-    // Clamp it to the not oriented rect
+    // Clamp it to the rect
     if (pointRect.x < -extent.x)
     {
       pointRect.x = -extent.x;
     }
+    else if (pointRect.x > extent.x)
+    {
+      pointRect.x = extent.x;
+    }
+
     if (pointRect.y < -extent.y)
     {
       pointRect.y = -extent.y;
     }
-
-    if (pointRect.x > extent.x)
-    {
-      pointRect.x = extent.x;
-    }
-    if (pointRect.y > extent.y)
+    else if (pointRect.y > extent.y)
     {
       pointRect.y = extent.y;
     }
 
 
-    // Re-transform the point in the world coordinates
-    // TODO: OPTIMIZATION -> in one step with Matrix2x3
-    // TODO: OPTIMIZATION -> keep a circleCenter transfomed and do the check
-    //                       with it before the re-transform
-    RECT->getBody()->transformWorld(&pointRect);
-
-
     // Test for collision
-    // TODO: check for correctness (squaredDistance == 0)
-    Real squaredDistance = (pointRect - centerC).getSquaredMagnitude();
+    Real squaredDistance = (pointRect - centerCinR).getSquaredMagnitude();
+    // The circle center is inside the rectangle
+    if (squaredDistance == 0)
+    {
+      // Clamp it to the rect bounds
+      if (pointRect.x < 0)
+      {
+        if (pointRect.y < 0)
+        {
+          if (extent.x + pointRect.x < extent.y + pointRect.y)
+          {
+            pointRect.x = -extent.x;
+          }
+          else
+          {
+            pointRect.y = -extent.y;
+          }
+        }
+        else
+        {
+          if (extent.x + pointRect.x < extent.y - pointRect.y)
+          {
+            pointRect.x = -extent.x;
+          }
+          else
+          {
+            pointRect.y = extent.y;
+          }
+        }
+      }
+      else
+      {
+        if (pointRect.y < 0)
+        {
+          if (extent.x - pointRect.x < extent.y + pointRect.y)
+          {
+            pointRect.x = extent.x;
+          }
+          else
+          {
+            pointRect.y = -extent.y;
+          }
+        }
+        else
+        {
+          if (extent.x - pointRect.x < extent.y - pointRect.y)
+          {
+            pointRect.x = extent.x;
+          }
+          else
+          {
+            pointRect.y = extent.y;
+          }
+        }
+      }
+
+      // Re-transform the point in the world coordinates
+      RECT->getBody()->transformWorld(&pointRect);
+
+      contact->penetrationDepth = radius + (pointRect - centerC).getMagnitude();
+      contact->point[0] = centerC +
+        (centerC - pointRect).getNormalizedCopy() * radius;
+      contact->point[1] = pointRect;
+
+      return true;
+    }
+    // The circle center is outside the rectangle but they collide
     if (squaredDistance < (radius * radius))
     {
+      // Re-transform the point in the world coordinates
+      RECT->getBody()->transformWorld(&pointRect);
+
       contact->penetrationDepth = radius - s2sqrt(squaredDistance);
-      contact->point[0] = centerC + (pointRect - centerC).getNormalizedCopy() * radius;
+      contact->point[0] = centerC +
+        (pointRect - centerC).getNormalizedCopy() * radius;
       contact->point[1] = pointRect;
 
       return true;
@@ -293,7 +354,7 @@ namespace Spring2D
     Vector2 sA;
     Vector2 sB;
 
-    // Get a start point from the Minkowsky difference
+    // Get a start point from the Minkowski difference
     Vector2 v = SHAPE1->getSupportPoint0() - SHAPE2->getSupportPoint0();
 
     while (v.isNotZero())
@@ -340,6 +401,7 @@ namespace Spring2D
       Contact* contact) const
   {
     Vector2 v;
+    Vector2 vN;
     Vector2 w;
     Vector2 sA;
     Vector2 sB;
@@ -378,25 +440,22 @@ namespace Spring2D
       edge = Q.top();
       Q.pop();
 
-      v = edge->v;
-      sA = SHAPE1->getSupportPoint(v.getNormalizedCopy());
-      sB = SHAPE2->getSupportPoint(-v.getNormalizedCopy());
+      v  = edge->v;
+      vN = v.getNormalizedCopy();
+      sA = SHAPE1->getSupportPoint(vN);
+      sB = SHAPE2->getSupportPoint(-vN);
       w = sA - sB;
 
-      if (dot(v.getNormalizedCopy(), w) > mu)
+      //TODO: check for correctness
+      if (mu < dot(v, w) * dot(v, w) / edge->key)
       {
-        // TODO: return an approssimate penetration depth
-        error = false;
         break;
       }
 
-
-      //mu = std::min(mu, dot(v, w) * dot(v, w) / v.getSquaredMagnitude());
-      mu = std::min(mu, dot(v.getNormalizedCopy(), w));
+      mu = std::min(mu, dot(v, w) * dot(v, w) / edge->key);
 
       // Close enough
-      //if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * v.getSquaredMagnitude())
-      if (mu <= (1 + EPSILON_REL) * v.getMagnitude())
+      if (mu <= (1 + EPSILON_REL) * (1 + EPSILON_REL) * edge->key)
       {
         error = false;
         break;
@@ -410,13 +469,14 @@ namespace Spring2D
             edge->supportPointsA[0], edge->supportPointsB[0],
             w,
             sA, sB) &&
-          v.getMagnitude() <= edge1->v.getMagnitude() && edge1->v.getMagnitude() <= mu)
-        //v.getSquaredMagnitude() <= edge1->key && edge1->key <= mu)
+          edge->key <= edge1->key && edge1->key <= mu)
       {
         if (
             Q.hasEdge(edge1) ||
-            (edge->endpoints[0] == edge1->endpoints[0] && edge->endpoints[1] == edge1->endpoints[1]) ||
-            (edge->endpoints[0] == edge1->endpoints[1] && edge->endpoints[1] == edge1->endpoints[0])
+            (edge->endpoints[0] == edge1->endpoints[0] &&
+             edge->endpoints[1] == edge1->endpoints[1]) ||
+            (edge->endpoints[0] == edge1->endpoints[1] &&
+             edge->endpoints[1] == edge1->endpoints[0])
            )
         {
           delete edge1;
@@ -427,15 +487,6 @@ namespace Spring2D
       }
       else
       {
-        if (
-            (edge->endpoints[0] == edge1->endpoints[0] && edge->endpoints[1] == edge1->endpoints[1]) ||
-            (edge->endpoints[0] == edge1->endpoints[1] && edge->endpoints[1] == edge1->endpoints[0])
-           )
-        {
-          delete edge1;
-          error = false;
-          break;
-        }
         delete edge1;
       }
 
@@ -445,13 +496,14 @@ namespace Spring2D
             sA, sB,
             edge->endpoints[1],
             edge->supportPointsA[1], edge->supportPointsB[1]) &&
-          //v.getSquaredMagnitude() <= edge2->key && edge2->key <= mu)
-        v.getMagnitude() <= edge2->v.getMagnitude() && edge2->v.getMagnitude() <= mu)
+          edge->key <= edge2->key && edge2->key <= mu)
         {
           if (
               Q.hasEdge(edge2) ||
-              (edge->endpoints[0] == edge2->endpoints[0] && edge->endpoints[1] == edge2->endpoints[1]) ||
-              (edge->endpoints[0] == edge2->endpoints[1] && edge->endpoints[1] == edge2->endpoints[0])
+              (edge->endpoints[0] == edge2->endpoints[0] &&
+               edge->endpoints[1] == edge2->endpoints[1]) ||
+              (edge->endpoints[0] == edge2->endpoints[1] &&
+               edge->endpoints[1] == edge2->endpoints[0])
              )
           {
             delete edge2;
@@ -462,25 +514,22 @@ namespace Spring2D
         }
       else
       {
-        if (
-            (edge->endpoints[0] == edge2->endpoints[0] && edge->endpoints[1] == edge2->endpoints[1]) ||
-            (edge->endpoints[0] == edge2->endpoints[1] && edge->endpoints[1] == edge2->endpoints[0])
-           )
-        {
-          delete edge2;
-          error = false;
-          break;
-        }
         delete edge2;
       }
 
     }
-    //while(Q.size() > 0 && Q.top()->key <= mu);
-    while (Q.size() > 0 && Q.top()->v.getMagnitude() <= mu);
-    //while (Q.size() > 0);
+    while(Q.size() > 0 && Q.top()->key <= mu);
+
+    // Skip collision if EPA fails
+    if (error)
+    {
+      contact->penetrationDepth = 0;
+      delete edge;
+      return;
+    }
 
     // Set the contact data
-    contact->penetrationDepth = v.getMagnitude();
+    contact->penetrationDepth = s2sqrt(edge->key);
     contact->point[0] =
       edge->supportPointsA[0] * (1 - edge->t) +
       edge->supportPointsA[1] * edge->t;
@@ -488,27 +537,7 @@ namespace Spring2D
       edge->supportPointsB[0] * (1 - edge->t) +
       edge->supportPointsB[1] * edge->t;
 
-    // Skip collision if EPA fails
-    if (error)
-    {
-      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
-      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
-      std::cerr << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n";
-      contact->penetrationDepth = 0;
-    }
-
-
-    // Free the memory
-    // TODO: implement in priority queue a method for this
     delete edge;
-    int qsize = Q.size();
-    for (int i = 0; i < qsize; ++i)
-    {
-      edge = Q.top();
-      Q.pop();
-      delete edge;
-    }
-
   }
 
 
@@ -641,13 +670,6 @@ namespace Spring2D
       if (va <= 0 && unum >= 0 && udenom >= 0 && (unum + udenom) > 0)
       {
         // Remove A & return the projection on BC
-        // TODO: OPTIMIZATION -> switch A <> C
-        //vertices[0]       = vertices[1];
-        //supportPointsA[0] = supportPointsA[1];
-        //supportPointsB[0] = supportPointsB[1];
-        //vertices[1]       = vertices[2];
-        //supportPointsA[1] = supportPointsA[2];
-        //supportPointsB[1] = supportPointsB[2];
         vertices[0]       = vertices[2];
         supportPointsA[0] = supportPointsA[2];
         supportPointsB[0] = supportPointsB[2];
@@ -709,8 +731,6 @@ namespace Spring2D
     t = dot(-A, AB) / dot(AB, AB);
     if (t <= 0 || t >= 1)
     {
-      // TODO: does it need ???
-      //t <= 0 ? t = 0 : t = 1;
       valid = false;
     }
     else

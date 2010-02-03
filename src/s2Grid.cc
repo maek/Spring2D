@@ -9,7 +9,7 @@ namespace Spring2D
   {
     BodyList      collisionBodies;
     Shape*        shape;
-    const AABB*   aabb;
+    const AABR*   aabr;
     Vector2       min;
     Vector2       max;
     int           index;
@@ -29,15 +29,15 @@ namespace Spring2D
     {
       collisionBodies.clear();
 
-      // Get the shape & AABB
+      // Get the shape & AABR
       shape = (*bodyI)->getShape();
-      aabb  = shape->getAABB();
+      aabr  = shape->getAABR();
 
-      // Update the AABB
-      shape->updateAABB();
+      // Update the AABR
+      shape->updateAABR();
 
-      min = (aabb->min - origin_) * (1. / cellSize_);
-      max = (aabb->max - origin_) * (1. / cellSize_);
+      min = (aabr->min - origin_) * (1. / cellSize_);
+      max = (aabr->max - origin_) * (1. / cellSize_);
 
       for (int x = s2floor(min.x); x <= s2floor(max.x); ++x)
       {
@@ -53,8 +53,8 @@ namespace Spring2D
             for (BodyList::reverse_iterator bodyJ = cellList_[index].rbegin();
                 bodyJ != cellList_[index].rend(); ++bodyJ)
             {
-              // Check the AABB for collisions
-              if (testAABBAABB(aabb, (*bodyJ)->getShape()->getAABB()) == true)
+              // Check the AABR for collisions
+              if (testAABRAABR(aabr, (*bodyJ)->getShape()->getAABR()) == true)
               {
                 // Check already existing contact
                 BodyList::iterator bodyH;

@@ -1,5 +1,5 @@
-#ifndef __AABB_H__
-#define __AABB_H__
+#ifndef __AABR_H__
+#define __AABR_H__
 
 #include "s2Settings.h"
 #include "s2Math.h"
@@ -8,8 +8,8 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // The AABB collision primitive
-  class AABB
+  // The AABR collision primitive
+  class AABR
   {
     public:
 
@@ -21,15 +21,15 @@ namespace Spring2D
 
 
   // ---------------------------------------------------------------------------
-  // Check two AABBs for collision
-  inline bool testAABBAABB (const AABB* aabb1, const AABB* aabb2)
+  // Check two AABRs for collision
+  inline bool testAABRAABR (const AABR* aabr1, const AABR* aabr2)
   {
     // Test X before Y because it can be more discriminatory
-    if (aabb1->max.x < aabb2->min.x || aabb1->min.x > aabb2->max.x)
+    if (aabr1->max.x < aabr2->min.x || aabr1->min.x > aabr2->max.x)
     {
       return false;
     }
-    if (aabb1->max.y < aabb2->min.y || aabb1->min.y > aabb2->max.y)
+    if (aabr1->max.y < aabr2->min.y || aabr1->min.y > aabr2->max.y)
     {
       return false;
     }
@@ -41,4 +41,4 @@ namespace Spring2D
 }
 
 
-#endif // __AABB_H__
+#endif // __AABR_H__

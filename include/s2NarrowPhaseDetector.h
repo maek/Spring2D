@@ -44,7 +44,6 @@ namespace Spring2D
 
   // ---------------------------------------------------------------------------
   // A n-dimensional simplex (n = [0-2])
-  // TODO: use pointer
   class Simplex
   {
     public:
@@ -180,6 +179,17 @@ namespace Spring2D
   {
     public:
 
+      // Destructor
+      ~EdgeQueue ()
+      {
+        for (std::list<Edge*>::iterator edgeI = edgeList_.begin();
+            edgeI != edgeList_.end(); ++edgeI)
+        {
+          delete *edgeI;
+        }
+      }
+
+
       // Return the number of elements in the queue
       int size () const
       {
@@ -235,6 +245,16 @@ namespace Spring2D
         }
 
         return false;
+      }
+
+      // TODO: DEBUG
+      void print ()
+      {
+        for (std::list<Edge*>::reverse_iterator edgeI = edgeList_.rbegin();
+            edgeI != edgeList_.rend(); ++edgeI)
+        {
+std::cerr << "E " << (*edgeI)->endpoints[0] << " - " << (*edgeI)->endpoints[1] << "\n";
+        }
       }
 
 

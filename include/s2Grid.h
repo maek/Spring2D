@@ -5,7 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2Shape.h"
-#include "s2AABB.h"
+#include "s2AABR.h"
 #include "s2BroadPhaseDetector.h"
 
 
@@ -39,17 +39,11 @@ namespace Spring2D
       void findCollisions (const BodyList&, ContactList*);
 
 
-      // TODO: TESTING
-      BodyList* getCells () const
-      {
-        return cellList_;
-      }
-
-
       // TODO: fix
     private:
     public:
 
+      // TODO: const body vector
       BodyList*   cellList_;
 
 

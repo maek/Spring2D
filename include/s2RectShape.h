@@ -54,7 +54,7 @@ namespace Spring2D
       }
 
 
-      void updateAABB ();
+      void updateAABR ();
 
 
       // Calculate the moment of inertia

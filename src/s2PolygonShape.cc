@@ -4,8 +4,8 @@
 namespace Spring2D
 {
   // ---------------------------------------------------------------------------
-  // Update the associated AABB
-  void PolygonShape::updateAABB ()
+  // Update the associated AABR
+  void PolygonShape::updateAABR ()
   {
     Vector2 min;
     Vector2 max;
@@ -44,8 +44,8 @@ namespace Spring2D
       }
     }
 
-    aabb_.min = body_->getPosition() + min;
-    aabb_.max = body_->getPosition() + max;
+    aabr_.min = body_->getPosition() + min;
+    aabr_.max = body_->getPosition() + max;
 
   }
 

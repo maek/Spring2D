@@ -100,7 +100,7 @@ namespace Spring2D
       }
 
 
-      void updateAABB ();
+      void updateAABR ();
 
 
       void updateInverseMomentOfInertia ();

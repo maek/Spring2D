@@ -5,7 +5,7 @@
 #include "s2Math.h"
 #include "s2Body.h"
 #include "s2Shape.h"
-#include "s2AABB.h"
+#include "s2AABR.h"
 #include "s2BroadPhaseDetector.h"
 
 
