@@ -8,7 +8,7 @@ namespace Spring2D
   // (EULER)
   void Body::integrate ()
   {
-    if (static_)
+    if (static_ || sleeping_)
       return;
 
     // Calculate the velocity from acceleration
@@ -29,6 +29,17 @@ namespace Spring2D
     rotation_ = iDrag_ * rotation_ +
       netTorque_ * shape_->iMomentOfInertia_ * timestep_;
 
+
+    // Calculate the current motion
+    Real currentMotion = velocity_.getMagnitude() + s2fabs(rotation_);
+
+    motion_ = MOTION_BIAS * motion_ + (1 - MOTION_BIAS) * currentMotion;
+
+    // Let the body sleep if its level of motion is under a certain threshold
+    if (motion_ <= MOTION_THRESHOLD)
+    {
+      sleeping_ = true;
+    }
 
     // Normalize the orientation
     // TODO: only 1 time every second

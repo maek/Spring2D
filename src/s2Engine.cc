@@ -18,7 +18,8 @@ namespace Spring2D
     collisionDetector_.checkConstraints(environment_->getConstraints());
 
     // Solve violated constraints
-    collisionSolver_.solveConstraints(collisionDetector_.getConstraintsContacts());
+    collisionSolver_.solveCollisions(
+        collisionDetector_.getConstraintsContacts(), true);
 
     // Find collisions
     collisionDetector_.findCollisions(environment_->getBodyList());

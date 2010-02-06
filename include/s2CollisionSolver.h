@@ -15,9 +15,7 @@ namespace Spring2D
   {
     public:
 
-      void solveCollisions (ContactList*);
-
-      void solveConstraints (ContactList*);
+      void solveCollisions (ContactList*, bool constraint = false);
 
 
     private:
@@ -32,12 +30,6 @@ namespace Spring2D
       void solveVelocity (Contact*);
 
   };
-
-
-
-  bool interpenetrationCompare (Contact*, Contact*);
-
-  bool velocityCompare (Contact*, Contact*);
 
 
 }

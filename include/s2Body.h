@@ -27,11 +27,17 @@ namespace Spring2D
         : timestep_(TIMESTEP), static_(STATIC),
         position_(POSITION), velocity_(VELOCITY), acceleration_(ACCELERATION),
         orientation_(ORIENTATION), rotation_(ROTATION),
-        iDrag_(1), elasticity_(1), friction_(0)
+        iDrag_(1), elasticity_(1), friction_(0),
+        sleeping_(false), motion_(2 * MOTION_THRESHOLD)
       {
         shape_ = SHAPE;
         shape_->body_ = this;
         shape_->updateAABR();
+
+        if (STATIC)
+        {
+          sleeping_ = true;
+        }
       }
 
       // Destructor
@@ -243,6 +249,20 @@ namespace Spring2D
       }
 
 
+      // Is the body sleeping ?
+      bool isSleeping () const
+      {
+        return sleeping_;
+      }
+
+      // Awake the body
+      void awake ()
+      {
+        sleeping_ = false;
+        motion_ = 2 * MOTION_THRESHOLD;
+      }
+
+
       // Transform the point in local coordinates
       void transformLocal (Vector2* point) const
       {
@@ -323,6 +343,11 @@ namespace Spring2D
       Real        elasticity_;
 
       Real        friction_;
+
+
+      bool        sleeping_;
+
+      Real        motion_;
 
 
       Vector2     netForce_;

@@ -68,7 +68,6 @@ namespace Spring2D
       CollisionDetector   collisionDetector_;
 
       CollisionSolver     collisionSolver_;
-
   };
 
 

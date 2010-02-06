@@ -65,8 +65,9 @@ namespace Spring2D
   #define s2sqr(x)              (x) * (x)
 
 
-  // Physics constants
-  const Real G = 9.80665;
+  const Real MOTION_THRESHOLD = 5.;
+  const Real MOTION_BIAS      = 0.9;
+
 
 
   // Class declarations (to decrease dependencies)
